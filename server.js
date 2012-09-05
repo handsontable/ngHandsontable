@@ -2,7 +2,7 @@ var express = require('express')
   , app = express.createServer()
   , io = require('socket.io').listen(app);
 
-app.configure(function() {
+app.configure(function () {
   app.use(express.static(__dirname + '/public'));
 });
 
@@ -23,9 +23,15 @@ io.sockets.on('connection', function (socket) {
    });*/
 
   setInterval(function () {
-    socket.emit('articleUpdate', [{ "replace": "/meta/lastUpdate", "value": (new Date()).toString() }]);
+    socket.emit('articleUpdate', [
+      { "replace":"/meta/lastUpdate", "value":(new Date()).toString() }
+    ]);
   }, 1000);
 
   socket.emit('article', article);
+
+  socket.on('items', function (data) {
+    socket.broadcast.emit('items', data);
+  });
 });
 

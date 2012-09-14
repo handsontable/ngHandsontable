@@ -70,7 +70,7 @@ angular.module('StarcounterLib', [])
           $(container).handsontable(options);
 
           scope.$watch('dataChange', function (value) {
-            console.log($(element).attr('id'), "triggered dataChange", value);
+            //console.log($(element).attr('id'), "triggered dataChange", value);
             $(container).handsontable("loadData", scope[attrs.ngModel]);
             scope.$emit('broadcastItems');
           });

@@ -5,12 +5,16 @@ angular.module('StarcounterLib', [])
       require:'?ngModel',
       compile:function compile(tElement, tAttrs, transclude) {
 
+        var container = $('<div class="dataTable"></div>');
+
         return function postLink(scope, element, attrs, controller) {
           //console.log('postLink', transclude, element);
 
-          $(element).handsontable({
+          $(element).append(container);
+
+          $(container).handsontable({
             rows:6,
-            cols:8,
+            cols:3,
             outsideClickDeselects:false,
             onChange:function (changes, source) {
               //console.log("onChange", scope[attrs.ngModel], source);
@@ -25,7 +29,7 @@ angular.module('StarcounterLib', [])
                   }
                   model[changes[i][0]][changes[i][1]] = changes[i][3];
                 }
-                //scope[attrs.ngModel] = $(element).handsontable("getData");
+                //scope[attrs.ngModel] = $(container).handsontable("getData");
                 scope.dataChange = !scope.dataChange;
               });
             },
@@ -43,19 +47,19 @@ angular.module('StarcounterLib', [])
 
           scope.$watch('dataChange', function (value) {
             console.log($(element).attr('id'), "triggered dataChange", value);
-            $(element).handsontable("loadData", scope[attrs.ngModel]);
+            $(container).handsontable("loadData", scope[attrs.ngModel]);
             scope.$emit('broadcastItems');
           });
 
           scope.$watch('selectionChange', function (value) {
             //console.log($(element).attr('id'), "triggered selectionChange", value);
             if (value) {
-              $(element).handsontable("selectCell", value[0], value[1], value[2], value[3]);
+              $(container).handsontable("selectCell", value[0], value[1], value[2], value[3]);
             }
           });
 
           scope.$on('incomingItems', function() {
-            $(element).handsontable("loadData", scope[attrs.ngModel]);
+            $(container).handsontable("loadData", scope[attrs.ngModel]);
           });
         }
       }

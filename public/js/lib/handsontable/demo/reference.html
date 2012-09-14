@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8'>
-  <title>Custom buttons - Handsontable</title>
+  <title>Array as reference - Handsontable</title>
 
   <!--
   Loading handsontable dependencies.
@@ -105,43 +105,26 @@
   <div id="exampleGrid" class="dataTable"></div>
 
   <script>
-    var container = $("#exampleGrid");
-
-    container.handsontable({
-      startRows: 15,
-      startCols: 16,
-      rowHeaders: true,
-      colHeaders: true,
-      minSpareCols: 1,
-      minSpareRows: 1,
-      contextMenu: true,
-      RemoveRow: true
-    });
-
     var data = [
-      ["", "Kia", "Nissan", "Toyota", "Honda"],
-      ["2008", 10, 11, 12, 13],
-      ["2009", 20, 11, 14, 13],
-      ["2010", 30, 15, 12, 13]
+      {id: 1, name: "Marcin", address: "Warsaw"},
+      {id: 2, name: "Marcin", address: "Warsaw"},
+      {id: 3, name: "Marcin", address: "Warsaw"}
     ];
 
-    container.handsontable("loadData", data);
-
-    $("button#selectFirst").on('click', function () {
-      setTimeout(function () {
-        //timeout is needed because Handsontable normally deselects
-        //current cell when you click outside the table
-        container.handsontable("selectCell", 0, 0);
-      }, 10);
+    $("#exampleGrid").handsontable({
+      rows: 5,
+      cols: 3,
+      minSpareCols: 0, //always keep at least 1 spare row at the right
+      minSpareRows: 1, //always keep at least 1 spare row at the bottom
+      contextMenu: true,
+      columns: [
+        {data: "name"},
+        {data: "id"},
+        {data: "address"}
+      ]
     });
 
-    $("input#rowHeaders").change(function () {
-      container.handsontable("updateSettings", {rowHeaders: $(this).is(':checked')});
-    });
-
-    $("input#colHeaders").change(function () {
-      container.handsontable("updateSettings", {colHeaders: $(this).is(':checked')});
-    });
+    $("#exampleGrid").handsontable("loadData", data);
   </script>
 
   <h3>About</h3>

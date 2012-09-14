@@ -13,7 +13,7 @@
    - jquery.contextMenu.css - is required only if you need the context menu feature
    - jquery.ui.position.js  - is required only if you need the context menu feature
   -->
-  <script src="lib/jquery.js"></script>
+  <script src="lib/jquery.min.js"></script>
   <script src="jquery.handsontable.js"></script>
   <script src="lib/bootstrap-typeahead.js"></script>
   <script src="lib/jquery.autoresize.js"></script>
@@ -35,7 +35,7 @@
   Google Analytics for GitHub Page. Don't copy this to your project :)
   -->
   <script type="text/javascript">
-    if (window.location.hostname === 'warpech.github.com') {
+    if (window.location.hostname === 'handsontable.com' || window.location.hostname === 'www.handsontable.com' || window.location.hostname === 'warpech.github.com') {
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-33932793-1']);
       _gaq.push(['_trackPageview']);
@@ -50,6 +50,15 @@
       })();
     }
   </script>
+
+  <meta property="og:title" content="Handsontable - jQuery grid editor">
+  <meta property="og:description" content="Excel-like data grid with HTML &amp; JavaScript">
+  <meta property="og:url" content="http://handsontable.com/">
+  <meta property="og:image" content="http://handsontable.com/demo/image/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="409">
+  <meta property="og:image:height" content="164">
+  <link rel="canonical" href="http://handsontable.com/">
 </head>
 
 <body class="examplesListOffset">
@@ -66,6 +75,11 @@
   <iframe id="githubFork" src="http://ghbtns.com/github-btn.html?user=warpech&repo=jquery-handsontable&type=fork&count=true"
           frameborder="0" scrolling="0" width="87" height="20"></iframe>
 </h1>
+
+<div class="notice" id="domainNotice">
+  This page has been moved to
+  <a href="http://handsontable.com/">http://handsontable.com/</a>. Please update your bookmarks.
+</div>
 
 <div class="description">
   <p>
@@ -141,8 +155,8 @@
 
 &lt;script&gt;
   $("#example1grid").handsontable({
-    rows: 5,
-    cols: 5,
+    startRows: 5,
+    startCols: 5,
     minSpareCols: 1, //always keep at least 1 spare row at the right
     minSpareRows: 1, //always keep at least 1 spare row at the bottom
     contextMenu: true
@@ -167,7 +181,7 @@
     <h3>Legend</h3>
 
     <p>The <b>legend</b> feature, which makes the first row have an
-      <span style="color: green; font-weight: bold">green</span> font.</p>
+      <span style="color: green; font-weight: bold">green</span> font and an <strong>icon</strong>.</p>
 
     <p>In the below example, the <strong>column</strong> (A, B, C) and <strong>row</strong> (1, 2, 3) headers are on.
     </p>
@@ -180,8 +194,8 @@
 
 &lt;script&gt;
   $("#example2grid").handsontable({
-    rows: 5,
-    cols: 5,
+    startRows: 5,
+    startCols: 5,
 
     rowHeaders: true,
     colHeaders: true,
@@ -213,7 +227,7 @@
       },
       {
         match: function (row, col, data) {
-          return (col === 0 && data()[row][col]); //if it is first column with data
+          return (row === 0 && data()[row][col]); //if it is first row with data
         },
         icon: {
           src: "http://upload.wikimedia.org/wikipedia/commons/7/75/Information-silk.png",
@@ -265,8 +279,8 @@
 
 &lt;script&gt;
   $("#example3grid").handsontable({
-    rows: 7,
-    cols: 4,
+    startRows: 7,
+    startCols: 4,
     rowHeaders: false, //turn off 1, 2, 3, ...
     colHeaders: ["Car", "Year", "Chassis color", "Bumper color"],
     legend: [
@@ -344,8 +358,8 @@
 
 &lt;script&gt;
   $("#example4grid").handsontable({
-    rows: 40,
-    cols: 40,
+    startRows: 40,
+    startCols: 40,
     rowHeaders: true,
     colHeaders: true,
     minSpareCols: 1, //always keep at least 1 spare row at the right
@@ -383,8 +397,8 @@
 
 &lt;script&gt;
   $("#example5grid").handsontable({
-    rows: 8,
-    cols: 8,
+    startRows: 8,
+    startCols: 8,
     rowHeaders: true,
     colHeaders: true,
     minSpareCols: 1,
@@ -427,8 +441,8 @@
 
 &lt;script&gt;
   $("#example7grid").handsontable({
-    rows: 5,
-    cols: 5,
+    startRows: 5,
+    startCols: 5,
     rowHeaders: true,
     colHeaders: true,
     minSpareCols: 1,
@@ -474,8 +488,8 @@
 
 &lt;script&gt;
   $("#example6grid").handsontable({
-    rows: 8,
-    cols: 8,
+    startRows: 8,
+    startCols: 8,
     rowHeaders: true,
     colHeaders: true,
     minSpareCols: 1,
@@ -557,8 +571,8 @@
   var $parent = $container.parent();
   var autosaveNotification;
   $container.handsontable({
-    rows: 8,
-    cols: 8,
+    startRows: 8,
+    startCols: 8,
     rowHeaders: true,
     colHeaders: true,
     minSpareCols: 1,

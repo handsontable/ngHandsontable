@@ -32,7 +32,7 @@
   Google Analytics for GitHub Page. Don't copy this to your project :)
   -->
   <script type="text/javascript">
-    if (window.location.hostname === 'warpech.github.com') {
+    if (window.location.hostname === 'handsontable.com' || window.location.hostname === 'www.handsontable.com' || window.location.hostname === 'warpech.github.com') {
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-33932793-1']);
       _gaq.push(['_trackPageview']);
@@ -47,6 +47,15 @@
       })();
     }
   </script>
+
+  <meta property="og:title" content="PHP example - Handsontable">
+  <meta property="og:description" content="This page loads and saves data on server. In this example, client side uses $.ajax. Server side uses PHP with PDO (SQLite)">
+  <meta property="og:url" content="http://handsontable.com/demo/php.html">
+  <meta property="og:image" content="http://handsontable.com/demo/image/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="409">
+  <meta property="og:image:height" content="164">
+  <link rel="canonical" href="http://handsontable.com/demo/php.html">
 </head>
 
 <body>
@@ -82,8 +91,8 @@
     var $parent = $container.parent();
     var autosaveNotification;
     $container.handsontable({
-      rows: 8,
-      cols: 3,
+      startRows: 8,
+      startCols: 3,
       rowHeaders: true,
       colHeaders: ['Manufacturer', 'Year', 'Price'],
       minSpareCols: 0,

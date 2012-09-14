@@ -6,8 +6,8 @@ $(function () {
      */
 
     $("#example1grid").handsontable({
-      rows: 5,
-      cols: 5,
+      startRows: 5,
+      startCols: 5,
       minSpareCols: 1, //always keep at least 1 spare row at the right
       minSpareRows: 1, //always keep at least 1 spare row at the bottom
       contextMenu: true
@@ -27,8 +27,8 @@ $(function () {
      * Example 2
      */
     $("#example2grid").handsontable({
-      rows: 5,
-      cols: 5,
+      startRows: 5,
+      startCols: 5,
 
       rowHeaders: true,
       colHeaders: true,
@@ -60,23 +60,12 @@ $(function () {
         },
         {
           match: function (row, col, data) {
-            return (col === 0 && data()[row][col]); //if it is first column
+            return (row === 0 && data()[row][col]); //if it is first row with data
           },
           icon: {
             src: "http://upload.wikimedia.org/wikipedia/commons/7/75/Information-silk.png",
             click: function (row, col, data, icon) {
               alert("The icon in row " + row + " and column " + col + " was clicked.");
-            }
-          }
-        },
-        {
-          match: function (row, col, data) {
-            return (col === 1 && data()[row][col]); //if it is first column
-          },
-          icon: {
-            src: "http://upload.wikimedia.org/wikipedia/commons/7/75/Information-silk.png",
-            click: function (row, col, data, icon) {
-              alert("The aicon in row " + row + " and column " + col + " was clicked." + icon);
             }
           }
         }
@@ -97,8 +86,8 @@ $(function () {
      * Example 3
      */
     $("#example3grid").handsontable({
-      rows: 7,
-      cols: 4,
+      startRows: 7,
+      startCols: 4,
       rowHeaders: false, //turn off 1, 2, 3, ...
       colHeaders: ["Car", "Year", "Chassis color", "Bumper color"],
       legend: [
@@ -161,8 +150,8 @@ $(function () {
      * Example 4
      */
     $("#example4grid").handsontable({
-      rows: 40,
-      cols: 40,
+      startRows: 40,
+      startCols: 40,
       rowHeaders: true,
       colHeaders: true,
       minSpareCols: 1, //always keep at least 1 spare row at the right
@@ -183,8 +172,8 @@ $(function () {
      * Example 5
      */
     $("#example5grid").handsontable({
-      rows: 8,
-      cols: 8,
+      startRows: 8,
+      startCols: 8,
       rowHeaders: true,
       colHeaders: true,
       minSpareCols: 1,
@@ -208,8 +197,8 @@ $(function () {
      * Example 6
      */
     $("#example6grid").handsontable({
-      rows: 8,
-      cols: 8,
+      startRows: 8,
+      startCols: 8,
       rowHeaders: true,
       colHeaders: true,
       minSpareCols: 1,
@@ -253,8 +242,8 @@ $(function () {
      * Example 7
      */
     $("#example7grid").handsontable({
-      rows: 5,
-      cols: 5,
+      startRows: 5,
+      startCols: 5,
       rowHeaders: true,
       colHeaders: true,
       minSpareCols: 1,
@@ -280,8 +269,8 @@ $(function () {
     var $parent = $container.parent();
     var autosaveNotification;
     $container.handsontable({
-      rows: 8,
-      cols: 8,
+      startRows: 8,
+      startCols: 8,
       rowHeaders: true,
       colHeaders: true,
       minSpareCols: 1,
@@ -366,4 +355,8 @@ $(function () {
     $this.find('a[href~=#' + $this.attr('id').replace('container', '') + ']').addClass('active');
   });
   examplesList.remove();
+
+  if (window.location.hostname === 'warpech.github.com') {
+    $('#domainNotice').show();
+  }
 });

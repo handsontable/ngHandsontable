@@ -12,7 +12,18 @@ angular.module('StarcounterLib', [])
 
           $(element).append(container);
 
-          $(container).handsontable({
+          var columns = [];
+          var colToProp = [];
+          var propToCol = {};
+          var i = 0;
+          $(element).find('datacolumn').each(function () {
+            var name = $(this).attr('name');
+            columns.push({data:name});
+            colToProp[i] = name;
+            propToCol[name] = i;
+          });
+
+          var options = {
             rows:6,
             cols:3,
             outsideClickDeselects:false,
@@ -33,7 +44,7 @@ angular.module('StarcounterLib', [])
                 scope.dataChange = !scope.dataChange;
               });
             },
-            onSelection:function (r, c, r2, c2) {
+            onSelectionByProp:function (r, c, r2, c2) {
               //console.log("onSelection", arguments);
               var oldSel = scope.selectionChange;
               var newSel = arguments;
@@ -43,7 +54,13 @@ angular.module('StarcounterLib', [])
                 });
               }
             }
-          });
+          };
+
+          if (columns.length > 0) {
+            options['columns'] = columns;
+          }
+
+          $(container).handsontable(options);
 
           scope.$watch('dataChange', function (value) {
             console.log($(element).attr('id'), "triggered dataChange", value);
@@ -54,11 +71,11 @@ angular.module('StarcounterLib', [])
           scope.$watch('selectionChange', function (value) {
             //console.log($(element).attr('id'), "triggered selectionChange", value);
             if (value) {
-              $(container).handsontable("selectCell", value[0], value[1], value[2], value[3]);
+              $(container).handsontable("selectCellByProp", value[0], value[1], value[2], value[3]);
             }
           });
 
-          scope.$on('incomingItems', function() {
+          scope.$on('incomingItems', function () {
             $(container).handsontable("loadData", scope[attrs.ngModel]);
           });
         }

@@ -945,6 +945,9 @@ var Handsontable = { //class namespace
         if (priv.settings.onSelection) {
           priv.settings.onSelection(priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col);
         }
+        if (priv.settings.onSelectionByProp) {
+          priv.settings.onSelectionByProp(priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col));
+        }
         selection.refreshBorders();
         if (scrollToCell !== false) {
           highlight.scrollViewport(td);
@@ -2722,6 +2725,14 @@ var Handsontable = { //class namespace
       else {
         selection.setRangeEnd(self.getCell(endRow, endCol), scrollToCell);
       }
+    };
+
+    this.selectCellByProp = function (row, prop, endRow, endProp, scrollToCell) {
+      arguments[1] = datamap.propToCol(arguments[1]);
+      if (typeof arguments[3] !== "undefined") {
+        arguments[3] = datamap.propToCol(arguments[3]);
+      }
+      self.selectCell.apply(self, arguments);
     };
 
     /**

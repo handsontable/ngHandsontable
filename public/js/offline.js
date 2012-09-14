@@ -1,14 +1,11 @@
 function MyCtrl($scope) {
-  var socket = io.connect('http://localhost');
-
   $scope.items = [
-    ["", "Kia", "Nissan", "Toyota", "Honda"],
-    ["2008", 10, 11, 12, 13],
-    ["2009", 20, 11, 14, 13],
-    ["2010", 30, 15, 12, 13]
+    {id: 9, name: "Marcin", address: "Schellingstr. 58, Muenchen"},
+    {id: 9, name: "Marcin", address: "Schellingstr. 58, Muenchen"},
+    {id: 9, name: "Marcin", address: "Schellingstr. 58, Muenchen"}
   ];
 
-  $scope.dumpItems = function () {
+  /*$scope.dumpItems = function () {
     console.log("dumpItems", $scope.items);
   }
 
@@ -27,5 +24,5 @@ function MyCtrl($scope) {
     console.log("received items", data);
     $scope.items = data;
     $scope.$emit('incomingItems');
-  });
+  });*/
 }

@@ -24,14 +24,18 @@
 <h2>Instance 1</h2>
 
 <datagrid id="grid1" ng-model="items">
-  <datacolumn name="address"/>
-  <datacolumn name="id"/>
-  <datacolumn name="name"/>
+  <datacolumn name="id" title="ID"/>
+  <datacolumn name="address" title="Address"/>
+  <datacolumn name="name" title="Name"/>
 </datagrid>
 
 <h2>Instance 2</h2>
 
-<datagrid id="grid2" ng-model="items"></datagrid>
+<datagrid id="grid2" ng-model="items">
+  <datacolumn name="id" title="ID"/>
+  <datacolumn name="name" title="Name"/>
+  <datacolumn name="address" title="Address"/>
+</datagrid>
 
 <button ng-click="dumpItems()">Dump items to console</button>
 

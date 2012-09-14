@@ -13,14 +13,17 @@ angular.module('StarcounterLib', [])
           $(element).append(container);
 
           var columns = [];
+          var colHeaders = [];
           var colToProp = [];
           var propToCol = {};
           var i = 0;
           $(element).find('datacolumn').each(function () {
             var name = $(this).attr('name');
+            var title = $(this).attr('title');
             columns.push({data:name});
             colToProp[i] = name;
             propToCol[name] = i;
+            colHeaders.push(title);
           });
 
           var options = {
@@ -58,6 +61,10 @@ angular.module('StarcounterLib', [])
 
           if (columns.length > 0) {
             options['columns'] = columns;
+          }
+
+          if (colHeaders.length > 0) {
+            options['colHeaders'] = colHeaders;
           }
 
           $(container).handsontable(options);

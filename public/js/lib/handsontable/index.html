@@ -38,6 +38,7 @@
     if (window.location.hostname === 'handsontable.com' || window.location.hostname === 'www.handsontable.com' || window.location.hostname === 'warpech.github.com') {
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-33932793-1']);
+      _gaq.push(['_setDomainName', window.location.hostname]);
       _gaq.push(['_trackPageview']);
 
       (function () {
@@ -157,7 +158,7 @@
   $("#example1grid").handsontable({
     startRows: 5,
     startCols: 5,
-    minSpareCols: 1, //always keep at least 1 spare row at the right
+    minSpareCols: 1, //always keep at least 1 spare col at the right
     minSpareRows: 1, //always keep at least 1 spare row at the bottom
     contextMenu: true
   });
@@ -362,7 +363,7 @@
     startCols: 40,
     rowHeaders: true,
     colHeaders: true,
-    minSpareCols: 1, //always keep at least 1 spare row at the right
+    minSpareCols: 1, //always keep at least 1 spare col at the right
     minSpareRows: 1 //always keep at least 1 spare row at the bottom
   });
 

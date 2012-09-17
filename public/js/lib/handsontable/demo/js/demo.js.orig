@@ -6,9 +6,15 @@ $(function () {
      */
 
     $("#example1grid").handsontable({
+<<<<<<< HEAD
       startRows: 5,
       startCols: 5,
       minSpareCols: 1, //always keep at least 1 spare row at the right
+=======
+      rows: 5,
+      cols: 5,
+      minSpareCols: 1, //always keep at least 1 spare col at the right
+>>>>>>> master
       minSpareRows: 1, //always keep at least 1 spare row at the bottom
       contextMenu: true
     });

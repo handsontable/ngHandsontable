@@ -945,6 +945,9 @@ var Handsontable = { //class namespace
         if (priv.settings.onSelection) {
           priv.settings.onSelection(priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col);
         }
+        if (priv.settings.onSelectionByProp) {
+          priv.settings.onSelectionByProp(priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col));
+        }
         selection.refreshBorders();
         if (scrollToCell !== false) {
           highlight.scrollViewport(td);
@@ -1972,7 +1975,7 @@ var Handsontable = { //class namespace
       self.table.on('mousewheel', 'td', interaction.onMouseWheel);
       container.append(div);
 
-      if(typeof settings.cols !== 'undefined') {
+      if (typeof settings.cols !== 'undefined') {
         settings.startCols = settings.cols; //backwards compatibility
       }
 
@@ -2360,12 +2363,18 @@ var Handsontable = { //class namespace
 
       grid.keepEmptyRows();
       grid.clear();
+      var changes = [];
       for (var r = 0; r < priv.settings.startRows; r++) {
         for (var c = 0; c < priv.settings.startCols; c++) {
           var p = datamap.colToProp(c);
           grid.render(r, c, data[r][p], allowHtml);
+          changes.push([r, c])
         }
       }
+      setTimeout(function () {
+        self.blockedRows.dimensions(changes);
+        self.blockedCols.dimensions(changes);
+      }, 10);
       priv.isPopulated = true;
       self.clearUndo();
     };
@@ -2489,7 +2498,7 @@ var Handsontable = { //class namespace
         if (settings.colHeaders === false && priv.extensions["ColHeader"]) {
           priv.extensions["ColHeader"].destroy();
         }
-        else {
+        else if(settings.colHeaders !== false) {
           priv.extensions["ColHeader"] = new Handsontable.ColHeader(self, settings.colHeaders);
         }
       }
@@ -2498,7 +2507,7 @@ var Handsontable = { //class namespace
         if (settings.rowHeaders === false && priv.extensions["RowHeader"]) {
           priv.extensions["RowHeader"].destroy();
         }
-        else {
+        else if(settings.rowHeaders !== false) {
           priv.extensions["RowHeader"] = new Handsontable.RowHeader(self, settings.rowHeaders);
         }
       }
@@ -2722,6 +2731,14 @@ var Handsontable = { //class namespace
       else {
         selection.setRangeEnd(self.getCell(endRow, endCol), scrollToCell);
       }
+    };
+
+    this.selectCellByProp = function (row, prop, endRow, endProp, scrollToCell) {
+      arguments[1] = datamap.propToCol(arguments[1]);
+      if (typeof arguments[3] !== "undefined") {
+        arguments[3] = datamap.propToCol(arguments[3]);
+      }
+      self.selectCell.apply(self, arguments);
     };
 
     /**

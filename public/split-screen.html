@@ -25,19 +25,19 @@
 
 <h2>Instance 1</h2>
 
-<datagrid id="grid1" ng-model="items">
+<div ui-datagrid="{rowHeaders: true}" ng-model="items">
   <datacolumn name="id" title="ID"/>
   <datacolumn name="address" title="Address"/>
   <datacolumn name="name" title="Name"/>
-</datagrid>
+</div>
 
 <h2>Instance 2</h2>
 
-<datagrid id="grid2" ng-model="items">
+<div ui-datagrid ng-model="items">
   <datacolumn name="id" title="ID"/>
   <datacolumn name="name" title="Name"/>
   <datacolumn name="address" title="Address"/>
-</datagrid>
+</div>
 
 </body>
 </html>

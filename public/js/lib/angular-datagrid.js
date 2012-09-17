@@ -1,8 +1,8 @@
 angular.module('StarcounterLib', [])
-  .directive('datagrid', function () {
+  .directive('uiDatagrid', function () {
     var directiveDefinitionObject = {
-      restrict:'EA',
-      require:'?ngModel',
+      restrict:'A',
+      require:'ngModel',
       compile:function compile(tElement, tAttrs, transclude) {
 
         var container = $('<div class="dataTable"></div>');

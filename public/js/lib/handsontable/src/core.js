@@ -2249,7 +2249,7 @@ var Handsontable = { //class namespace
      * @param {String} [source='edit'] String that identifies how this change will be described in changes array (useful in onChange callback)
      */
     this.setDataAtCell = function (row, prop, value, allowHtml, source) {
-      var refreshRows = false, refreshCols = false, changes, i, ilen, td;
+      var refreshRows = false, refreshCols = false, changes, i, ilen, td, changesByCol = [];
 
       if (typeof row === "object") { //is stringish
         changes = row;
@@ -2279,6 +2279,7 @@ var Handsontable = { //class namespace
         var col = datamap.propToCol(prop);
         value = changes[i][3];
         allowHtml = changes[i][4] || allowHtml;
+        changesByCol.push([changes[i][0], col, changes[i][2], changes[i][3], changes[i][4]]);
 
         if (priv.settings.minSpareRows) {
           while (row > self.rowCount - 1) {
@@ -2307,16 +2308,9 @@ var Handsontable = { //class namespace
       if (!recreated) {
         selection.refreshBorders();
       }
-      setTimeout(function () {
-        if (!refreshRows) {
-          self.blockedRows.dimensions(changes);
-        }
-        if (!refreshCols) {
-          self.blockedCols.dimensions(changes);
-        }
-      }, 10);
       if (changes.length) {
         self.container.triggerHandler("datachange.handsontable", [changes, source || 'edit']);
+        self.container.triggerHandler("datachangebycol.handsontable", [changesByCol, source || 'edit']);
       }
       return td;
     };

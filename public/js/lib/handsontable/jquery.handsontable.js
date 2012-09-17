@@ -942,12 +942,8 @@ var Handsontable = { //class namespace
         if (!priv.settings.multiSelect) {
           priv.selStart = coords;
         }
-        if (priv.settings.onSelection) {
-          priv.settings.onSelection(priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col);
-        }
-        if (priv.settings.onSelectionByProp) {
-          priv.settings.onSelectionByProp(priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col));
-        }
+        self.container.triggerHandler("selection.handsontable", [priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col]);
+        self.container.triggerHandler("selectionbyprop.handsontable", [priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col)]);
         selection.refreshBorders();
         if (scrollToCell !== false) {
           highlight.scrollViewport(td);
@@ -2231,6 +2227,16 @@ var Handsontable = { //class namespace
           priv.settings.onChange(changes, source);
         }
       });
+      self.container.on("selection.handsontable", function (event, row, col, endRow, endCol) {
+        if (priv.settings.onSelection) {
+          priv.settings.onSelection(row, col, endRow, endCol);
+        }
+      });
+      self.container.on("selectionbyprop.handsontable", function (event, row, prop, endRow, endProp) {
+        if (priv.settings.onSelectionByProp) {
+          priv.settings.onSelectionByProp(row, prop, endRow, endProp);
+        }
+      });
     };
 
     /**
@@ -2498,7 +2504,7 @@ var Handsontable = { //class namespace
         if (settings.colHeaders === false && priv.extensions["ColHeader"]) {
           priv.extensions["ColHeader"].destroy();
         }
-        else if(settings.colHeaders !== false) {
+        else if (settings.colHeaders !== false) {
           priv.extensions["ColHeader"] = new Handsontable.ColHeader(self, settings.colHeaders);
         }
       }
@@ -2507,7 +2513,7 @@ var Handsontable = { //class namespace
         if (settings.rowHeaders === false && priv.extensions["RowHeader"]) {
           priv.extensions["RowHeader"].destroy();
         }
-        else if(settings.rowHeaders !== false) {
+        else if (settings.rowHeaders !== false) {
           priv.extensions["RowHeader"] = new Handsontable.RowHeader(self, settings.rowHeaders);
         }
       }

@@ -47,13 +47,6 @@ angular.module('StarcounterLib', [])
               return;
             }
             scope.$apply(function () {
-              var model = scope[attrs.ngModel];
-              for (var i = 0, ilen = changes.length; i < ilen; i++) {
-                if (typeof model[changes[i][0]] === 'undefined') {
-                  model[changes[i][0]] = [];
-                }
-                model[changes[i][0]][changes[i][1]] = changes[i][3];
-              }
               scope.dataChange = !scope.dataChange;
             });
           });

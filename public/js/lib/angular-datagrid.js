@@ -5,6 +5,12 @@ angular.module('StarcounterLib', [])
       require:'ngModel',
       compile:function compile(tElement, tAttrs, transclude) {
 
+        var defaultOptions = {
+          rows:6,
+          cols:3,
+          outsideClickDeselects:false
+        };
+
         var $container = $('<div class="dataTable"></div>');
 
         return function postLink(scope, element, attrs, controller) {
@@ -12,6 +18,7 @@ angular.module('StarcounterLib', [])
 
           $(element).append($container);
 
+          var options = {};
           var columns = [];
           var colHeaders = [];
           var colToProp = [];
@@ -26,12 +33,6 @@ angular.module('StarcounterLib', [])
             colHeaders.push(title);
           });
 
-          var options = {
-            rows:6,
-            cols:3,
-            outsideClickDeselects:false
-          };
-
           if (columns.length > 0) {
             options['columns'] = columns;
           }
@@ -39,6 +40,8 @@ angular.module('StarcounterLib', [])
           if (colHeaders.length > 0) {
             options['colHeaders'] = colHeaders;
           }
+
+          options = angular.extend({}, defaultOptions, options, scope.$eval(attrs.uiDatagrid));
 
           $container.handsontable(options);
 

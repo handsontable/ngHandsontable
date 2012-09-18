@@ -64,21 +64,15 @@ angular.module('StarcounterLib', [])
             }
           });
 
-          scope.$watch('dataChange', function (value) {
-            //console.log($(element).attr('id'), "triggered dataChange", value);
-            $container.handsontable("loadData", scope[attrs.ngModel]);
+          scope.$watch('items', function (value) {
+            $container.handsontable("loadData", scope[attrs.ngModel]); //todo: after first iteration it is only used to rerender data
             scope.$emit('broadcastItems');
           });
 
           scope.$watch('selectionChange', function (value) {
-            //console.log($(element).attr('id'), "triggered selectionChange", value);
             if (value) {
               $container.handsontable("selectCellByProp", value[0], value[1], value[2], value[3]);
             }
-          });
-
-          scope.$on('incomingItems', function () {
-            $container.handsontable("loadData", scope[attrs.ngModel]);
           });
         }
       }

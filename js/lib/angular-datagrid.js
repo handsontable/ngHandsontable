@@ -64,7 +64,7 @@ angular.module('StarcounterLib', [])
             }
           });
 
-          scope.$watch('items', function (value) {
+          scope.$watch('dataChange', function (value) {
             $container.handsontable("loadData", scope[attrs.ngModel]); //todo: after first iteration it is only used to rerender data
             scope.$emit('broadcastItems');
           });

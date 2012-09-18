@@ -463,7 +463,7 @@ var Handsontable = { //class namespace
             changes.push([r, c, oldData[r] ? oldData[r][c] : null, newData[r][c]]);
           }
         }
-        self.container.triggerHandler("datachange.handsontable", [changes, 'alter']);
+        self.rootElement.triggerHandler("datachange.handsontable", [changes, 'alter']);
       },
 
       /**
@@ -958,8 +958,8 @@ var Handsontable = { //class namespace
         if (!priv.settings.multiSelect) {
           priv.selStart = coords;
         }
-        self.container.triggerHandler("selection.handsontable", [priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col]);
-        self.container.triggerHandler("selectionbyprop.handsontable", [priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col)]);
+        self.rootElement.triggerHandler("selection.handsontable", [priv.selStart.row, priv.selStart.col, priv.selEnd.row, priv.selEnd.col]);
+        self.rootElement.triggerHandler("selectionbyprop.handsontable", [priv.selStart.row, datamap.colToProp(priv.selStart.col), priv.selEnd.row, datamap.colToProp(priv.selEnd.col)]);
         selection.refreshBorders();
         if (scrollToCell !== false) {
           highlight.scrollViewport(td);
@@ -1106,7 +1106,7 @@ var Handsontable = { //class namespace
           autofill.hideHandle();
         }
         selection.end(false);
-        self.container.trigger('deselect.handsontable');
+        self.rootElement.triggerHandler('deselect.handsontable');
       },
 
       /**
@@ -1146,7 +1146,7 @@ var Handsontable = { //class namespace
           }
         }
         if (changes.length) {
-          self.container.triggerHandler("datachange.handsontable", [changes, 'empty']);
+          self.rootElement.triggerHandler("datachange.handsontable", [changes, 'empty']);
           setTimeout(function () {
             self.blockedRows.dimensions(changes);
             self.blockedCols.dimensions(changes);
@@ -2206,7 +2206,7 @@ var Handsontable = { //class namespace
         $('.context-menu-root').on('mouseenter', onMouseEnterTable).on('mouseleave', onMouseLeaveTable);
       }
 
-      self.container.on("beforedatachange.handsontable", function (event, changes) {
+      self.rootElement.on("beforedatachange.handsontable", function (event, changes) {
         if (priv.settings.autoComplete) { //validate strict autocompletes
           var typeahead = priv.editProxy.data('typeahead');
           loop : for (var c = 0, clen = changes.length; c < clen; c++) {
@@ -2239,17 +2239,17 @@ var Handsontable = { //class namespace
           }
         }
       });
-      self.container.on("datachange.handsontable", function (event, changes, source) {
+      self.rootElement.on("datachange.handsontable", function (event, changes, source) {
         if (priv.settings.onChange) {
           priv.settings.onChange(changes, source);
         }
       });
-      self.container.on("selection.handsontable", function (event, row, col, endRow, endCol) {
+      self.rootElement.on("selection.handsontable", function (event, row, col, endRow, endCol) {
         if (priv.settings.onSelection) {
           priv.settings.onSelection(row, col, endRow, endCol);
         }
       });
-      self.container.on("selectionbyprop.handsontable", function (event, row, prop, endRow, endProp) {
+      self.rootElement.on("selectionbyprop.handsontable", function (event, row, prop, endRow, endProp) {
         if (priv.settings.onSelectionByProp) {
           priv.settings.onSelectionByProp(row, prop, endRow, endProp);
         }
@@ -2284,7 +2284,7 @@ var Handsontable = { //class namespace
         changes[i].splice(2, 0, datamap.get(changes[i][0], changes[i][1])); //add old value at index 2
       }
 
-      self.container.triggerHandler("beforedatachange.handsontable", [changes]);
+      self.rootElement.triggerHandler("beforedatachange.handsontable", [changes]);
 
       for (i = 0, ilen = changes.length; i < ilen; i++) {
         if (changes[i][3] === false) {
@@ -2326,8 +2326,8 @@ var Handsontable = { //class namespace
         selection.refreshBorders();
       }
       if (changes.length) {
-        self.container.triggerHandler("datachange.handsontable", [changes, source || 'edit']);
-        self.container.triggerHandler("datachangebycol.handsontable", [changesByCol, source || 'edit']);
+        self.rootElement.triggerHandler("datachange.handsontable", [changes, source || 'edit']);
+        self.rootElement.triggerHandler("datachangebycol.handsontable", [changesByCol, source || 'edit']);
       }
       return td;
     };
@@ -3022,7 +3022,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
     var that = this;
     this.instance = instance;
     this.clear();
-    instance.container.on("datachange.handsontable", function (event, changes, origin) {
+    instance.rootElement.on("datachange.handsontable", function (event, changes, origin) {
       if (origin !== 'undo' && origin !== 'redo') {
         that.add(changes);
       }
@@ -3109,7 +3109,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
     this.instance.container.append(this.main);
     this.hasCSS3 = !($.browser.msie && (parseInt($.browser.version, 10) <= 8)); //Used to get over IE8- not having :last-child selector
     this.update();
-    this.instance.container.on("datachangebycol.handsontable", function (event, changes, source) {
+    this.instance.rootElement.on("datachangebycol.handsontable", function (event, changes, source) {
       setTimeout(function () {
         that.dimensions(changes, source);
       }, 10);
@@ -3313,7 +3313,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
     instance.positionFix(position);
     this.main = $('<div style="position: absolute; top: ' + position.top + 'px; left: ' + position.left + 'px"><table cellspacing="0" cellpadding="0"><thead><tr></tr></thead><tbody></tbody></table></div>');
     this.instance.container.append(this.main);
-    this.instance.container.on("datachangebycol.handsontable", function (event, changes, source) {
+    this.instance.rootElement.on("datachangebycol.handsontable", function (event, changes, source) {
       setTimeout(function () {
         that.dimensions(changes, source);
       }, 10);
@@ -3505,7 +3505,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
         instance.selectCell(this.parentNode.rowIndex - offset, 0, this.parentNode.rowIndex - offset, instance.colCount - 1, false);
       }
     });
-    instance.container.on('deselect.handsontable', function () {
+    instance.rootElement.on('deselect.handsontable', function () {
       that.deselect();
     });
     this.labels = labels;
@@ -3563,7 +3563,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
       var offset = instance.blockedCols ? instance.blockedCols.count() : 0;
       instance.selectCell(0, index - offset, instance.rowCount - 1, index - offset, false);
     });
-    instance.container.on('deselect.handsontable', function () {
+    instance.rootElement.on('deselect.handsontable', function () {
       that.deselect();
     });
     this.instance = instance;

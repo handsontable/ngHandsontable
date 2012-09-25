@@ -1,14 +1,15 @@
 angular.module('StarcounterLib', [])
   .directive('uiDatagrid', function () {
     var directiveDefinitionObject = {
-      restrict:'A',
-      require:'ngModel',
-      compile:function compile(tElement, tAttrs, transclude) {
+      restrict: 'A',
+      require: 'ngModel',
+      compile: function compile(tElement, tAttrs, transclude) {
 
         var defaultOptions = {
-          rows:6,
-          cols:3,
-          outsideClickDeselects:false
+          rows: 6,
+          cols: 3,
+          outsideClickDeselects: false,
+          autoComplete: []
         };
 
         var $container = $('<div class="dataTable"></div>');
@@ -21,16 +22,29 @@ angular.module('StarcounterLib', [])
           var options = {};
           var columns = [];
           var colHeaders = [];
-          var colToProp = [];
-          var propToCol = {};
+
+          options = angular.extend({}, defaultOptions, options, scope.$eval(attrs.uiDatagrid));
+
           var i = 0;
-          $(element).find('datacolumn').each(function () {
+          $(element).find('datacolumn').each(function (index) {
             var name = $(this).attr('name');
             var title = $(this).attr('title');
-            columns.push({data:name});
-            colToProp[i] = name;
-            propToCol[name] = i;
+            var autoCompleteProvider = $(this).attr('options');
+            columns.push({data: name});
             colHeaders.push(title);
+
+            if (autoCompleteProvider) {
+              options['autoComplete'].push({
+                match: function (row, col) {
+                  if (col === index) {
+                    return true;
+                  }
+                },
+                source: function () {
+                  return scope[autoCompleteProvider];
+                }
+              })
+            }
           });
 
           if (columns.length > 0) {
@@ -40,8 +54,6 @@ angular.module('StarcounterLib', [])
           if (colHeaders.length > 0) {
             options['colHeaders'] = colHeaders;
           }
-
-          options = angular.extend({}, defaultOptions, options, scope.$eval(attrs.uiDatagrid));
 
           $container.handsontable(options);
 

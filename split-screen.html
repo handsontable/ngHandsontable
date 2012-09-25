@@ -27,9 +27,9 @@
 
 <div ui-datagrid ng-model="items">
   <datacolumn name="id" title="ID"/>
-  <datacolumn name="address" title="Address"/>
+  <datacolumn name="name.first" title="First Name"/>
   <datacolumn name="name.last" title="Last Name"/>
-  <datacolumn name="isActive" title="Is active" options="activeOptions"/>
+  <datacolumn name="Product.Description" title="Favorite food" options="getOptions(Product.Options)"/></datacolumn>
 </div>
 
 <h2>Instance 2</h2>

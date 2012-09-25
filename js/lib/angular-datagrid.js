@@ -40,8 +40,18 @@ angular.module('StarcounterLib', [])
                     return true;
                   }
                 },
-                source: function () {
-                  return scope[autoCompleteProvider];
+                source: function (row, col) {
+                  var data = $container.data('handsontable').getData();
+                  var item = data[row];
+
+                  var childScope = scope.$new();
+                  for(var i in item) {
+                    if(item.hasOwnProperty(i)) {
+                      childScope[i] = item[i];
+                    }
+                  }
+                  var parsed = childScope.$eval(autoCompleteProvider);
+                  return parsed;
                 }
               })
             }

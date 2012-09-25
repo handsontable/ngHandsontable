@@ -631,9 +631,17 @@ var Handsontable = { //class namespace
           emptyRows++;
         }
 
+        //should I add empty rows to meet startRows?
+        if (self.rowCount < priv.settings.startRows) {
+          for (; self.rowCount < priv.settings.startRows; emptyRows++) {
+            grid.createRow();
+            recreateRows = true;
+          }
+        }
+
         //should I add empty rows to meet minSpareRows?
-        if (self.rowCount < priv.settings.startRows || emptyRows < priv.settings.minSpareRows) {
-          for (; self.rowCount < priv.settings.startRows || emptyRows < priv.settings.minSpareRows; emptyRows++) {
+        if (emptyRows < priv.settings.minSpareRows) {
+          for (;emptyRows < priv.settings.minSpareRows; emptyRows++) {
             datamap.createRow();
             grid.createRow();
             recreateRows = true;
@@ -1538,12 +1546,22 @@ var Handsontable = { //class namespace
               case 9: /* tab */
                 r = priv.settings.tabMoves.row;
                 c = priv.settings.tabMoves.col;
-                if (!isAutoComplete()) {
+                if (priv.isCellEdited) {
+                  if (!isAutoComplete()) {
+                    if (event.shiftKey) {
+                      editproxy.finishEditing(false, -r, -c);
+                    }
+                    else {
+                      editproxy.finishEditing(false, r, c);
+                    }
+                  }
+                }
+                else {
                   if (event.shiftKey) {
-                    editproxy.finishEditing(false, -r, -c);
+                    selection.transformStart(-r, -c);
                   }
                   else {
-                    editproxy.finishEditing(false, r, c);
+                    selection.transformStart(r, c);
                   }
                 }
                 event.preventDefault();
@@ -2276,7 +2294,7 @@ var Handsontable = { //class namespace
         }
 
         if (priv.settings.onBeforeChange) {
-          var result = priv.settings.onBeforeChange(changes);
+          var result = priv.settings.onBeforeChange.apply(self.rootElement[0], [changes]);
           if (result === false) {
             changes.splice(0, changes.length); //invalidate all changes (remove everything from array)
           }
@@ -2284,18 +2302,18 @@ var Handsontable = { //class namespace
       });
       self.rootElement.on("datachange.handsontable", function (event, changes, source) {
         if (priv.settings.onChange) {
-          priv.settings.onChange(changes, source);
+          priv.settings.onChange.apply(self.rootElement[0], [changes, source]);
         }
         self.rootElement.triggerHandler("cellrender.handsontable", [changes, source]);
       });
       self.rootElement.on("selection.handsontable", function (event, row, col, endRow, endCol) {
         if (priv.settings.onSelection) {
-          priv.settings.onSelection(row, col, endRow, endCol);
+          priv.settings.onSelection.apply(self.rootElement[0], [row, col, endRow, endCol]);
         }
       });
       self.rootElement.on("selectionbyprop.handsontable", function (event, row, prop, endRow, endProp) {
         if (priv.settings.onSelectionByProp) {
-          priv.settings.onSelectionByProp(row, prop, endRow, endProp);
+          priv.settings.onSelectionByProp.apply(self.rootElement[0], [row, prop, endRow, endProp]);
         }
       });
     };
@@ -3057,8 +3075,10 @@ var Handsontable = { //class namespace
         }
         else {
           var currentSettings = $.extend(true, {}, settings), instance;
-          if (options) {
-            $.extend(true, currentSettings, options);
+          for (i in options) {
+            if (options.hasOwnProperty(i)) {
+              currentSettings[i] = options[i];
+            }
           }
           instance = new Handsontable.Core($this, currentSettings);
           $this.data("handsontable", instance);

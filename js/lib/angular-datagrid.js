@@ -76,7 +76,7 @@ angular.module('StarcounterLib', [])
             });
           });
 
-          $container.on('selectionbyprop.handsontable', function (event, r, c, r2, c2) {
+          /*$container.on('selectionbyprop.handsontable', function (event, r, c, r2, c2) {
             var oldSel = scope.selectionChange;
             var newSel = [r, c, r2, c2];
             if (typeof oldSel === 'undefined' || oldSel[0] != newSel[0] || oldSel[1] != newSel[1] || oldSel[2] != newSel[2] || oldSel[3] != newSel[3]) {
@@ -84,18 +84,18 @@ angular.module('StarcounterLib', [])
                 scope.selectionChange = newSel;
               });
             }
-          });
+          });*/
 
           scope.$watch('dataChange', function (value) {
             $container.handsontable("loadData", scope[attrs.ngModel]); //todo: after first iteration it is only used to rerender data
             scope.$emit('broadcastItems');
           });
 
-          scope.$watch('selectionChange', function (value) {
+          /*scope.$watch('selectionChange', function (value) {
             if (value) {
               $container.handsontable("selectCellByProp", value[0], value[1], value[2], value[3]);
             }
-          });
+          });*/
         }
       }
     };

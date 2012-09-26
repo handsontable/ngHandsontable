@@ -798,7 +798,10 @@ var Handsontable = { //class namespace
                   }
                 })(legend));
                 $img.on("load", function () {
-                  self.rootElement.triggerHandler('cellrender.handsontable', changes);
+                  var changes = [
+                    [coords.row, datamap.colToProp(coords.col)]
+                  ];
+                  self.rootElement.triggerHandler('cellrender.handsontable', [changes]);
                 });
                 $td.append($img);
               }
@@ -1930,9 +1933,13 @@ var Handsontable = { //class namespace
           });
         }
         priv.editProxyHolder.removeClass('htHidden');
-        priv.editProxyHolder.css({
-          overflow: 'visible'
-        });
+
+        setTimeout(function () {
+          //async fix for Firefox 3.6.28 (needs manual testing)
+          priv.editProxyHolder.css({
+            overflow: 'visible'
+          });
+        }, 1);
       },
 
       /**
@@ -2036,7 +2043,7 @@ var Handsontable = { //class namespace
       self.lastScrollTop = self.lastScrollLeft = null;
       priv.scrollbarSize = measureScrollbar();
 
-      var div = $('<div><table cellspacing="0" cellpadding="0"><thead></thead><tbody></tbody></table></div>');
+      var div = $('<div><table class="htCore" cellspacing="0" cellpadding="0"><thead></thead><tbody></tbody></table></div>');
       priv.tableContainer = div[0];
       self.table = $(priv.tableContainer.firstChild);
       priv.tableBody = self.table.find("tbody")[0];
@@ -3208,7 +3215,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
     this.headers = [];
     var position = instance.table.position();
     instance.positionFix(position);
-    this.main = $('<div style="position: absolute; top: ' + position.top + 'px; left: ' + position.left + 'px"><table cellspacing="0" cellpadding="0"><thead></thead></table></div>');
+    this.main = $('<div style="position: absolute; top: ' + position.top + 'px; left: ' + position.left + 'px"><table class="htBlockedRows" cellspacing="0" cellpadding="0"><thead></thead></table></div>');
     this.instance.container.append(this.main);
     this.hasCSS3 = !($.browser.msie && (parseInt($.browser.version, 10) <= 8)); //Used to get over IE8- not having :last-child selector
     this.update();
@@ -3415,7 +3422,7 @@ Handsontable.helper.isPrintableChar = function (keyCode) {
     this.headers = [];
     var position = instance.table.position();
     instance.positionFix(position);
-    this.main = $('<div style="position: absolute; top: ' + position.top + 'px; left: ' + position.left + 'px"><table cellspacing="0" cellpadding="0"><thead><tr></tr></thead><tbody></tbody></table></div>');
+    this.main = $('<div style="position: absolute; top: ' + position.top + 'px; left: ' + position.left + 'px"><table class="htBlockedCols" cellspacing="0" cellpadding="0"><thead><tr></tr></thead><tbody></tbody></table></div>');
     this.instance.container.append(this.main);
     this.instance.rootElement.on('cellrender.handsontable', function (event, changes, source) {
       setTimeout(function () {

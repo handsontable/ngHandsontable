@@ -35,10 +35,10 @@ angular.module('StarcounterLib', [])
           var i = 0;
           $(element).find('datacolumn').each(function (index) {
             var pattern = new RegExp("^(" + lhs + "\\.)");
-            var name = $(this).attr('name').replace(pattern, '');
+            var value = $(this).attr('value').replace(pattern, '');
             var title = $(this).attr('title');
             var autoCompleteProvider = $(this).attr('options');
-            columns.push({data: name});
+            columns.push({data: value});
             colHeaders.push(title);
 
             if (autoCompleteProvider) {

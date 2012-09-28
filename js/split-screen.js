@@ -1,4 +1,4 @@
-function MyCtrl($scope) {
+function MyCtrl($scope, $filter) {
   $scope.activeOptions = ['Yes', 'No'];
 
   $scope.items = [
@@ -35,4 +35,9 @@ function MyCtrl($scope) {
     }
     return out;
   }
+
+  $scope.$watch('query', function (newVal, oldVal) {
+    $scope.filteredItems = $filter('filter')($scope.items, $scope.query);
+    $scope.dataChange = !$scope.dataChange;
+  });
 }

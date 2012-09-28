@@ -36,7 +36,9 @@
 
 <h2>Instance 2</h2>
 
-<div ui-datagrid="{rowHeaders: true}" datarows="item in items">
+<p>Filter: <input ng-model="query"></p>
+
+<div ui-datagrid="{rowHeaders: true}" datarows="item in filteredItems">
   <datacolumn value="item.id" title="ID"/>
   <datacolumn value="item.isActive" title="Is active" options="item.activeOptions"/>
   <datacolumn value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>

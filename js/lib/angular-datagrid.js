@@ -77,26 +77,13 @@ angular.module('StarcounterLib', [])
             });
           });
 
-          /*$container.on('selectionbyprop.handsontable', function (event, r, c, r2, c2) {
-           var oldSel = scope.selectionChange;
-           var newSel = [r, c, r2, c2];
-           if (typeof oldSel === 'undefined' || oldSel[0] != newSel[0] || oldSel[1] != newSel[1] || oldSel[2] != newSel[2] || oldSel[3] != newSel[3]) {
-           scope.$apply(function () {
-           scope.selectionChange = newSel;
+          $container.on('selectionbyprop.handsontable', function (event, r, p, r2, p2) {
+            scope.$emit('datagridSelection', $container, r, p, r2, p2);
            });
-           }
-           });*/
 
           scope.$watch('dataChange', function (value) {
             $container.handsontable("loadData", scope[rhs]); //todo: after first iteration it is only used to rerender data
-            scope.$emit('broadcastItems');
           });
-
-          /*scope.$watch('selectionChange', function (value) {
-           if (value) {
-           $container.handsontable("selectCellByProp", value[0], value[1], value[2], value[3]);
-           }
-           });*/
         }
       }
     };

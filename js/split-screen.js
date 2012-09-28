@@ -28,7 +28,7 @@ function MyCtrl($scope, $filter) {
 
   $scope.getOptions = function (options) {
     var out = []
-    if(typeof options === 'object' && options.length) {
+    if (typeof options === 'object' && options.length) {
       for (var i = 0, ilen = options.length; i < ilen; i++) {
         out.push(options[i].Description);
       }
@@ -36,8 +36,29 @@ function MyCtrl($scope, $filter) {
     return out;
   }
 
+  /**
+   * Filter
+   */
+
   $scope.$watch('query', function (newVal, oldVal) {
     $scope.filteredItems = $filter('filter')($scope.items, $scope.query);
     $scope.dataChange = !$scope.dataChange;
+  });
+
+  /**
+   * Selection
+   */
+
+  $scope.currentSelection = "None";
+
+  $scope.$on('datagridSelection', function (scope, $container, r, p, r2, p2) {
+    var ht = $container.data('handsontable');
+    var str = "row '" + r + "' col '" + ht.propToCol(p) + "' (prop '" + p + "')";
+    if (r !== r2 && p !== p2) {
+      str = "From " + str + " to row '" + r2 + "' col '" + ht.propToCol(p2) + "' (prop '" + p2 + "')";
+    }
+    $scope.$apply(function () {
+      $scope.currentSelection = str;
+    });
   });
 }

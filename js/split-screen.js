@@ -28,7 +28,7 @@ function MyCtrl($scope, $filter) {
 
   $scope.getOptions = function (options) {
     var out = []
-    if (typeof options === 'object' && options.length) {
+    if (options !== null && typeof options === 'object' && options.length) {
       for (var i = 0, ilen = options.length; i < ilen; i++) {
         out.push(options[i].Description);
       }

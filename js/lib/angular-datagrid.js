@@ -82,7 +82,7 @@ angular.module('StarcounterLib', [])
           });
 
           scope.$watch('dataChange', function (value) {
-            $container.handsontable("render");
+            $container.handsontable("loadData", scope[rhs]);
           });
         }
       }

@@ -32,7 +32,6 @@ angular.module('StarcounterLib', [])
 
           options = angular.extend({}, defaultOptions, options, scope.$eval(attrs.uiDatagrid));
 
-          var i = 0;
           $(element).find('datacolumn').each(function (index) {
             var pattern = new RegExp("^(" + lhs + "\\.)");
             var value = $(this).attr('value').replace(pattern, '');
@@ -66,6 +65,7 @@ angular.module('StarcounterLib', [])
             options['colHeaders'] = colHeaders;
           }
 
+          options['data'] = scope[rhs];
           $container.handsontable(options);
 
           $container.on('datachange.handsontable', function (event, changes, source) {
@@ -79,10 +79,10 @@ angular.module('StarcounterLib', [])
 
           $container.on('selectionbyprop.handsontable', function (event, r, p, r2, p2) {
             scope.$emit('datagridSelection', $container, r, p, r2, p2);
-           });
+          });
 
           scope.$watch('dataChange', function (value) {
-            $container.handsontable("loadData", scope[rhs]); //todo: after first iteration it is only used to rerender data
+            $container.handsontable("render");
           });
         }
       }

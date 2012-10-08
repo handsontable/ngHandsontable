@@ -14,8 +14,10 @@ Template:
   <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.name.last" title="Last Name"/>
   <datacolumn value="item.address" title="Address"/>
-  <datacolumn value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn value="item.isActive" title="Is active" options="activeOptions"/>
+  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food"  
+              options="getOptions(item.Product.Options)"/></datacolumn>
+  <datacolumn type="checkbox" value="item.isActive" title="Is active"  
+              options="{checked: 'Yes', unchecked: 'No'}"/>
 </div>
 ```
 
@@ -56,9 +58,10 @@ Whereas `item.isActive` column has autocomplete options defined directly in the 
  div           | ui-datagrid                 | Defines the grid container
  div           | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
  datacolumn    |                             | Defines a column in the grid
+ datacolumn    | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
  datacolumn    | value                       | Row property that will be used as data source for each cell
  datacolumn    | title                       | Column title
- datacolumn    | options                     | (Optional) Expression that returns array of possible cell values
+ datacolumn    | options                     | (Optional) Expression that returns: <ul><li>configuration of actual values for checkbox type</li><li>array of possible cell values for autocomplete type</li></ul>
 
 ## Further development
 

@@ -1,6 +1,4 @@
 function MyCtrl($scope, $filter) {
-  $scope.activeOptions = ['Yes', 'No'];
-
   $scope.items = [
     {id: 1, name: {first: "Marcin", last: "Warpechowski"}, address: "Schellingstr. 58, Muenchen", isActive: 'Yes', "Product": {
       "Description": "Big Mac",

@@ -32,8 +32,8 @@
   <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.name.last" title="Last Name"/>
   <datacolumn value="item.address" title="Address"/>
-  <datacolumn value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn value="item.isActive" title="Is active" options="activeOptions"/>
+  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
+  <datacolumn type="checkbox" value="item.isActive" title="Is active" options="{checked: 'Yes', unchecked: 'No'}"/>
 </div>
 
 <h2>Instance 2</h2>
@@ -42,8 +42,8 @@
 
 <div ui-datagrid="{rowHeaders: true}" datarows="item in filteredItems">
   <datacolumn value="item.id" title="ID"/>
-  <datacolumn value="item.isActive" title="Is active" options="item.activeOptions"/>
-  <datacolumn value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
+  <datacolumn type="checkbox" value="item.isActive" title="Is active" options="{checked: 'Yes', unchecked: 'No'}"/>
+  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
   <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.name.last" title="Last Name"/>
   <datacolumn value="item.address" title="Address"/>

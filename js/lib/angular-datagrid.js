@@ -4,7 +4,7 @@ angular.module('StarcounterLib', [])
       restrict: 'A',
       compile: function compile(tElement, tAttrs, transclude) {
 
-        var defaultOptions = {
+        var defaultSettings = {
           rows: 6,
           cols: 3,
           outsideClickDeselects: false,
@@ -26,22 +26,25 @@ angular.module('StarcounterLib', [])
 
           $(element).append($container);
 
-          var options = {};
+          var settings = angular.extend({}, defaultSettings, scope.$eval(attrs.uiDatagrid));
           var columns = [];
           var colHeaders = [];
-
-          options = angular.extend({}, defaultOptions, options, scope.$eval(attrs.uiDatagrid));
 
           $(element).find('datacolumn').each(function (index) {
             var pattern = new RegExp("^(" + lhs + "\\.)");
             var value = $(this).attr('value').replace(pattern, '');
             var title = $(this).attr('title');
-            var autoCompleteProvider = $(this).attr('options');
-            columns.push({data: value});
+            var type = $(this).attr('type');
+            var options = $(this).attr('options');
+
+            var column = {
+              data: value
+            };
+
             colHeaders.push(title);
 
-            if (autoCompleteProvider) {
-              options['autoComplete'].push({
+            if (type === 'autocomplete') {
+              settings['autoComplete'].push({
                 match: function (row, col) {
                   if (col === index) {
                     return true;
@@ -50,23 +53,31 @@ angular.module('StarcounterLib', [])
                 source: function (row, col) {
                   var childScope = scope.$new();
                   childScope.item = $container.data('handsontable').getData()[row];
-                  var parsed = childScope.$eval(autoCompleteProvider);
+                  var parsed = childScope.$eval(options);
                   return parsed;
                 }
               })
             }
+            else if (type === 'checkbox') {
+              column.renderer = Handsontable.CheckboxRenderer;
+              column.rendererOptions = scope.$eval(options);
+              column.editor = Handsontable.CheckboxEditor;
+              column.editorOptions = scope.$eval(options);
+            }
+
+            columns.push(column);
           });
 
           if (columns.length > 0) {
-            options['columns'] = columns;
+            settings['columns'] = columns;
           }
 
           if (colHeaders.length > 0) {
-            options['colHeaders'] = colHeaders;
+            settings['colHeaders'] = colHeaders;
           }
 
-          options['data'] = scope[rhs];
-          $container.handsontable(options);
+          settings['data'] = scope[rhs];
+          $container.handsontable(settings);
 
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (source === 'loadData') {

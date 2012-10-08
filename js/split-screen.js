@@ -24,17 +24,17 @@ function MyCtrl($scope, $filter) {
 
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);
-  }
+  };
 
   $scope.getOptions = function (options) {
-    var out = []
+    var out = [];
     if (options !== null && typeof options === 'object' && options.length) {
       for (var i = 0, ilen = options.length; i < ilen; i++) {
         out.push(options[i].Description);
       }
     }
     return out;
-  }
+  };
 
   /**
    * Filter
@@ -44,6 +44,7 @@ function MyCtrl($scope, $filter) {
     $scope.filteredItems = $filter('filter')($scope.items, $scope.query);
     $scope.dataChange = !$scope.dataChange;
   });
+  $scope.filteredItems = $scope.items;
 
   /**
    * Selection

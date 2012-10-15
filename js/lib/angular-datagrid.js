@@ -31,38 +31,56 @@ angular.module('StarcounterLib', [])
           var colHeaders = [];
 
           $(element).find('datacolumn').each(function (index) {
-            var pattern = new RegExp("^(" + lhs + "\\.)");
-            var value = $(this).attr('value').replace(pattern, '');
-            var title = $(this).attr('title');
-            var type = $(this).attr('type');
-            var options = $(this).attr('options');
+            var $this = $(this)
+              , pattern = new RegExp("^(" + lhs + "\\.)")
+              , value = $this.attr('value').replace(pattern, '')
+              , title = $this.attr('title')
+              , type = scope.$eval($this.attr('type'))
+              , options = $this.attr('options')
+              , tmp;
 
-            var column = {
-              data: value
-            };
+            var column = scope.$eval(options) || {};
+            column.data = value;
 
             colHeaders.push(title);
 
-            if (type === 'autocomplete') {
-              settings['autoComplete'].push({
-                match: function (row, col) {
-                  if (col === index) {
-                    return true;
+            switch(type) {
+              case 'autocomplete':
+                settings['autoComplete'].push({
+                  match: function (row, col) {
+                    if (col === index) {
+                      return true;
+                    }
+                  },
+                  source: function (row, col) {
+                    var childScope = scope.$new();
+                    childScope.item = $container.data('handsontable').getData()[row];
+                    var parsed = childScope.$eval(options);
+                    return parsed;
                   }
-                },
-                source: function (row, col) {
-                  var childScope = scope.$new();
-                  childScope.item = $container.data('handsontable').getData()[row];
-                  var parsed = childScope.$eval(options);
-                  return parsed;
+                });
+                break;
+
+              case 'checkbox':
+                column.cellType = Handsontable.CheckboxCell;
+                tmp = $this.attr('checkedTemplate');
+                if(typeof tmp !== 'undefined') {
+                  column.checked = scope.$eval(tmp); //if undefined then defaults to Boolean true
                 }
-              })
+                tmp = $this.attr('uncheckedTemplate');
+                if(typeof tmp !== 'undefined') {
+                  column.unchecked = scope.$eval(tmp); //if undefined then defaults to Boolean true
+                }
+                break;
+
+              default:
+                if(typeof type === 'object') {
+                  column.cellType = type;
+                }
             }
-            else if (type === 'checkbox') {
-              column.renderer = Handsontable.CheckboxRenderer;
-              column.rendererOptions = scope.$eval(options);
-              column.editor = Handsontable.CheckboxEditor;
-              column.editorOptions = scope.$eval(options);
+
+            if($this.attr('readOnly')) {
+              column.readOnly = true;
             }
 
             columns.push(column);

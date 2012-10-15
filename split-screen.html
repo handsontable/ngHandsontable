@@ -29,11 +29,13 @@
 
 <div ui-datagrid datarows="item in items">
   <datacolumn value="item.id" title="ID"/>
-  <datacolumn value="item.name.first" title="First Name"/>
-  <datacolumn value="item.name.last" title="Last Name"/>
+  <datacolumn type="grayedOut" value="item.name.first" title="First Name" readOnly/>
+  <datacolumn type="grayedOut" value="item.name.last" title="Last Name" readOnly/>
   <datacolumn value="item.address" title="Address"/>
-  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn type="checkbox" value="item.isActive" title="Is active" options="{checked: 'Yes', unchecked: 'No'}"/>
+  <datacolumn type="'autocomplete'" value="item.Product.Description" title="Favorite food"
+              options="getOptions(item.Product.Options)"/>
+  </datacolumn>
+  <datacolumn type="'checkbox'" value="item.isActive" title="Is active" checkedTemplate="'Yes'" uncheckedTemplate="'No'"/>
 </div>
 
 <h2>Instance 2</h2>
@@ -42,11 +44,13 @@
 
 <div ui-datagrid="{rowHeaders: true}" datarows="item in filteredItems">
   <datacolumn value="item.id" title="ID"/>
-  <datacolumn type="checkbox" value="item.isActive" title="Is active" options="{checked: 'Yes', unchecked: 'No'}"/>
-  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food" options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.name.last" title="Last Name"/>
+  <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.address" title="Address"/>
+  <datacolumn type="'autocomplete'" value="item.Product.Description" title="Favorite food"
+              options="getOptions(item.Product.Options)"/>
+  </datacolumn>
+  <datacolumn type="'checkbox'" value="item.isActive" title="Is active" checkedTemplate="'Yes'" uncheckedTemplate="'No'"/>
 </div>
 
 </body>

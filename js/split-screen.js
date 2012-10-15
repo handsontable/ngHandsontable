@@ -34,6 +34,13 @@ function MyCtrl($scope, $filter) {
     return out;
   };
 
+  $scope.grayedOut = {
+    renderer: function (instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.TextCell.renderer.apply(this, arguments);
+      td.style.color = '#777';
+    }
+  };
+
   /**
    * Filter
    */

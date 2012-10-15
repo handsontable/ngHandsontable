@@ -262,10 +262,10 @@ Handsontable.Core = function (rootElement, settings) {
         row = $.extend(true, {}, datamap.getSchema());
       }
       if (!coords || coords.row >= self.rowCount) {
-        settings.data.push(row);
+        priv.settings.data.push(row);
       }
       else {
-        settings.data.splice(coords.row, 0, row);
+        priv.settings.data.splice(coords.row, 0, row);
       }
     },
 
@@ -280,15 +280,15 @@ Handsontable.Core = function (rootElement, settings) {
       var r = 0;
       if (!coords || coords.col >= self.colCount) {
         for (; r < self.rowCount; r++) {
-          if (typeof settings.data[r] === 'undefined') {
-            settings.data[r] = [];
+          if (typeof priv.settings.data[r] === 'undefined') {
+            priv.settings.data[r] = [];
           }
-          settings.data[r].push('');
+          priv.settings.data[r].push('');
         }
       }
       else {
         for (; r < self.rowCount; r++) {
-          settings.data[r].splice(coords.col, 0, '');
+          priv.settings.data[r].splice(coords.col, 0, '');
         }
       }
     },
@@ -300,10 +300,10 @@ Handsontable.Core = function (rootElement, settings) {
      */
     removeRow: function (coords, toCoords) {
       if (!coords || coords.row === self.rowCount - 1) {
-        settings.data.pop();
+        priv.settings.data.pop();
       }
       else {
-        settings.data.splice(coords.row, toCoords.row - coords.row + 1);
+        priv.settings.data.splice(coords.row, toCoords.row - coords.row + 1);
       }
     },
 
@@ -319,13 +319,13 @@ Handsontable.Core = function (rootElement, settings) {
       var r = 0;
       if (!coords || coords.col === self.colCount - 1) {
         for (; r < self.rowCount; r++) {
-          settings.data[r].pop();
+          priv.settings.data[r].pop();
         }
       }
       else {
         var howMany = toCoords.col - coords.col + 1;
         for (; r < self.rowCount; r++) {
-          settings.data[r].splice(coords.col, howMany);
+          priv.settings.data[r].splice(coords.col, howMany);
         }
       }
     },
@@ -338,7 +338,7 @@ Handsontable.Core = function (rootElement, settings) {
     get: function (row, prop) {
       if (typeof prop === 'string' && prop.indexOf('.') > -1) {
         var sliced = prop.split(".");
-        var out = settings.data[row];
+        var out = priv.settings.data[row];
         for (var i = 0, ilen = sliced.length; i < ilen; i++) {
           out = out[sliced[i]];
           if (typeof out === 'undefined') {
@@ -348,7 +348,7 @@ Handsontable.Core = function (rootElement, settings) {
         return out;
       }
       else {
-        return settings.data[row] ? settings.data[row][prop] : null;
+        return priv.settings.data[row] ? priv.settings.data[row][prop] : null;
       }
     },
 
@@ -361,14 +361,14 @@ Handsontable.Core = function (rootElement, settings) {
     set: function (row, prop, value) {
       if (typeof prop === 'string' && prop.indexOf('.') > -1) {
         var sliced = prop.split(".");
-        var out = settings.data[row];
+        var out = priv.settings.data[row];
         for (var i = 0, ilen = sliced.length - 1; i < ilen; i++) {
           out = out[sliced[i]];
         }
         out[sliced[i]] = value;
       }
       else {
-        settings.data[row][prop] = value;
+        priv.settings.data[row][prop] = value;
       }
     },
 
@@ -388,7 +388,7 @@ Handsontable.Core = function (rootElement, settings) {
      * @return {Array}
      */
     getAll: function () {
-      return settings.data;
+      return priv.settings.data;
     },
 
     /**
@@ -418,7 +418,7 @@ Handsontable.Core = function (rootElement, settings) {
      * @return {String}
      */
     getText: function (start, end) {
-      var data = datamap.getRange(start, end), text = '', r, rlen, c, clen, stripHtml = /<(?:.|\n)*?>/gm, val;
+      var data = datamap.getRange(start, end), text = '', r, rlen, c, clen, val;
       for (r = 0, rlen = data.length; r < rlen; r++) {
         for (c = 0, clen = data[r].length; c < clen; c++) {
           if (c > 0) {
@@ -427,10 +427,10 @@ Handsontable.Core = function (rootElement, settings) {
           val = data[r][c];
           if (typeof val === 'string') {
             if (val.indexOf('\n') > -1) {
-              text += '"' + val.replace(stripHtml, '').replace(/"/g, '""') + '"';
+              text += '"' + val.replace(/"/g, '""') + '"';
             }
             else {
-              text += val.replace(stripHtml, '');
+              text += val;
             }
           }
           else if (val == null || typeof val === 'undefined') {
@@ -442,7 +442,6 @@ Handsontable.Core = function (rootElement, settings) {
         }
         text += "\n";
       }
-      text = text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, "&"); //unescape html special chars
       return text;
     }
   };
@@ -639,7 +638,7 @@ Handsontable.Core = function (rootElement, settings) {
 
       //count currently empty rows
       rows : for (r = self.rowCount - 1; r >= 0; r--) {
-        for (c = 0, clen = self.colCount - 1; c < clen; c++) {
+        for (c = 0, clen = self.colCount; c < clen; c++) {
           val = datamap.get(r, datamap.colToProp(c));
           if (val !== '' && val !== null) {
             break rows;
@@ -680,7 +679,7 @@ Handsontable.Core = function (rootElement, settings) {
       //count currently empty cols
       if (self.rowCount - 1 > 0) {
         cols : for (c = self.colCount - 1; c >= 0; c--) {
-          for (r = 0; r < self.rowCount - 1; r++) {
+          for (r = 0; r < self.rowCount; r++) {
             val = datamap.get(r, datamap.colToProp(c));
             if (val !== '' && val !== null && typeof val !== 'undefined') {
               break cols;
@@ -801,7 +800,7 @@ Handsontable.Core = function (rootElement, settings) {
     updateLegend: function (coords) {
       if (priv.settings.legend || priv.hasLegend) {
         var $td = $(grid.getCellAtCoords(coords));
-        $td.removeAttr("style").removeAttr("title").removeData("readOnly");
+        $td.removeAttr("style").removeAttr("title");
         $td[0].className = '';
         $td.find("img").remove();
       }
@@ -812,7 +811,6 @@ Handsontable.Core = function (rootElement, settings) {
           if (legend.match(coords.row, coords.col, datamap.getAll)) {
             priv.hasLegend = true;
             typeof legend.style !== "undefined" && $td.css(legend.style);
-            typeof legend.readOnly !== "undefined" && $td.data("readOnly", legend.readOnly);
             typeof legend.title !== "undefined" && $td.attr("title", legend.title);
             typeof legend.className !== "undefined" && $td.addClass(legend.className);
             if (typeof legend.icon !== "undefined" &&
@@ -841,9 +839,15 @@ Handsontable.Core = function (rootElement, settings) {
     /**
      * Is cell writable
      */
-    isCellWritable: function ($td) {
-      if (priv.isPopulated && $td.data("readOnly")) {
-        return false;
+    isCellWritable: function ($td, cellProperties) {
+      if (priv.isPopulated) {
+        var data = $td.data('readOnly');
+        if (typeof data === 'undefined') {
+          return !cellProperties.readOnly;
+        }
+        else {
+          return data;
+        }
       }
       return true;
     },
@@ -853,11 +857,10 @@ Handsontable.Core = function (rootElement, settings) {
      * @param {Object} start Start selection position
      * @param {Array} input 2d array
      * @param {Object} [end] End selection position (only for drag-down mode)
-     * @param {Boolean} [allowHtml]
      * @param {String} [source="populateFromArray"]
      * @return {Object|undefined} ending td in pasted area (only if any cell was changed)
      */
-    populateFromArray: function (start, input, end, allowHtml, source) {
+    populateFromArray: function (start, input, end, source) {
       var r, rlen, c, clen, td, endTd, setData = [], current = {};
       rlen = input.length;
       if (rlen === 0) {
@@ -876,9 +879,9 @@ Handsontable.Core = function (rootElement, settings) {
             break;
           }
           td = grid.getCellAtCoords(current);
-          if (grid.isCellWritable($(td))) {
+          if (self.getCellMeta(current.row, current.col).isWritable) {
             var p = datamap.colToProp(current.col);
-            setData.push([current.row, p, input[r][c], allowHtml]);
+            setData.push([current.row, p, input[r][c]]);
           }
           current.col++;
           if (end && c === clen - 1) {
@@ -890,7 +893,7 @@ Handsontable.Core = function (rootElement, settings) {
           r = -1;
         }
       }
-      endTd = self.setDataAtCell(setData, null, null, null, source || 'populateFromArray');
+      endTd = self.setDataAtCell(setData, null, null, source || 'populateFromArray');
       return endTd;
     },
 
@@ -996,40 +999,36 @@ Handsontable.Core = function (rootElement, settings) {
       return tds;
     },
 
-    render: function (row, col, prop, value, allowHtml) {
-      var td = grid.getCellAtCoords({row: row, col: col})
-        , renderer
-        , rendererOptions
-        , colSettings;
-      if (priv.settings.renderers) {
-        renderer = priv.settings.renderers(row, col, prop);
-      }
-      if (typeof renderer !== "function") {
-        colSettings = priv.settings.columns && priv.settings.columns[col];
-        if (colSettings && colSettings.renderer) {
-          renderer = colSettings.renderer;
-          if (colSettings.rendererOptions) {
-            rendererOptions = colSettings.rendererOptions;
-          }
-        }
-        else if (priv.settings.autoComplete) {
-          for (var i = 0, ilen = priv.settings.autoComplete.length; i < ilen; i++) {
-            if (priv.settings.autoComplete[i].match(row, col, datamap.getAll)) {
-              renderer = Handsontable.AutocompleteRenderer;
-              rendererOptions = {allowHtml: allowHtml};
-              break;
-            }
-          }
-        }
-        if (typeof renderer !== "function") {
-          renderer = Handsontable.TextRenderer;
-          rendererOptions = {allowHtml: allowHtml};
-        }
-      }
-      renderer(self, td, row, col, prop, value, rendererOptions);
+    render: function (row, col, prop, value) {
+      var coords = {row: row, col: col};
+      var td = grid.getCellAtCoords(coords);
+      grid.applyCellTypeMethod('renderer', td, coords, value);
       self.minWidthFix(td);
-      grid.updateLegend({row: row, col: col});
+      grid.updateLegend(coords);
       return td;
+    },
+
+    applyCellTypeMethod: function (methodName, td, coords, extraParam) {
+      var prop = datamap.colToProp(coords.col)
+        , method
+        , cellProperties = self.getCellMeta(coords.row, coords.col);
+
+      if (cellProperties.cellType && typeof cellProperties.cellType[methodName] === "function") {
+        method = cellProperties.cellType[methodName];
+      }
+      else if (priv.settings.autoComplete) {
+        for (var i = 0, ilen = priv.settings.autoComplete.length; i < ilen; i++) {
+          if (priv.settings.autoComplete[i].match(coords.row, coords.col, datamap.getAll)) {
+            method = Handsontable.AutocompleteCell[methodName];
+            cellProperties.autoComplete = priv.settings.autoComplete[i];
+            break;
+          }
+        }
+      }
+      if (typeof method !== "function") {
+        method = Handsontable.TextCell[methodName];
+      }
+      return method(self, td, coords.row, coords.col, prop, extraParam, cellProperties);
     }
   };
 
@@ -1232,7 +1231,7 @@ Handsontable.Core = function (rootElement, settings) {
         prop = datamap.colToProp(coords.col);
         old = datamap.get(coords.row, prop);
         $td = $(tds[i]);
-        if (old !== '' && grid.isCellWritable($td)) {
+        if (old !== '' && self.getCellMeta(coords.row, coords.col).isWritable) {
           changes.push([coords.row, prop, old, '']);
         }
       }
@@ -1472,7 +1471,7 @@ Handsontable.Core = function (rootElement, settings) {
 
       if (start) {
         var inputArray = CSVToArray(priv.editProxy.val(), '\t');
-        grid.populateFromArray(start, inputArray, end, null, 'autofill');
+        grid.populateFromArray(start, inputArray, end, 'autofill');
 
         selection.setRangeStart(grid.getCellAtCoords(drag.TL));
         selection.setRangeEnd(grid.getCellAtCoords(drag.BR));
@@ -1543,7 +1542,7 @@ Handsontable.Core = function (rootElement, settings) {
             endTd = grid.populateFromArray(coords.TL, inputArray, {
               row: Math.max(coords.BR.row, inputArray.length - 1 + coords.TL.row),
               col: Math.max(coords.BR.col, inputArray[0].length - 1 + coords.TL.col)
-            }, null, 'paste');
+            }, 'paste');
           selection.setRangeEnd(endTd);
         }, 100);
       }
@@ -1704,42 +1703,8 @@ Handsontable.Core = function (rootElement, settings) {
       priv.editProxy.height(priv.editProxy.parent().innerHeight() - 4);
       priv.editProxy.val(datamap.getText(priv.selStart, priv.selEnd));
       setTimeout(editproxy.focus, 1);
-
-      var current = grid.getCellAtCoords(priv.selStart);
-
-      var editor
-        , editorOptions = {
-          enterBeginsEditing: priv.settings.enterBeginsEditing
-        }
-        , colSettings;
-
-      if (priv.settings.editors) {
-        editor = priv.settings.editors(priv.selStart.row, priv.selStart.col, datamap.colToProp(priv.selStart.col));
-      }
-      if (typeof editor !== "function") {
-        colSettings = priv.settings.columns && priv.settings.columns[priv.selStart.col];
-        if (colSettings && colSettings.editor) {
-          editor = colSettings.editor;
-          if (colSettings.editorOptions) {
-            editorOptions = $.extend(true, editorOptions, colSettings.editorOptions);
-          }
-        }
-        else if (priv.settings.autoComplete) {
-          for (var i = 0, ilen = priv.settings.autoComplete.length; i < ilen; i++) {
-            if (priv.settings.autoComplete[i].match(priv.selStart.row, priv.selStart.col, datamap.getAll)) {
-              editor = Handsontable.AutocompleteEditor;
-              editorOptions.autoComplete = priv.settings.autoComplete[i];
-              break;
-            }
-          }
-        }
-        if (typeof editor !== "function") {
-          editor = Handsontable.TextEditor;
-        }
-      }
-
       editproxy.destroy();
-      priv.editorDestroyer = editor(self, current, priv.selStart.row, priv.selStart.col, datamap.colToProp(priv.selStart.col), priv.editProxy, editorOptions);
+      priv.editorDestroyer = grid.applyCellTypeMethod('editor', grid.getCellAtCoords(priv.selStart), priv.selStart, priv.editProxy);
     },
 
     /**
@@ -2086,13 +2051,12 @@ Handsontable.Core = function (rootElement, settings) {
   /**
    * Set data at given cell
    * @public
-   * @param {Number|Array} row or array of changes in format [[row, col, value, allowHtml], ...]
+   * @param {Number|Array} row or array of changes in format [[row, col, value], ...]
    * @param {Number} prop
    * @param {String} value
-   * @param {Boolean} allowHtml
    * @param {String} [source='edit'] String that identifies how this change will be described in changes array (useful in onChange callback)
    */
-  this.setDataAtCell = function (row, prop, value, allowHtml, source) {
+  this.setDataAtCell = function (row, prop, value, source) {
     var refreshRows = false, refreshCols = false, changes, i, ilen, td, changesByCol = [];
 
     if (typeof row === "object") { //is stringish
@@ -2103,7 +2067,7 @@ Handsontable.Core = function (rootElement, settings) {
     }
     else {
       changes = [
-        [row, prop, value, allowHtml]
+        [row, prop, value]
       ];
     }
 
@@ -2122,7 +2086,6 @@ Handsontable.Core = function (rootElement, settings) {
       prop = changes[i][1];
       var col = datamap.propToCol(prop);
       value = changes[i][3];
-      allowHtml = changes[i][4] || allowHtml;
       changesByCol.push([changes[i][0], col, changes[i][2], changes[i][3], changes[i][4]]);
 
       if (priv.settings.minSpareRows) {
@@ -2139,7 +2102,7 @@ Handsontable.Core = function (rootElement, settings) {
           refreshCols = true;
         }
       }
-      td = grid.render(row, col, prop, value, allowHtml);
+      td = grid.render(row, col, prop, value);
       datamap.set(row, prop, value);
     }
     if (refreshRows) {
@@ -2190,7 +2153,7 @@ Handsontable.Core = function (rootElement, settings) {
       }
     }
     for (var i = 0, ilen = changes.length; i < ilen; i++) {
-      grid.render(changes[i][0], datamap.propToCol(changes[i][1]), changes[i][1], changes[i][3], true);
+      grid.render(changes[i][0], datamap.propToCol(changes[i][1]), changes[i][1], changes[i][3]);
     }
     self.rootElement.triggerHandler('cellrender.handsontable', [changes, source || 'render']);
   };
@@ -2199,11 +2162,10 @@ Handsontable.Core = function (rootElement, settings) {
    * Load data from array
    * @public
    * @param {Array} data
-   * @param {Boolean} [allowHtml]
    */
-  this.loadData = function (data, allowHtml) {
+  this.loadData = function (data) {
     priv.isPopulated = false;
-    settings.data = data;
+    priv.settings.data = data;
     if (typeof data === 'object' && typeof data[0] === 'object' && typeof data[0].push !== 'function') {
       priv.dataType = 'object';
     }
@@ -2212,7 +2174,7 @@ Handsontable.Core = function (rootElement, settings) {
     }
     priv.duckDataSchema = datamap.recursiveDuckSchema(data[0]);
     datamap.createMap();
-    var dlen = settings.data.length;
+    var dlen = priv.settings.data.length;
     while (priv.settings.startRows > dlen) {
       datamap.createRow();
       dlen++;
@@ -2443,6 +2405,14 @@ Handsontable.Core = function (rootElement, settings) {
   };
 
   /**
+   * Returns current settings object
+   * @return {Object}
+   */
+  this.getSettings = function () {
+    return priv.settings;
+  };
+
+  /**
    * Clears grid
    * @public
    */
@@ -2527,9 +2497,16 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Object}
    */
   this.getCellMeta = function (row, col) {
-    return {
-      isWritable: grid.isCellWritable($(grid.getCellAtCoords({row: row, col: col})))
+    var cellProperites = {}
+      , prop = datamap.colToProp(col);
+    if (priv.settings.cells) {
+      cellProperites = $.extend(true, cellProperites, priv.settings.cells(row, col, prop) || {});
     }
+    if (priv.settings.columns) {
+      cellProperites = $.extend(true, cellProperites, priv.settings.columns[col] || {});
+    }
+    cellProperites.isWritable = grid.isCellWritable($(grid.getCellAtCoords({row: row, col: col})), cellProperites);
+    return cellProperites;
   };
 
   /**
@@ -3500,18 +3477,12 @@ Handsontable.ColHeader.prototype.destroy = function () {
  * @param {Number} col
  * @param {String|Number} prop Row object property name
  * @param value Value to render (remember to escape unsafe HTML before inserting to DOM!)
- * @param {Object} rendererOptions Render options
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
  */
-Handsontable.TextRenderer = function (instance, td, row, col, prop, value, rendererOptions) {
-  if (typeof rendererOptions === "undefined") {
-    rendererOptions = {};
-  }
+Handsontable.TextRenderer = function (instance, td, row, col, prop, value, cellProperties) {
   var escaped = Handsontable.helper.stringify(value);
-  if (!rendererOptions.allowHtml) {
-    escaped = escaped.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); //escape html special chars
-  }
+  escaped = escaped.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); //escape html special chars
   td.innerHTML = escaped.replace(/\n/g, '<br/>');
-  return td;
 };
 /**
  * Autocomplete renderer
@@ -3521,9 +3492,9 @@ Handsontable.TextRenderer = function (instance, td, row, col, prop, value, rende
  * @param {Number} col
  * @param {String|Number} prop Row object property name
  * @param value Value to render (remember to escape unsafe HTML before inserting to DOM!)
- * @param {Object} rendererOptions Render options
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
  */
-Handsontable.AutocompleteRenderer = function (instance, td, row, col, prop, value, rendererOptions) {
+Handsontable.AutocompleteRenderer = function (instance, td, row, col, prop, value, cellProperties) {
   var $td = $(td);
   var $text = $('<div class="htAutocomplete"></div>');
   var $arrow = $('<div class="htAutocompleteArrow">&#x25BC;</div>');
@@ -3531,7 +3502,7 @@ Handsontable.AutocompleteRenderer = function (instance, td, row, col, prop, valu
     $td.triggerHandler('dblclick.editor');
   });
 
-  Handsontable.TextRenderer(instance, $text[0], row, col, prop, value, rendererOptions);
+  Handsontable.TextCell.renderer(instance, $text[0], row, col, prop, value, cellProperties);
 
   if($text.html() === '') {
     $text.html('&nbsp;');
@@ -3539,8 +3510,6 @@ Handsontable.AutocompleteRenderer = function (instance, td, row, col, prop, valu
 
   $text.append($arrow);
   $td.empty().append($text);
-
-  return td;
 };
 /**
  * Checkbox renderer
@@ -3550,23 +3519,19 @@ Handsontable.AutocompleteRenderer = function (instance, td, row, col, prop, valu
  * @param {Number} col
  * @param {String|Number} prop Row object property name
  * @param value Value to render (remember to escape unsafe HTML before inserting to DOM!)
- * @param {Object} rendererOptions Render options
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
  */
-Handsontable.CheckboxRenderer = function (instance, td, row, col, prop, value, rendererOptions) {
-  if (typeof rendererOptions === "undefined") {
-    rendererOptions = {};
+Handsontable.CheckboxRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+  if (typeof cellProperties.checked === "undefined") {
+    cellProperties.checked = true;
   }
-  if (typeof rendererOptions.checked === "undefined") {
-    rendererOptions.checked = true;
+  if (typeof cellProperties.unchecked === "undefined") {
+    cellProperties.unchecked = false;
   }
-  if (typeof rendererOptions.unchecked === "undefined") {
-    rendererOptions.unchecked = false;
-  }
-
-  if (value === rendererOptions.checked || value === Handsontable.helper.stringify(rendererOptions.checked)) {
+  if (value === cellProperties.checked || value === Handsontable.helper.stringify(cellProperties.checked)) {
     td.innerHTML = "<input type='checkbox' checked autocomplete='no'>";
   }
-  else if (value === rendererOptions.unchecked || value === Handsontable.helper.stringify(rendererOptions.unchecked)) {
+  else if (value === cellProperties.unchecked || value === Handsontable.helper.stringify(cellProperties.unchecked)) {
     td.innerHTML = "<input type='checkbox' autocomplete='no'>";
   }
   else if (value === null) { //default value
@@ -3578,10 +3543,10 @@ Handsontable.CheckboxRenderer = function (instance, td, row, col, prop, value, r
 
   $(td).find('input').change(function () {
     if ($(this).is(':checked')) {
-      instance.setDataAtCell(row, prop, rendererOptions.checked);
+      instance.setDataAtCell(row, prop, cellProperties.checked);
     }
     else {
-      instance.setDataAtCell(row, prop, rendererOptions.unchecked);
+      instance.setDataAtCell(row, prop, cellProperties.unchecked);
     }
   });
 
@@ -3637,8 +3602,6 @@ var texteditor = {
 
   /**
    * Shows text input in grid cell
-   * @param {Boolean} useOriginalValue
-   * @param {String} suffix
    */
   beginEditing: function (instance, td, row, col, prop, keyboardProxy, useOriginalValue, suffix) {
     if (texteditor.isCellEdited) {
@@ -3655,7 +3618,7 @@ var texteditor = {
 
     var $td = $(td);
 
-    if (!instance.grid.isCellWritable($td)) {
+    if (!instance.getCellMeta(row, col).isWritable) {
       return;
     }
 
@@ -3705,10 +3668,6 @@ var texteditor = {
 
   /**
    * Finishes text input in selected cells
-   * @param {Boolean} [isCancelled] If TRUE, restore old value instead of using current from editproxy
-   * @param {Number} [moveRow] Move selection row if edit is not cancelled
-   * @param {Number} [moveCol] Move selection column if edit is not cancelled
-   * @param {Boolean} [ctrlDown] If true, apply to all selected cells
    */
   finishEditing: function (instance, td, row, col, prop, keyboardProxy, isCancelled, ctrlDown) {
     if (texteditor.isCellEdited) {
@@ -3743,7 +3702,17 @@ var texteditor = {
   }
 };
 
-Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy, editorOptions) {
+/**
+ * Default text editor
+ * @param {Object} instance Handsontable instance
+ * @param {Element} td Table cell where to render
+ * @param {Number} row
+ * @param {Number} col
+ * @param {String|Number} prop Row object property name
+ * @param {Object} keyboardProxy jQuery element of keyboard proxy that contains current editing value
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
+ */
+Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy, cellProperties) {
   texteditor.isCellEdited = false;
 
   var $current = $(td);
@@ -3787,7 +3756,7 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
     if (Handsontable.helper.isPrintableChar(event.keyCode)) {
       if (!texteditor.isCellEdited && !ctrlDown) { //disregard CTRL-key shortcuts
         texteditor.beginEditing(instance, td, row, col, prop, keyboardProxy);
-        event.stopPropagation();
+        event.stopImmediatePropagation();
       }
       else if (ctrlDown) {
         if (texteditor.isCellEdited && event.keyCode === 65) { //CTRL + A
@@ -3884,7 +3853,7 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
             texteditor.finishEditing(instance, td, row, col, prop, keyboardProxy, false, ctrlDown);
           }
         }
-        else if (editorOptions.enterBeginsEditing) {
+        else if (instance.getSettings().enterBeginsEditing) {
           if ((ctrlDown && !selection.isMultiple()) || event.altKey) { //if ctrl+enter or alt+enter, add new line
             texteditor.beginEditing(instance, td, row, col, prop, keyboardProxy, true, '\n'); //show edit field
           }
@@ -3938,14 +3907,24 @@ function defaultAutoCompleteHighlighter(item) {
   })
 }
 
-Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboardProxy, editorOptions) {
+/**
+ * Autocomplete editor
+ * @param {Object} instance Handsontable instance
+ * @param {Element} td Table cell where to render
+ * @param {Number} row
+ * @param {Number} col
+ * @param {String|Number} prop Row object property name
+ * @param {Object} keyboardProxy jQuery element of keyboard proxy that contains current editing value
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
+ */
+Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboardProxy, cellProperties) {
   var typeahead = keyboardProxy.data('typeahead');
   if (!typeahead) {
     keyboardProxy.typeahead();
     typeahead = keyboardProxy.data('typeahead');
   }
-  typeahead.source = editorOptions.autoComplete.source(row, col);
-  typeahead.highlighter = editorOptions.autoComplete.highlighter || defaultAutoCompleteHighlighter;
+  typeahead.source = cellProperties.autoComplete.source(row, col);
+  typeahead.highlighter = cellProperties.autoComplete.highlighter || defaultAutoCompleteHighlighter;
 
   var oneChange = function () {
     if (isAutoComplete(keyboardProxy)) {
@@ -3974,7 +3953,7 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
     }
   );
 
-  var textDestroyer = Handsontable.TextEditor(instance, td, row, col, prop, keyboardProxy, editorOptions);
+  var textDestroyer = Handsontable.TextEditor(instance, td, row, col, prop, keyboardProxy, cellProperties);
 
   keyboardProxy.data("typeahead").$menu.off('click.editor', 'li').on('click.editor', 'li', function(){
     setTimeout(function(){
@@ -3999,36 +3978,45 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
 
   return destroyer;
 };
-function toggleCheckboxCell(instance, row, prop, editorOptions) {
-  if (Handsontable.helper.stringify(instance.getDataAtCell(row, prop)) === Handsontable.helper.stringify(editorOptions.checked)) {
-    instance.setDataAtCell(row, prop, editorOptions.unchecked);
+function toggleCheckboxCell(instance, row, prop, cellProperties) {
+  if (Handsontable.helper.stringify(instance.getDataAtCell(row, prop)) === Handsontable.helper.stringify(cellProperties.checked)) {
+    instance.setDataAtCell(row, prop, cellProperties.unchecked);
   }
   else {
-    instance.setDataAtCell(row, prop, editorOptions.checked);
+    instance.setDataAtCell(row, prop, cellProperties.checked);
   }
 }
 
-
-Handsontable.CheckboxEditor = function (instance, td, row, col, prop, keyboardProxy, editorOptions) {
-  if (typeof editorOptions === "undefined") {
-    editorOptions = {};
+/**
+ * Checkbox editor
+ * @param {Object} instance Handsontable instance
+ * @param {Element} td Table cell where to render
+ * @param {Number} row
+ * @param {Number} col
+ * @param {String|Number} prop Row object property name
+ * @param {Object} keyboardProxy jQuery element of keyboard proxy that contains current editing value
+ * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
+ */
+Handsontable.CheckboxEditor = function (instance, td, row, col, prop, keyboardProxy, cellProperties) {
+  if (typeof cellProperties === "undefined") {
+    cellProperties = {};
   }
-  if (typeof editorOptions.checked === "undefined") {
-    editorOptions.checked = true;
+  if (typeof cellProperties.checked === "undefined") {
+    cellProperties.checked = true;
   }
-  if (typeof editorOptions.unchecked === "undefined") {
-    editorOptions.unchecked = false;
+  if (typeof cellProperties.unchecked === "undefined") {
+    cellProperties.unchecked = false;
   }
 
   keyboardProxy.on("keydown.editor", function (event) {
     if (Handsontable.helper.isPrintableChar(event.keyCode)) {
-      toggleCheckboxCell(instance, row, prop, editorOptions);
+      toggleCheckboxCell(instance, row, prop, cellProperties);
       event.stopPropagation();
     }
   });
 
   function onDblClick() {
-    toggleCheckboxCell(instance, row, prop, editorOptions);
+    toggleCheckboxCell(instance, row, prop, cellProperties);
   }
 
   var $td = $(td);
@@ -4040,6 +4028,20 @@ Handsontable.CheckboxEditor = function (instance, td, row, col, prop, keyboardPr
     $td.off(".editor");
     instance.container.find('.htBorder.current').off(".editor");
   }
+};
+Handsontable.AutocompleteCell = {
+  renderer: Handsontable.AutocompleteRenderer,
+  editor: Handsontable.AutocompleteEditor
+};
+
+Handsontable.CheckboxCell = {
+  renderer: Handsontable.CheckboxRenderer,
+  editor: Handsontable.CheckboxEditor
+};
+
+Handsontable.TextCell = {
+  renderer: Handsontable.TextRenderer,
+  editor: Handsontable.TextEditor
 };
 /*
  * jQuery.fn.autoResize 1.1

@@ -14,18 +14,16 @@ Template:
   <datacolumn value="item.name.first" title="First Name"/>
   <datacolumn value="item.name.last" title="Last Name"/>
   <datacolumn value="item.address" title="Address"/>
-  <datacolumn type="autocomplete" value="item.Product.Description" title="Favorite food"  
+  <datacolumn type="'autocomplete'" value="item.Product.Description" title="Favorite food"  
               options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn type="checkbox" value="item.isActive" title="Is active"  
-              options="{checked: 'Yes', unchecked: 'No'}"/>
+  <datacolumn type="'checkbox'" value="item.isActive" title="Is active"  
+              checkedTemplate="'Yes'" uncheckedTemplate="'No'"/>
 </div>
 ```
 
 Controller:
 
 ```javascript
-$scope.activeOptions = ['Yes', 'No'];
-
 $scope.items = [
   {id: 1, name: {first: "Marcin", last: "Warpechowski"}, address: "Schellingstr. 58, Muenchen", isActive: 'Yes', "Product": {
   "Description": "Big Mac",

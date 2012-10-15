@@ -62,20 +62,20 @@ angular.module('StarcounterLib', [])
                 break;
 
               case 'checkbox':
-                column.cellType = Handsontable.CheckboxCell;
+                column.type = Handsontable.CheckboxCell;
                 tmp = $this.attr('checkedTemplate');
                 if(typeof tmp !== 'undefined') {
-                  column.checked = scope.$eval(tmp); //if undefined then defaults to Boolean true
+                  column.checkedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
                 }
                 tmp = $this.attr('uncheckedTemplate');
                 if(typeof tmp !== 'undefined') {
-                  column.unchecked = scope.$eval(tmp); //if undefined then defaults to Boolean true
+                  column.uncheckedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
                 }
                 break;
 
               default:
                 if(typeof type === 'object') {
-                  column.cellType = type;
+                  column.type = type;
                 }
             }
 

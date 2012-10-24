@@ -8,6 +8,12 @@
   font-size: 13px;
 }
 
+.handsontable * {
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+}
+
 .handsontable table {
   border-collapse: separate;
   position: relative;
@@ -236,4 +242,9 @@ AutocompleteRenderer down arrow
 .typeahead a {
   color: #08C;
   text-decoration: none;
+}
+
+/*context menu rules*/
+ul.context-menu-list {
+  color: black;
 }

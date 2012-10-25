@@ -1,12 +1,12 @@
-angular.module('StarcounterLib', [])
+angular.module('ui.directives', [])
   .directive('uiDatagrid', function () {
     var directiveDefinitionObject = {
       restrict: 'A',
       compile: function compile(tElement, tAttrs, transclude) {
 
         var defaultSettings = {
-          rows: 6,
-          cols: 3,
+          startRows: 0,
+          startCols: 3,
           outsideClickDeselects: false,
           autoComplete: []
         };
@@ -44,7 +44,7 @@ angular.module('StarcounterLib', [])
 
             colHeaders.push(title);
 
-            switch(type) {
+            switch (type) {
               case 'autocomplete':
                 settings['autoComplete'].push({
                   match: function (row, col) {
@@ -64,37 +64,40 @@ angular.module('StarcounterLib', [])
               case 'checkbox':
                 column.type = Handsontable.CheckboxCell;
                 tmp = $this.attr('checkedTemplate');
-                if(typeof tmp !== 'undefined') {
+                if (typeof tmp !== 'undefined') {
                   column.checkedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
                 }
                 tmp = $this.attr('uncheckedTemplate');
-                if(typeof tmp !== 'undefined') {
+                if (typeof tmp !== 'undefined') {
                   column.uncheckedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
                 }
                 break;
 
               default:
-                if(typeof type === 'object') {
+                if (typeof type === 'object') {
                   column.type = type;
                 }
             }
 
-            if($this.attr('readOnly')) {
+            if ($this.attr('readOnly')) {
               column.readOnly = true;
             }
 
             columns.push(column);
           });
 
-          if (columns.length > 0) {
-            settings['columns'] = columns;
+          if (typeof scope[rhs] !== 'undefined') {
+            settings['data'] = scope[rhs];
+            if (columns.length > 0) {
+              settings['columns'] = columns;
+              settings['startCols'] = columns.length;
+            }
           }
 
           if (colHeaders.length > 0) {
             settings['colHeaders'] = colHeaders;
           }
 
-          settings['data'] = scope[rhs];
           $container.handsontable(settings);
 
           $container.on('datachange.handsontable', function (event, changes, source) {
@@ -111,6 +114,13 @@ angular.module('StarcounterLib', [])
           });
 
           scope.$watch('dataChange', function (value) {
+            if (scope[rhs] !== $container.handsontable('getData') && columns.length > 0) {
+              var update = {
+                columns: columns,
+                startCols: columns.length
+              }
+              $container.handsontable("updateSettings", update);
+            }
             $container.handsontable("loadData", scope[rhs]);
           });
         }

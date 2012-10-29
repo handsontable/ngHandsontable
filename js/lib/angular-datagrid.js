@@ -88,7 +88,7 @@ angular.module('ui.directives', [])
 
             columns.push(column);
           });
-          
+
           if (typeof scope[rhs] !== 'undefined') {
             settings['data'] = scope[rhs];
             if (columns.length > 0) {
@@ -104,6 +104,9 @@ angular.module('ui.directives', [])
           $container.handsontable(settings);
 
           $container.on('datachange.handsontable', function (event, changes, source) {
+            if (source !== 'loadData') {
+              scope[rhs + '_deepChangeInfo'] = changes;
+            }
             if (!scope.$$phase) { //if digest is not in progress
               scope.$digest(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
@@ -114,14 +117,16 @@ angular.module('ui.directives', [])
           });
 
           scope.$watch(rhs, function (value) {
-            var update = {
-              data: scope[rhs]
-            };
             if (scope[rhs] !== $container.handsontable('getData') && columns.length > 0) {
-              update['columns'] = columns;
-              update['startCols'] = columns.length;
+              $container.handsontable('updateSettings', {
+                data: scope[rhs],
+                columns: columns,
+                startCols: columns.length
+              });
             }
-            $container.handsontable("updateSettings", update);
+            else {
+              $container.handsontable('render');
+            }
           }, true);
         }
       }

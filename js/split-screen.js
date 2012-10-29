@@ -47,7 +47,6 @@ function MyCtrl($scope, $filter) {
 
   $scope.$watch('query', function (newVal, oldVal) {
     $scope.filteredItems = $filter('filter')($scope.items, $scope.query);
-    $scope.dataChange = !$scope.dataChange;
   });
   $scope.filteredItems = $scope.items;
 

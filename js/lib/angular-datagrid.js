@@ -1,3 +1,6 @@
+/**
+ * https://github.com/warpech/angular-ui-handsontable
+ */
 angular.module('ui.directives', [])
   .directive('uiDatagrid', function () {
     var directiveDefinitionObject = {
@@ -101,19 +104,17 @@ angular.module('ui.directives', [])
           $container.handsontable(settings);
 
           $container.on('datachange.handsontable', function (event, changes, source) {
-            if (source === 'loadData') {
-              return;
+            if (!scope.$$phase) { //if digest is not in progress
+              scope.$digest(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
-            scope.$apply(function () {
-              scope.dataChange = !scope.dataChange;
-            });
           });
 
           $container.on('selectionbyprop.handsontable', function (event, r, p, r2, p2) {
             scope.$emit('datagridSelection', $container, r, p, r2, p2);
           });
 
-          scope.$watch('dataChange', function (value) {
+          scope.$watch(rhs, function (value) {
+            $container.handsontable("loadData", scope[rhs]);
             if (scope[rhs] !== $container.handsontable('getData') && columns.length > 0) {
               var update = {
                 columns: columns,
@@ -121,8 +122,7 @@ angular.module('ui.directives', [])
               }
               $container.handsontable("updateSettings", update);
             }
-            $container.handsontable("loadData", scope[rhs]);
-          });
+          }, true);
         }
       }
     };

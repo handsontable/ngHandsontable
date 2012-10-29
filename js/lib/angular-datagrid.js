@@ -88,7 +88,7 @@ angular.module('ui.directives', [])
 
             columns.push(column);
           });
-
+          
           if (typeof scope[rhs] !== 'undefined') {
             settings['data'] = scope[rhs];
             if (columns.length > 0) {
@@ -114,14 +114,14 @@ angular.module('ui.directives', [])
           });
 
           scope.$watch(rhs, function (value) {
-            $container.handsontable("loadData", scope[rhs]);
+            var update = {
+              data: scope[rhs]
+            };
             if (scope[rhs] !== $container.handsontable('getData') && columns.length > 0) {
-              var update = {
-                columns: columns,
-                startCols: columns.length
-              }
-              $container.handsontable("updateSettings", update);
+              update['columns'] = columns;
+              update['startCols'] = columns.length;
             }
+            $container.handsontable("updateSettings", update);
           }, true);
         }
       }

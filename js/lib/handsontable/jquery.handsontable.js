@@ -4,7 +4,7 @@
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
- * http://warpech.github.com/jquery-handsontable/
+ * http://handsontable.com/
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -73,58 +73,14 @@ Handsontable.Core = function (rootElement, settings) {
     }
   };
 
-  /**
-   * This will parse a delimited string into an array of arrays. The default delimiter is the comma, but this can be overriden in the second argument.
-   * @see http://www.bennadel.com/blog/1504-Ask-Ben-Parsing-CSV-Strings-With-Javascript-Exec-Regular-Expression-Command.htm
-   * @param strData
-   * @param strDelimiter
-   */
-  var strDelimiter = '\t';
-  var objPattern = new RegExp("(\\" + strDelimiter + "|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\"\\" + strDelimiter + "\\r\\n]*))", "gi");
-  var dblQuotePattern = /""/g;
-
-  function CSVToArray(strData) {
-    var rows;
-    if (strData.indexOf('"') === -1) { //if there is no " symbol, we don't have to use regexp to parse the input
-      var r, rlen;
-      rows = strData.split("\n");
-      if (rows.length > 1 && rows[rows.length - 1] === '') {
-        rows.pop();
-      }
-      for (r = 0, rlen = rows.length; r < rlen; r++) {
-        rows[r] = rows[r].split("\t");
-      }
-    }
-    else {
-      rows = [
-        []
-      ];
-      var arrMatches, strMatchedValue;
-      while (arrMatches = objPattern.exec(strData)) {
-        var strMatchedDelimiter = arrMatches[ 1 ];
-        if (strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)) {
-          rows.push([]);
-        }
-        if (arrMatches[2]) {
-          strMatchedValue = arrMatches[2].replace(dblQuotePattern, '"');
-        }
-        else {
-          strMatchedValue = arrMatches[3];
-        }
-        rows[rows.length - 1].push(strMatchedValue);
-      }
-    }
-    return rows;
-  }
-
   datamap = {
     recursiveDuckSchema: function (obj) {
       var schema;
-      if (Object.prototype.toString.call(obj) === '[object Object]') {
+      if ($.isPlainObject(obj)) {
         schema = {};
         for (var i in obj) {
           if (obj.hasOwnProperty(i)) {
-            if (Object.prototype.toString.call(obj[i]) === '[object Object]') {
+            if ($.isPlainObject(obj[i])) {
               schema[i] = datamap.recursiveDuckSchema(obj[i]);
             }
             else {
@@ -145,7 +101,7 @@ Handsontable.Core = function (rootElement, settings) {
         lastCol = 0;
         parent = '';
       }
-      if (Object.prototype.toString.call(schema) === '[object Object]') {
+      if ($.isPlainObject(schema)) {
         for (i in schema) {
           if (schema.hasOwnProperty(i)) {
             if (schema[i] === null) {
@@ -376,31 +332,7 @@ Handsontable.Core = function (rootElement, settings) {
      * @return {String}
      */
     getText: function (start, end) {
-      var data = datamap.getRange(start, end), text = '', r, rlen, c, clen, val;
-      for (r = 0, rlen = data.length; r < rlen; r++) {
-        for (c = 0, clen = data[r].length; c < clen; c++) {
-          if (c > 0) {
-            text += "\t";
-          }
-          val = data[r][c];
-          if (typeof val === 'string') {
-            if (val.indexOf('\n') > -1) {
-              text += '"' + val.replace(/"/g, '""') + '"';
-            }
-            else {
-              text += val;
-            }
-          }
-          else if (val == null || typeof val === 'undefined') {
-            text += '';
-          }
-          else {
-            text += val;
-          }
-        }
-        text += "\n";
-      }
-      return text;
+      return SheetClip.stringify(datamap.getRange(start, end));
     }
   };
 
@@ -929,13 +861,13 @@ Handsontable.Core = function (rootElement, settings) {
       if (!selection.isSelected()) {
         return;
       }
-      selection.end(false);
-      editproxy.destroy();
       highlight.off();
       priv.currentBorder.disappear();
       if (autofill.handle) {
         autofill.hideHandle();
       }
+      selection.end(false);
+      editproxy.destroy();
       self.rootElement.triggerHandler('deselect.handsontable');
     },
 
@@ -1134,8 +1066,7 @@ Handsontable.Core = function (rootElement, settings) {
       }
 
       if (start) {
-        var inputArray = CSVToArray(priv.editProxy.val(), '\t');
-        grid.populateFromArray(start, inputArray, end, 'autofill');
+        grid.populateFromArray(start, SheetClip.parse(priv.editProxy.val()), end, 'autofill');
 
         selection.setRangeStart(self.view.getCellAtCoords(drag.TL));
         selection.setRangeEnd(self.view.getCellAtCoords(drag.BR));
@@ -1201,7 +1132,7 @@ Handsontable.Core = function (rootElement, settings) {
       function onPaste() {
         setTimeout(function () {
           var input = priv.editProxy.val().replace(/^[\r\n]*/g, '').replace(/[\r\n]*$/g, ''), //remove newline from the start and the end of the input
-            inputArray = CSVToArray(input, '\t'),
+            inputArray = SheetClip.parse(input),
             coords = grid.getCornerCoords([priv.selStart, priv.selEnd]),
             endTd = grid.populateFromArray(coords.TL, inputArray, {
               row: Math.max(coords.BR.row, inputArray.length - 1 + coords.TL.row),
@@ -1230,10 +1161,10 @@ Handsontable.Core = function (rootElement, settings) {
               selection.selectAll(); //select all cells
             }
             else if (event.keyCode === 88 && $.browser.opera) { //CTRL + X
-              priv.editProxy.triggerHandler('cut'); //simulate oncut for Opera
+              priv.editProxyHolder.triggerHandler('cut'); //simulate oncut for Opera
             }
             else if (event.keyCode === 86 && $.browser.opera) { //CTRL + V
-              priv.editProxy.triggerHandler('paste'); //simulate onpaste for Opera
+              priv.editProxyHolder.triggerHandler('paste'); //simulate onpaste for Opera
             }
             else if (event.keyCode === 89 || (event.shiftKey && event.keyCode === 90)) { //CTRL + Y or CTRL + SHIFT + Z
               priv.undoRedo && priv.undoRedo.redo();
@@ -1474,10 +1405,10 @@ Handsontable.Core = function (rootElement, settings) {
   this.setDataAtCell = function (row, prop, value, source) {
     var refreshRows = false, refreshCols = false, changes, i, ilen, td, changesByCol = [];
 
-    if (typeof row === "object") { //is stringish
+    if (typeof row === "object") { //is it an array of changes
       changes = row;
     }
-    else if (Object.prototype.toString.call(value) === '[object Object]') { //backwards compatibility
+    else if ($.isPlainObject(value)) { //backwards compatibility
       changes = value;
     }
     else {
@@ -1598,13 +1529,18 @@ Handsontable.Core = function (rootElement, settings) {
   this.loadData = function (data) {
     priv.isPopulated = false;
     priv.settings.data = data;
-    if (typeof data === 'object' && typeof data[0] === 'object' && typeof data[0].push !== 'function') {
+    if ($.isPlainObject(priv.settings.dataSchema) || $.isPlainObject(data[0])) {
       priv.dataType = 'object';
     }
     else {
       priv.dataType = 'array';
     }
-    priv.duckDataSchema = datamap.recursiveDuckSchema(data[0]);
+    if(data[0]) {
+      priv.duckDataSchema = datamap.recursiveDuckSchema(data[0]);
+    }
+    else {
+      priv.duckDataSchema = {};
+    }
     datamap.createMap();
     var dlen = priv.settings.data.length;
     while (priv.settings.startRows > dlen) {
@@ -3870,7 +3806,7 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
 
   typeahead.hide = function () {
     if (!dontHide) {
-      dontHide = false;
+      dontHide = false; //set to true by dblclick handler, otherwise appears and disappears immediately after double click
       return typeahead._hide.call(this);
     }
   };
@@ -3903,6 +3839,10 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
 
   keyboardProxy.on("keydown.editor", function (event) {
     switch (event.keyCode) {
+      case 27: /* ESC */
+        dontHide = false;
+        break;
+
       case 38: /* arrow up */
       case 40: /* arrow down */
       case 9: /* tab */
@@ -3955,7 +3895,8 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
   var destroyer = function (isCancelled) {
     textDestroyer(isCancelled);
     typeahead.source = [];
-    if (isAutoComplete(keyboardProxy) && isAutoComplete(keyboardProxy).shown) {
+    dontHide = false;
+    if (isAutoComplete(keyboardProxy)) {
       isAutoComplete(keyboardProxy).hide();
     }
   };
@@ -4179,9 +4120,20 @@ function createContextMenu() {
 
 Handsontable.PluginHooks.push('afterInit', createContextMenu);
 /*
- * jQuery.fn.autoResize 1.1
+ * jQuery.fn.autoResize 1.1+
  * --
+ * https://github.com/warpech/jQuery.fn.autoResize
+ *
+ * This fork differs from others in a way that it autoresizes textarea in 2-dimensions (horizontally and vertically).
+ * It was originally forked from alexbardas's repo but maybe should be merged with dpashkevich's repo in future.
+ *
+ * originally forked from:
  * https://github.com/jamespadolsey/jQuery.fn.autoResize
+ * which is now located here:
+ * https://github.com/alexbardas/jQuery.fn.autoResize
+ * though the mostly maintained for is here:
+ * https://github.com/dpashkevich/jQuery.fn.autoResize/network
+ *
  * --
  * This program is free software. It comes without any warranty, to
  * the extent permitted by applicable law. You can redistribute it
@@ -4305,7 +4257,7 @@ Handsontable.PluginHooks.push('afterInit', createContextMenu);
       if (config.minWidth !== 'original' || config.maxWidth !== 'original') {
         this.wClone = $('<div/>').width('auto').css({
           whiteSpace: 'nowrap',
-          float: 'left'
+          'float': 'left'
         });
         this.clones = this.clones.add(this.wClone);
       }
@@ -4505,4 +4457,94 @@ function handler(event) {
 
 })(jQuery);
 
+/**
+ * SheetClip - Spreadsheet Clipboard Parser
+ * version 0.1
+ *
+ * This tiny library transforms JavaScript arrays to strings that are pasteable by LibreOffice, OpenOffice,
+ * Google Docs and Microsoft Excel.
+ *
+ * Copyright 2012, Marcin Warpechowski
+ * Licensed under the MIT license.
+ * http://github.com/warpech/sheetclip/
+ */
+/*jslint white: true*/
+(function (global) {
+  "use strict";
+
+  var UNDEFINED = (function () {
+  }());
+
+  function countQuotes(str) {
+    return str.split('"').length - 1;
+  }
+
+  global.SheetClip = {
+    parse: function (str) {
+      var r, rlen, rows, arr = [], a = 0, c, clen, multiline, last;
+      rows = str.split('\n');
+      if (rows.length > 1 && rows[rows.length - 1] === '') {
+        rows.pop();
+      }
+      for (r = 0, rlen = rows.length; r < rlen; r += 1) {
+        rows[r] = rows[r].split('\t');
+        for (c = 0, clen = rows[r].length; c < clen; c += 1) {
+          if (!arr[a]) {
+            arr[a] = [];
+          }
+          if (multiline && c === 0) {
+            last = arr[a].length - 1;
+            arr[a][last] = arr[a][last] + '\n' + rows[r][0];
+            if (multiline && countQuotes(rows[r][0]) % 2 === 1) {
+              multiline = false;
+              arr[a][last] = arr[a][last].substring(0, arr[a][last].length - 1).replace(/""/g, '"');
+            }
+          }
+          else {
+            if (c === clen - 1 && rows[r][c].indexOf('"') === 0) {
+              arr[a].push(rows[r][c].substring(1).replace(/""/g, '"'));
+              multiline = true;
+            }
+            else {
+              arr[a].push(rows[r][c].replace(/""/g, '"'));
+              multiline = false;
+            }
+          }
+        }
+        if(!multiline) {
+          a += 1;
+        }
+      }
+      return arr;
+    },
+
+    stringify: function (arr) {
+      var r, rlen, c, clen, str = '', val;
+      for (r = 0, rlen = arr.length; r < rlen; r += 1) {
+        for (c = 0, clen = arr[r].length; c < clen; c += 1) {
+          if (c > 0) {
+            str += '\t';
+          }
+          val = arr[r][c];
+          if (typeof val === 'string') {
+            if (val.indexOf('\n') > -1) {
+              str += '"' + val.replace(/"/g, '""') + '"';
+            }
+            else {
+              str += val;
+            }
+          }
+          else if (val === null || val === UNDEFINED) {
+            str += '';
+          }
+          else {
+            str += val;
+          }
+        }
+        str += '\n';
+      }
+      return str;
+    }
+  };
+}(window));
 })(jQuery, window, Handsontable);

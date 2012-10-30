@@ -47,6 +47,9 @@ angular.module('ui.directives', [])
 
             colHeaders.push(title);
 
+            var deregister
+              , deinterval;
+
             switch (type) {
               case 'autocomplete':
                 settings['autoComplete'].push({
@@ -56,10 +59,30 @@ angular.module('ui.directives', [])
                     }
                   },
                   source: function (row, col) {
+                    var fn;
+                    if (deregister) {
+                      deregister();
+                      clearInterval(deinterval);
+                    }
+                    var parsed;
                     var childScope = scope.$new();
                     childScope.item = $container.data('handsontable').getData()[row];
-                    var parsed = childScope.$eval(options);
-                    return parsed;
+                    deinterval = setInterval(function () {
+                      childScope.item = $container.data('handsontable').getData()[row];
+                      childScope.$digest();
+                    }, 100);
+                    deregister = childScope.$watch(options, function (oldVal, newVal) {
+                      parsed = childScope.$eval(options)
+                      if (fn) {
+                        fn(parsed);
+                      }
+                    }, true);
+                    return function (query, process) {
+                      fn = process;
+                      if (parsed) {
+                        fn(parsed);
+                      }
+                    }
                   }
                 });
                 break;
@@ -82,8 +105,12 @@ angular.module('ui.directives', [])
                 }
             }
 
-            if ($this.attr('readOnly')) {
+            if (typeof $this.attr('readOnly') !== 'undefined') {
               column.readOnly = true;
+            }
+
+            if (typeof $this.attr('live') !== 'undefined') {
+              column.live = true;
             }
 
             columns.push(column);
@@ -125,7 +152,7 @@ angular.module('ui.directives', [])
               });
             }
             else {
-              $container.handsontable('render');
+              $container.handsontable('loadData', scope[rhs]);
             }
           }, true);
         }

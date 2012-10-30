@@ -1344,32 +1344,6 @@ Handsontable.Core = function (rootElement, settings) {
 
   var bindEvents = function () {
     self.rootElement.on("beforedatachange.handsontable", function (event, changes) {
-      if (priv.settings.autoComplete) { //validate strict autocompletes
-        var typeahead = priv.editProxy.data('typeahead');
-        loop : for (var c = changes.length - 1; c >= 0; c--) {
-          for (var a = 0, alen = priv.settings.autoComplete.length; a < alen; a++) {
-            var autoComplete = priv.settings.autoComplete[a];
-            var source = autoComplete.source();
-            if (changes[c][3] && autoComplete.match(changes[c][0], changes[c][1], datamap.getAll)) {
-              var lowercaseVal = changes[c][3].toLowerCase();
-              for (var s = 0, slen = source.length; s < slen; s++) {
-                if (changes[c][3] === source[s]) {
-                  continue loop; //perfect match
-                }
-                else if (lowercaseVal === source[s].toLowerCase()) {
-                  changes[c][3] = source[s]; //good match, fix the case
-                  continue loop;
-                }
-              }
-              if (autoComplete.strict) {
-                changes.splice(c, 1); //no match, invalidate this change
-                continue loop;
-              }
-            }
-          }
-        }
-      }
-
       if (priv.settings.onBeforeChange) {
         var result = priv.settings.onBeforeChange.apply(self.rootElement[0], [changes]);
         if (result === false) {
@@ -1401,8 +1375,9 @@ Handsontable.Core = function (rootElement, settings) {
    * @param {Number} prop
    * @param {String} value
    * @param {String} [source='edit'] String that identifies how this change will be described in changes array (useful in onChange callback)
+   * @param {Boolean} [keepEditing=true] If set to true, editor will not be destroyed after data is set
    */
-  this.setDataAtCell = function (row, prop, value, source) {
+  this.setDataAtCell = function (row, prop, value, source, keepEditing) {
     var refreshRows = false, refreshCols = false, changes, i, ilen, td, changesByCol = [];
 
     if (typeof row === "object") { //is it an array of changes
@@ -1444,18 +1419,22 @@ Handsontable.Core = function (rootElement, settings) {
           refreshCols = true;
         }
       }
-      td = self.view.render(row, col, prop, value);
+      if (!keepEditing) {
+        td = self.view.render(row, col, prop, value);
+      }
       datamap.set(row, prop, value);
     }
-    if (refreshRows) {
-      self.blockedCols.refresh();
-    }
-    if (refreshCols) {
-      self.blockedRows.refresh();
-    }
-    var recreated = grid.keepEmptyRows();
-    if (!recreated) {
-      selection.refreshBorders();
+    if (!keepEditing) {
+      if (refreshRows) {
+        self.blockedCols.refresh();
+      }
+      if (refreshCols) {
+        self.blockedRows.refresh();
+      }
+      var recreated = grid.keepEmptyRows();
+      if (!recreated) {
+        selection.refreshBorders();
+      }
     }
     if (changes.length) {
       self.rootElement.triggerHandler("datachange.handsontable", [changes, source || 'edit']);
@@ -1535,7 +1514,7 @@ Handsontable.Core = function (rootElement, settings) {
     else {
       priv.dataType = 'array';
     }
-    if(data[0]) {
+    if (data[0]) {
       priv.duckDataSchema = datamap.recursiveDuckSchema(data[0]);
     }
     else {
@@ -3458,7 +3437,7 @@ var texteditor = {
    * Sets caret position in edit proxy
    * @author http://blog.vishalon.net/index.php/javascript-getting-and-setting-caret-position-in-textarea/
    * @param {Number}
-    */
+   */
   setCaretPosition: function (keyboardProxy, pos) {
     var el = keyboardProxy[0];
     if (el.setSelectionRange) {
@@ -3752,6 +3731,17 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
     }
   });
 
+  if (cellProperties.live) {
+    var oldVal = keyboardProxy.val();
+    var observeVal = setInterval(function () {
+      var newVal = keyboardProxy.val();
+      if (oldVal !== newVal) {
+        instance.setDataAtCell(row, prop, newVal, null, true);
+        oldVal = newVal;
+      }
+    }, 50);
+  }
+
   function onDblClick() {
     keyboardProxy[0].focus();
     texteditor.beginEditing(instance, td, row, col, prop, keyboardProxy, true);
@@ -3761,6 +3751,7 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
   instance.container.find('.htBorder.current').on('dblclick.editor', onDblClick);
 
   return function (isCancelled) {
+    clearTimeout(observeVal);
     texteditor.finishEditing(instance, td, row, col, prop, keyboardProxy, isCancelled);
   }
 };
@@ -3843,14 +3834,6 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, keyboa
     destroyer(true);
     instance.setDataAtCell(row, prop, typeahead.updater(val));
     return this.hide();
-  };
-
-  typeahead.render = function (items) {
-    typeahead._render.call(this, items);
-    if (cellProperties.autoComplete.strict) {
-      this.$menu.find('li:eq(0)').removeClass('active');
-    }
-    return this;
   };
 
   keyboardProxy.on("keydown.editor", function (event) {

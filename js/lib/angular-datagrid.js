@@ -18,7 +18,7 @@ angular.module('ui.directives', [])
 
         var expression = tAttrs.datarows;
         var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
-          lhs, rhs, valueIdent, keyIdent;
+          lhs, rhs;
         if (!match) {
           throw Error("Expected datarows in form of '_item_ in _collection_' but got '" +
             expression + "'.");
@@ -27,6 +27,7 @@ angular.module('ui.directives', [])
         rhs = match[2];
         tElement.data("uiDatagrid", {
           lhs: lhs,
+          rhs: rhs,
           colHeaders: [],
           columns: [],
           settings: angular.extend({}, defaultSettings),
@@ -63,7 +64,7 @@ angular.module('ui.directives', [])
             scope.$emit('datagridSelection', $container, r, p, r2, p2);
           });
 
-          scope.$watch(rhs, function (value) {
+          scope.$watch(rhs, function (newVal) {
             if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.columns.length > 0) {
               $container.handsontable('updateSettings', {
                 data: scope[rhs],
@@ -86,6 +87,11 @@ angular.module('ui.directives', [])
       priority: 500,
       compile: function compile(tElement, tAttrs, transclude) {
 
+        tElement.data("uiDatagridAutocomplete", {
+          value: tAttrs.value,
+          source: null
+        });
+
         return function postLink(scope, element, attrs, controller) {
           var uiDatagrid = element.inheritedData("uiDatagrid");
 
@@ -103,34 +109,11 @@ angular.module('ui.directives', [])
 
           uiDatagrid.colHeaders.unshift(title);
 
-          var deregister
-            , deinterval;
-
           switch (type) {
             case 'autocomplete':
               column.type = Handsontable.AutocompleteCell;
-              column.source = function (query, process) {
-                if (deregister) {
-                  deregister();
-                  clearInterval(deinterval);
-                }
-                var parsed;
-                var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
-                childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-                childScope.$eval(attrs.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-                childScope.$digest();
-                deinterval = setInterval(function () {
-                  scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-                  scope.$digest();
-                  childScope.$digest();
-                }, 100);
-                deregister = childScope.$watch(options, function (oldVal, newVal) {
-                  parsed = childScope.$eval(options)
-                  if (process) {
-                    process(parsed);
-                  }
-                }, true);
-              };
+              var uiDatagridAutocomplete = element.data("uiDatagridAutocomplete");
+              column.source = uiDatagridAutocomplete.source;
               break;
 
             case 'checkbox':
@@ -166,4 +149,61 @@ angular.module('ui.directives', [])
       }
     };
     return directiveDefinitionObject;
-  });
+  })
+  .directive('optionlist', ['$interpolate', function ($interpolate) {
+  var directiveDefinitionObject = {
+    restrict: 'E',
+    priority: 400,
+    compile: function compile(tElement, tAttrs, transclude, linker) {
+
+      return function postLink(scope, element, attrs, controller) {
+        var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
+        var uiDatagrid = element.inheritedData("uiDatagrid");
+
+        var expression = attrs.datarows;
+        var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
+          lhs, rhs;
+        if (!match) {
+          throw Error("Expected datarows in form of '_item_ in _collection_' but got '" +
+            expression + "'.");
+        }
+        lhs = match[1];
+        rhs = match[2];
+
+        var deregister
+          , deinterval;
+
+        var childScope = scope.$new();
+
+        var interpolateFn = $interpolate($.trim(element.html()));
+
+        uiDatagridAutocomplete.source = function (query, process) {
+          if (deregister) {
+            deregister();
+            clearInterval(deinterval);
+          }
+          var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
+          childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
+          childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
+          childScope.$digest();
+          deinterval = setInterval(function () {
+            scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
+            scope.$digest();
+            childScope.$digest();
+          }, 100);
+          deregister = childScope.$watch(rhs, function (newVal, oldVal) {
+            var parsed = [];
+            for (var i = 0, ilen = newVal.length; i < ilen; i++) {
+              childScope[lhs] = newVal[i];
+              parsed.push(interpolateFn(childScope));
+            }
+            if (process) {
+              process(parsed);
+            }
+          }, true);
+        };
+      }
+    }
+  };
+  return directiveDefinitionObject;
+}]);

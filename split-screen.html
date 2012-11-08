@@ -33,7 +33,7 @@
   <datacolumn value="item.address" title="'Address'"></datacolumn>
   <datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'">
     <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = option.Description">
-      {{option.Description}}
+      <img src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>
   <datacolumn type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"
@@ -51,7 +51,7 @@
   <datacolumn value="item.address" title="'Address'"></datacolumn>
   <datacolumn type="'autocomplete'" value="item.Product.Description" title="'Favorite food'">
     <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = option.Description">
-      {{option.Description}}
+      <img src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>
   <datacolumn type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"

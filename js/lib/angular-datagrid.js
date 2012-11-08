@@ -113,7 +113,11 @@ angular.module('ui.directives', [])
             case 'autocomplete':
               column.type = Handsontable.AutocompleteCell;
               var uiDatagridAutocomplete = element.data("uiDatagridAutocomplete");
-              column.source = uiDatagridAutocomplete.source;
+              for (var i in uiDatagridAutocomplete) {
+                if (uiDatagridAutocomplete.hasOwnProperty(i)) {
+                  column[i] = uiDatagridAutocomplete[i];
+                }
+              }
               break;
 
             case 'checkbox':
@@ -153,8 +157,10 @@ angular.module('ui.directives', [])
   .directive('optionlist', ['$interpolate', function ($interpolate) {
   var directiveDefinitionObject = {
     restrict: 'E',
-    priority: 400,
     compile: function compile(tElement, tAttrs, transclude, linker) {
+
+      var tpl = $.trim(tElement.html());
+      tElement.remove();
 
       return function postLink(scope, element, attrs, controller) {
         var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
@@ -175,7 +181,9 @@ angular.module('ui.directives', [])
 
         var childScope = scope.$new();
 
-        var interpolateFn = $interpolate($.trim(element.html()));
+        var interpolateFn = $interpolate(tpl);
+
+        var lastItems;
 
         uiDatagridAutocomplete.source = function (query, process) {
           if (deregister) {
@@ -192,15 +200,31 @@ angular.module('ui.directives', [])
             childScope.$digest();
           }, 100);
           deregister = childScope.$watch(rhs, function (newVal, oldVal) {
-            var parsed = [];
-            for (var i = 0, ilen = newVal.length; i < ilen; i++) {
-              childScope[lhs] = newVal[i];
-              parsed.push(interpolateFn(childScope));
-            }
+            lastItems = newVal;
             if (process) {
-              process(parsed);
+              process(newVal);
             }
           }, true);
+        };
+
+        uiDatagridAutocomplete.sorter = function (items) {
+          return items;
+        };
+
+        uiDatagridAutocomplete.highlighter = function (item) {
+          childScope[lhs] = item;
+          return interpolateFn(childScope);
+        };
+
+        uiDatagridAutocomplete.select = function () {
+          var index = this.$menu.find('.active').index();
+
+          var instance = uiDatagrid.$container.data('handsontable');
+          instance.destroyEditor(true);
+
+          childScope[lhs] = lastItems[index];
+          childScope.$eval(attrs.clickrow);
+          return this.hide();
         };
       }
     }

@@ -107,7 +107,7 @@ angular.module('ui.directives', [])
           var column = scope.$eval(options) || {};
           column.data = value;
 
-          uiDatagrid.colHeaders.unshift(title);
+          uiDatagrid.colHeaders.push(title);
 
           switch (type) {
             case 'autocomplete':
@@ -144,7 +144,7 @@ angular.module('ui.directives', [])
             }
           }
 
-          uiDatagrid.columns.unshift(column);
+          uiDatagrid.columns.push(column);
         }
       }
     };

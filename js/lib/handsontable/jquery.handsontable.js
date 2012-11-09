@@ -3902,6 +3902,8 @@ var Handsontable = { //class namespace
       }
     }
 
+    var wasDestroyed = false;
+
     keyboardProxy.on("keydown.editor", function (event) {
       switch (event.keyCode) {
         case 27: /* ESC */
@@ -3922,6 +3924,10 @@ var Handsontable = { //class namespace
     });
 
     keyboardProxy.on("keyup.editor", function (event) {
+        if (wasDestroyed) {
+          return;
+        }
+
         switch (event.keyCode) {
           case 9: /* tab */
           case 13: /* return/enter */
@@ -3960,6 +3966,7 @@ var Handsontable = { //class namespace
     instance.container.find('.htBorder.current').on('dblclick.editor', onDblClick);
 
     var destroyer = function (isCancelled) {
+      wasDestroyed = true;
       keyboardProxy.off(); //remove typeahead bindings
       textDestroyer(isCancelled);
       dontHide = false;

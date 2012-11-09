@@ -184,8 +184,14 @@ angular.module('ui.directives', [])
         var interpolateFn = $interpolate(tpl);
 
         var lastItems;
+        var lastQuery;
 
         uiDatagridAutocomplete.source = function (query, process) {
+          if ($.trim(query) === lastQuery) {
+            return;
+          }
+          lastQuery = $.trim(query);
+
           if (deregister) {
             deregister();
             clearInterval(deinterval);
@@ -217,13 +223,15 @@ angular.module('ui.directives', [])
         };
 
         uiDatagridAutocomplete.select = function () {
-          var index = this.$menu.find('.active').index();
+          if (this.$menu.find('.active').length) {
+            var index = this.$menu.find('.active').index();
+            childScope[lhs] = lastItems[index];
+            var instance = uiDatagrid.$container.data('handsontable');
+            instance.destroyEditor();
+            childScope.$eval(attrs.clickrow);
+          }
 
-          var instance = uiDatagrid.$container.data('handsontable');
-          instance.destroyEditor(true);
-
-          childScope[lhs] = lastItems[index];
-          childScope.$eval(attrs.clickrow);
+          lastQuery = void 0;
           return this.hide();
         };
       }

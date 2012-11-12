@@ -22,7 +22,7 @@ Include the library files (see [dist/](https://github.com/warpech/angular-ui-han
 Template:
 
 ```html
-<div ui-datagrid="{minSpareRows: 1}" datarows="item in items">
+<div ui-handsontable="{minSpareRows: 1}" datarows="item in items">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -69,19 +69,19 @@ Whereas `item.isActive` column has autocomplete options defined directly in the 
   
 ## Directives and attributes specification
   
- Directive          | Attribute&nbsp;&nbsp;&nbsp; | Description
- -------------------|-----------------------------|-------------
- <div ui-datagrid>  |                             | Defines the grid container
- <div ui-datagrid>  | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
- <datacolumn>       |                             | Defines a column in the grid
- <datacolumn>       | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
- <datacolumn>       | value                       | Row property that will be used as data source for each cell
- <datacolumn>       | title                       | Column title
- <datacolumn>       | readOnly                    | If set, column will be read-only
- <datacolumn>       | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
- <datacolumn>       | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
- <datacolumn>       | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
- <datacolumn>       | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
+ Directive                       | Attribute&nbsp;&nbsp;&nbsp; | Description
+ --------------------------------|-----------------------------|-------------
+ **&lt;div ui-handsontable&gt;** |                             | Defines the grid container
+ &lt;div ui-handsontable&gt;     | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+ **&lt;datacolumn&gt;**          |                             | Defines a column in the grid
+ &lt;datacolumn&gt;              | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
+ &lt;datacolumn&gt;              | value                       | Row property that will be used as data source for each cell
+ &lt;datacolumn&gt;              | title                       | Column title
+ &lt;datacolumn&gt;              | readOnly                    | If set, column will be read-only
+ &lt;datacolumn&gt;              | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
+ &lt;datacolumn&gt;              | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
+ &lt;datacolumn&gt;              | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
+ &lt;datacolumn&gt;              | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
 
 ## Further development
 

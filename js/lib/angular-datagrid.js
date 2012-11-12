@@ -97,10 +97,12 @@ angular.module('ui.directives', [])
         tElement.data("uiDatagridAutocomplete", {
           value: tAttrs.value,
           source: null,
-          live: ($.inArray('live', keys) !== -1) //true if element has attribute 'live'
+          live: ($.inArray('live', keys) !== -1), //true if element has attribute 'live'
+          strict: ($.inArray('strict', keys) !== -1) //true if element has attribute 'strict'
         });
 
         return function postLink(scope, element, attrs, controller) {
+          var i;
           var uiDatagrid = element.inheritedData("uiDatagrid");
 
           var pattern = new RegExp("^(" + uiDatagrid.lhs + "\\.)")
@@ -121,7 +123,7 @@ angular.module('ui.directives', [])
             case 'autocomplete':
               column.type = Handsontable.AutocompleteCell;
               var uiDatagridAutocomplete = element.data("uiDatagridAutocomplete");
-              for (var i in uiDatagridAutocomplete) {
+              for (i in uiDatagridAutocomplete) {
                 if (uiDatagridAutocomplete.hasOwnProperty(i)) {
                   column[i] = uiDatagridAutocomplete[i];
                 }
@@ -150,7 +152,7 @@ angular.module('ui.directives', [])
             column.readOnly = true;
           }
 
-          for (var i in attrs) {
+          for (i in attrs) {
             if (attrs.hasOwnProperty(i) && i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
               column[i] = childScope.$eval(attrs[i]);
             }
@@ -215,7 +217,7 @@ angular.module('ui.directives', [])
             scope.$digest();
             childScope.$digest();
           }, 100);
-          deregister = childScope.$watch(rhs, function (newVal, oldVal) {
+          deregister = childScope.$watch(rhs, function (newVal) {
             lastItems = newVal;
             if (process) {
               process(newVal);
@@ -233,12 +235,16 @@ angular.module('ui.directives', [])
         };
 
         uiDatagridAutocomplete.select = function () {
+          var instance = uiDatagrid.$container.data('handsontable');
           if (this.$menu.find('.active').length) {
             var index = this.$menu.find('.active').index();
             childScope[lhs] = lastItems[index];
-            var instance = uiDatagrid.$container.data('handsontable');
             instance.destroyEditor();
             childScope.$eval(attrs.clickrow);
+          }
+          else if (!uiDatagridAutocomplete.strict) {
+            instance.destroyEditor();
+            childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
           }
 
           lastQuery = void 0;

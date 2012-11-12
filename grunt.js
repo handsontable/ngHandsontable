@@ -3,6 +3,7 @@
  *
  * Installation:
  * 1. Install Grunt (`npm install -g grunt`)
+ * 2. Install NPM packages from `devDependencies` section in package.json (`npm install`)
  *
  * Build:
  * Execute `grunt` from root directory of this directory (where grunt.js is)

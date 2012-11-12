@@ -2,11 +2,22 @@
 
 Enables creation of data grid applications in AngularJS.
 
+## Demo
+
 The current version should be deployed here: http://ng-datagrid.handsontable.com/split-screen.html
 
 You can also clone this repo and run `split-screen.html` in your browser
 
-## Sample usage
+## Usage
+
+Include the library files (see [dist/](https://github.com/warpech/angular-ui-handsontable/tree/master/dist) directory):
+
+```html
+<script src="lib/angular.min.js"></script>
+<script src="lib/jquery.min.js"></script>
+<script src="dist/angular-ui-handsontable.full.js"></script>
+<link rel="stylesheet" media="screen" href="dist/angular-ui-handsontable.full.css">
+```
 
 Template:
 
@@ -56,21 +67,21 @@ Please note that in the above example, the `item.Product.Description` column has
 
 Whereas `item.isActive` column has autocomplete options defined directly in the parental scope.
   
-## Elements and attributes in use  
+## Directives and attributes specification
   
- Element       | Attribute&nbsp;&nbsp;&nbsp; | Description
- --------------|-----------------------------|-------------
- div           | ui-datagrid                 | Defines the grid container
- div           | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
- datacolumn    |                             | Defines a column in the grid
- datacolumn    | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
- datacolumn    | value                       | Row property that will be used as data source for each cell
- datacolumn    | title                       | Column title
- datacolumn    | readOnly                    | If set, column will be read-only
- datacolumn    | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
- datacolumn    | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
- datacolumn    | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
- datacolumn    | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
+ Directive          | Attribute&nbsp;&nbsp;&nbsp; | Description
+ -------------------|-----------------------------|-------------
+ <div ui-datagrid>  |                             | Defines the grid container
+ <div ui-datagrid>  | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+ <datacolumn>       |                             | Defines a column in the grid
+ <datacolumn>       | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
+ <datacolumn>       | value                       | Row property that will be used as data source for each cell
+ <datacolumn>       | title                       | Column title
+ <datacolumn>       | readOnly                    | If set, column will be read-only
+ <datacolumn>       | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
+ <datacolumn>       | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
+ <datacolumn>       | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
+ <datacolumn>       | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
 
 ## Further development
 

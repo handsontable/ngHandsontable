@@ -42,12 +42,20 @@ module.exports = function (grunt) {
         dest: 'dist/angular-ui-handsontable.full.css'
       }
     },
+    min: {
+      "dist/angular-ui-handsontable.full.min.js": [ "<banner>", "dist/angular-ui-handsontable.full.js" ]
+    },
+    cssmin: {
+      "dist/angular-ui-handsontable.full.min.css": [ "<banner>", "dist/angular-ui-handsontable.full.css" ]
+    },
     watch: {
       files: ['<config:concat.full_js.src>', '<config:concat.full_css.src>'],
-      tasks: 'concat'
+      tasks: 'concat min cssmin'
     }
   });
 
   // Default task.
-  grunt.registerTask('default', 'concat');
+  grunt.registerTask('default', 'concat min cssmin');
+
+  grunt.loadNpmTasks('grunt-css');
 };

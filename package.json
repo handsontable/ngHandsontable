@@ -1,10 +1,13 @@
 {
-  "name": "Angular UI Handsontable",
+  "name": "angular-ui-handsontable",
   "description": "Angular UI directive for Handsontable. Enables creation of data grid applications in AngularJS",
   "homepage": "https://github.com/warpech/angular-ui-handsontable",
   "bugs": {
     "url": "https://github.com/warpech/angular-ui-handsontable/issues"
   },
   "author": "Marcin Warpechowski <marcin@nextgen.pl>",
-  "version": "0.1.0-dev"
+  "version": "0.1.0-dev",
+  "devDependencies": {
+    "grunt-css": "~0.3.0"
+  }
 }

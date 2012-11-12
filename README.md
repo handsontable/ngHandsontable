@@ -9,15 +9,20 @@ You can also clone this repo and run `split-screen.html` in your browser
 Template:
 
 ```html
-<div ui-datagrid datarows="item in items">
-  <datacolumn value="item.id" title="ID"/>
-  <datacolumn value="item.name.first" title="First Name"/>
-  <datacolumn value="item.name.last" title="Last Name"/>
-  <datacolumn value="item.address" title="Address"/>
-  <datacolumn type="'autocomplete'" value="item.Product.Description" title="Favorite food"  
-              options="getOptions(item.Product.Options)"/></datacolumn>
-  <datacolumn type="'checkbox'" value="item.isActive" title="Is active"  
-              checkedTemplate="'Yes'" uncheckedTemplate="'No'"/>
+<div ui-datagrid="{minSpareRows: 1}" datarows="item in items">
+  <datacolumn value="item.id" title="'ID'"></datacolumn>
+  <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
+  <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
+  <datacolumn value="item.address" title="'Address'"></datacolumn>
+  <datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'" live strict>
+    <optionlist datarows="option in item.Product.Options"
+                clickrow="item.Product.Description = option.Description">
+      <img src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0">
+      {{option.Description}}
+    </optionlist>
+  </datacolumn>
+  <datacolumn type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"
+              uncheckedTemplate="'No'"></datacolumn>
 </div>
 ```
 
@@ -25,24 +30,24 @@ Controller:
 
 ```javascript
 $scope.items = [
-  {id: 1, name: {first: "Marcin", last: "Warpechowski"}, address: "Schellingstr. 58, Muenchen", isActive: 'Yes', "Product": {
-  "Description": "Big Mac",
-	"Options": [
-	  {"Description": "Big Mac"},
-	  {"Description": "Big Mac & Co"}
-	]}}
+  {
+    id: 1,
+    name: {
+      first: "Marcin",
+      last: "Warpechowski"
+    },
+    address: "Marienplatz 11, Munich",
+    isActive: "Yes",
+    Product: {
+      Description: "Big Mac",
+	    Options: [
+	      {Description: "Big Mac"},
+	      {Description: "Big Mac & Co"}
+	    ]
+	  }
+	}
   //more items go here
 ];
-
-$scope.getOptions = function (options) {
-  var out = []
-  if(typeof options === 'object' && options.length) {
-	for (var i = 0, ilen = options.length; i < ilen; i++) {
-	  out.push(options[i].Description);
-	}
-  }
-  return out;
-}
 ```
 
 Please note that in the above example, the `item.Product.Description` column has autocomplete options returned by a function defined in the controller.
@@ -59,7 +64,11 @@ Whereas `item.isActive` column has autocomplete options defined directly in the 
  datacolumn    | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
  datacolumn    | value                       | Row property that will be used as data source for each cell
  datacolumn    | title                       | Column title
- datacolumn    | options                     | (Optional) Expression that returns: <ul><li>configuration of actual values for checkbox type</li><li>array of possible cell values for autocomplete type</li></ul>
+ datacolumn    | readOnly                    | If set, column will be read-only
+ datacolumn    | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
+ datacolumn    | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
+ datacolumn    | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
+ datacolumn    | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
 
 ## Further development
 

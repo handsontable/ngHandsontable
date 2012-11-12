@@ -87,9 +87,17 @@ angular.module('ui.directives', [])
       priority: 500,
       compile: function compile(tElement, tAttrs, transclude) {
 
+        var keys = [];
+        for (var i in tAttrs) {
+          if (tAttrs.hasOwnProperty(i)) {
+            keys.push(i);
+          }
+        }
+
         tElement.data("uiDatagridAutocomplete", {
           value: tAttrs.value,
-          source: null
+          source: null,
+          live: ($.inArray('live', keys) !== -1) //true if element has attribute 'live'
         });
 
         return function postLink(scope, element, attrs, controller) {
@@ -198,8 +206,10 @@ angular.module('ui.directives', [])
           }
           var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
           childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
-          childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-          childScope.$digest();
+          if (uiDatagridAutocomplete.live) {
+            childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
+            childScope.$digest();
+          }
           deinterval = setInterval(function () {
             scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
             scope.$digest();

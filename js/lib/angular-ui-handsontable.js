@@ -2,7 +2,7 @@
  * https://github.com/warpech/angular-ui-handsontable
  */
 angular.module('ui.directives', [])
-  .directive('uiDatagrid', function () {
+  .directive('uiHandsontable', function () {
     var directiveDefinitionObject = {
       restrict: 'A',
       compile: function compile(tElement, tAttrs, transclude) {

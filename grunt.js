@@ -13,6 +13,8 @@
  * building Angular UI Handsontable will create files:
  *  - dist/angular-ui-handsontable.full.js
  *  - dist/angular-ui-handsontable.full.css
+ *  - dist/angular-ui-handsontable.full.min.js
+ *  - dist/angular-ui-handsontable.full.min.css
  *
  * See https://github.com/cowboy/grunt for more information about Grunt
  */

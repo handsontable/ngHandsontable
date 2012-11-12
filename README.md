@@ -13,8 +13,8 @@ You can also clone this repo and run `split-screen.html` in your browser
 Include the library files (see [dist/](https://github.com/warpech/angular-ui-handsontable/tree/master/dist) directory):
 
 ```html
-<script src="lib/angular.min.js"></script>
 <script src="lib/jquery.min.js"></script>
+<script src="lib/angular.min.js"></script>
 <script src="dist/angular-ui-handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="dist/angular-ui-handsontable.full.css">
 ```

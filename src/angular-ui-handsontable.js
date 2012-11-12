@@ -1,6 +1,3 @@
-/**
- * https://github.com/warpech/angular-ui-handsontable
- */
 angular.module('ui.directives', [])
   .directive('uiHandsontable', function () {
     var directiveDefinitionObject = {

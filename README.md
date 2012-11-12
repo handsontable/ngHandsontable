@@ -1,5 +1,7 @@
 # Angular UI directive for Handsontable
 
+Enables creation of data grid applications in AngularJS.
+
 The current version should be deployed here: http://ng-datagrid.handsontable.com/split-screen.html
 
 You can also clone this repo and run `split-screen.html` in your browser

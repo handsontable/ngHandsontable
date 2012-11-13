@@ -29,7 +29,7 @@
   <datacolumn value="item.address" title="'Address'"></datacolumn>
   <datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'">
     <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = option.Description">
-      <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> <button ng-click="dumpOption(option)">{{option.Description}}</button>
+      <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>
   <datacolumn type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"

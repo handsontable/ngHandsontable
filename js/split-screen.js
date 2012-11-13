@@ -24,10 +24,6 @@ function MyCtrl($scope, $filter) {
     console.log("dump items", $scope.items);
   };
 
-  $scope.dumpOption = function (option) {
-    console.log("dump option", option);
-  };
-
   $scope.grayedOut = {
     renderer: function (instance, td, row, col, prop, value, cellProperties) {
       Handsontable.TextCell.renderer.apply(this, arguments);

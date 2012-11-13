@@ -1,13 +1,13 @@
 /**
  * angular-ui-handsontable 0.1.1-dev
  * 
- * Date: Tue Nov 13 2012 14:50:43 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 13 2012 16:19:09 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])
   .directive('uiHandsontable', function () {
     var directiveDefinitionObject = {
-      restrict: 'A',
+      restrict: 'EA',
       compile: function compile(tElement, tAttrs, transclude) {
 
         var defaultSettings = {
@@ -17,7 +17,7 @@ angular.module('ui.directives', [])
           autoComplete: []
         };
 
-        var $container = $('<div class="dataTable"></div>');
+        var $container = $('<div class="ui-handsontable-container"></div>');
 
         var expression = tAttrs.datarows;
         var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
@@ -39,7 +39,7 @@ angular.module('ui.directives', [])
 
         return function postLink(scope, element, attrs, controller) {
           var uiDatagrid = element.data("uiDatagrid");
-          uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$eval(attrs.uiDatagrid));
+          uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$eval(attrs.uiHandsontable || attrs.settings));
 
           $(element).append($container);
 

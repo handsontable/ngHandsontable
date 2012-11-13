@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" ng-app="ui.directives">
 <head>
+  <!-- use this if you want IE <= 8  support -->
+  <!--[if lte IE 8]>
+  <script>
+    document.createElement('ui-handsontable');
+    document.createElement('datacolumn');
+    document.createElement('optionlist');
+  </script>
+  <![endif]-->
+
   <meta charset="utf-8">
   <title>Handsontable as Angular directive</title>
 
@@ -22,7 +31,7 @@
 
 <p>Selection: {{currentSelection}}</p>
 
-<div ui-handsontable="{minSpareRows: 1}" datarows="item in items">
+<ui-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="item in items">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -34,7 +43,7 @@
   </datacolumn>
   <datacolumn type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"
               uncheckedTemplate="'No'"></datacolumn>
-</div>
+</ui-handsontable>
 
 <h2>Instance 2</h2>
 

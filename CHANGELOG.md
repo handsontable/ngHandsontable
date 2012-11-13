@@ -1,5 +1,10 @@
 # Changelog
 
+##0.1.1-dev
+
+- now the template inside `optionlist` is compiled along with inner Angular directives
+- split-screen.html now uses `img ng-src` instead of `img src` so that there is no request to the server for the unparsed "{{option.Image}}" path
+
 ##0.1.0
 
 Changes since Nov 5, 2012:

@@ -1,0 +1,10 @@
+# Changelog
+
+##0.1.0-dev
+
+Changes since Nov 5, 2012:
+
+- now Angular UI Handsontable is built with Grunt
+- 2 distributions (in [dist/](https://github.com/warpech/angular-ui-handsontable/tree/master/dist) directory): full and full.min (for development purposes I think it is better to use full for now)
+- directive name changed to `ui-handsontable` to follow the scheme that Angular UI is using
+- new directive `optionlist` that includes the autocomplete row template inside

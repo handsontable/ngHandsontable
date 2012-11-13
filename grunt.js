@@ -52,7 +52,7 @@ module.exports = function (grunt) {
       "dist/angular-ui-handsontable.full.min.css": [ "<banner>", "dist/angular-ui-handsontable.full.css" ]
     },
     watch: {
-      files: ['<config:concat.full_js.src>', '<config:concat.full_css.src>'],
+      files: ['src/angular-ui-handsontable.js'],
       tasks: 'concat min cssmin'
     }
   });

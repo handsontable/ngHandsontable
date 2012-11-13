@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.1.0
+ * angular-ui-handsontable 0.1.1-dev
  * 
- * Date: Tue Nov 13 2012 11:36:13 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 13 2012 13:44:44 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])
@@ -167,12 +167,13 @@ angular.module('ui.directives', [])
     };
     return directiveDefinitionObject;
   })
-  .directive('optionlist', ['$interpolate', function ($interpolate) {
+  .directive('optionlist', ['$compile', function ($compile) {
   var directiveDefinitionObject = {
     restrict: 'E',
     compile: function compile(tElement, tAttrs, transclude, linker) {
 
-      var tpl = $.trim(tElement.html());
+      var tpl = '<span>' + $.trim(tElement.html()) + '</span>'; //span is needed because $compile needs a "root" element
+      var compiledTemplate = $compile(tpl);
       tElement.remove();
 
       return function postLink(scope, element, attrs, controller) {
@@ -193,8 +194,6 @@ angular.module('ui.directives', [])
           , deinterval;
 
         var childScope = scope.$new();
-
-        var interpolateFn = $interpolate(tpl);
 
         var lastItems;
         var lastQuery;
@@ -233,8 +232,13 @@ angular.module('ui.directives', [])
         };
 
         uiDatagridAutocomplete.highlighter = function (item) {
-          childScope[lhs] = item;
-          return interpolateFn(childScope);
+          var el;
+          var newScope = scope.$new();
+          newScope[lhs] = item;
+          compiledTemplate(newScope, function (elem) {
+            el = elem[0];
+          });
+          return el;
         };
 
         uiDatagridAutocomplete.select = function () {

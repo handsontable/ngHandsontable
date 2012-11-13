@@ -164,11 +164,8 @@ angular.module('ui.directives', [])
   .directive('optionlist', ['$compile', function ($compile) {
   var directiveDefinitionObject = {
     restrict: 'E',
-    compile: function compile(tElement, tAttrs, transclude, linker) {
-
-      var tpl = '<span>' + $.trim(tElement.html()) + '</span>'; //span is needed because $compile needs a "root" element
-      var compiledTemplate = $compile(tpl);
-      tElement.remove();
+    transclude: 'element',
+    compile: function compile(element, attr, linker) {
 
       return function postLink(scope, element, attrs, controller) {
         var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
@@ -229,7 +226,7 @@ angular.module('ui.directives', [])
           var el;
           var newScope = scope.$new();
           newScope[lhs] = item;
-          compiledTemplate(newScope, function (elem) {
+          linker(newScope, function (elem) {
             el = elem[0];
           });
           return el;

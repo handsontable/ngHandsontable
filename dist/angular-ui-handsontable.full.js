@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.1.1-dev
  * 
- * Date: Tue Nov 13 2012 13:44:44 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 13 2012 14:01:08 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])
@@ -170,11 +170,8 @@ angular.module('ui.directives', [])
   .directive('optionlist', ['$compile', function ($compile) {
   var directiveDefinitionObject = {
     restrict: 'E',
-    compile: function compile(tElement, tAttrs, transclude, linker) {
-
-      var tpl = '<span>' + $.trim(tElement.html()) + '</span>'; //span is needed because $compile needs a "root" element
-      var compiledTemplate = $compile(tpl);
-      tElement.remove();
+    transclude: 'element',
+    compile: function compile(element, attr, linker) {
 
       return function postLink(scope, element, attrs, controller) {
         var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
@@ -235,7 +232,7 @@ angular.module('ui.directives', [])
           var el;
           var newScope = scope.$new();
           newScope[lhs] = item;
-          compiledTemplate(newScope, function (elem) {
+          linker(newScope, function (elem) {
             el = elem[0];
           });
           return el;

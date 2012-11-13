@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.1.1-dev
  * 
- * Date: Tue Nov 13 2012 14:01:08 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 13 2012 14:50:43 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])
@@ -167,98 +167,100 @@ angular.module('ui.directives', [])
     };
     return directiveDefinitionObject;
   })
-  .directive('optionlist', ['$compile', function ($compile) {
-  var directiveDefinitionObject = {
-    restrict: 'E',
-    transclude: 'element',
-    compile: function compile(element, attr, linker) {
+  .directive('optionlist', function () {
+    var directiveDefinitionObject = {
+      restrict: 'E',
+      transclude: 'element',
+      priority: 510,
+      compile: function compile(element, attr, linker) {
 
-      return function postLink(scope, element, attrs, controller) {
-        var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
-        var uiDatagrid = element.inheritedData("uiDatagrid");
+        return function postLink(scope, element, attrs, controller) {
+          var uiDatagridAutocomplete = element.inheritedData("uiDatagridAutocomplete");
+          var uiDatagrid = element.inheritedData("uiDatagrid");
 
-        var expression = attrs.datarows;
-        var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
-          lhs, rhs;
-        if (!match) {
-          throw Error("Expected datarows in form of '_item_ in _collection_' but got '" +
-            expression + "'.");
-        }
-        lhs = match[1];
-        rhs = match[2];
-
-        var deregister
-          , deinterval;
-
-        var childScope = scope.$new();
-
-        var lastItems;
-        var lastQuery;
-
-        uiDatagridAutocomplete.source = function (query, process) {
-          if ($.trim(query) === lastQuery) {
-            return;
+          var expression = attrs.datarows;
+          var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
+            lhs, rhs;
+          if (!match) {
+            throw Error("Expected datarows in form of '_item_ in _collection_' but got '" +
+              expression + "'.");
           }
-          lastQuery = $.trim(query);
+          lhs = match[1];
+          rhs = match[2];
 
-          if (deregister) {
-            deregister();
-            clearInterval(deinterval);
-          }
-          var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
-          childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
-          if (uiDatagridAutocomplete.live) {
-            childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-            childScope.$digest();
-          }
-          deinterval = setInterval(function () {
-            scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-            scope.$digest();
-            childScope.$digest();
-          }, 100);
-          deregister = childScope.$watch(rhs, function (newVal) {
-            lastItems = newVal;
-            if (process) {
-              process(newVal);
+          var deregister
+            , deinterval;
+
+          var childScope = scope.$new();
+
+          var lastItems;
+          var lastQuery;
+
+          uiDatagridAutocomplete.source = function (query, process) {
+            if ($.trim(query) === lastQuery) {
+              return;
             }
-          }, true);
-        };
+            lastQuery = $.trim(query);
 
-        uiDatagridAutocomplete.sorter = function (items) {
-          return items;
-        };
+            if (deregister) {
+              deregister();
+              clearInterval(deinterval);
+            }
+            var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
+            childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
+            if (uiDatagridAutocomplete.live) {
+              childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
+              childScope.$digest();
+            }
+            deinterval = setInterval(function () {
+              scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
+              scope.$digest();
+              childScope.$digest();
+            }, 100);
+            deregister = childScope.$watch(rhs, function (newVal) {
+              lastItems = newVal;
+              if (process) {
+                process(newVal);
+              }
+            }, true);
+          };
 
-        uiDatagridAutocomplete.highlighter = function (item) {
-          var el;
-          var newScope = scope.$new();
-          newScope[lhs] = item;
-          linker(newScope, function (elem) {
-            el = elem[0];
-          });
-          return el;
-        };
+          uiDatagridAutocomplete.sorter = function (items) {
+            return items;
+          };
 
-        uiDatagridAutocomplete.select = function () {
-          var instance = uiDatagrid.$container.data('handsontable');
-          if (this.$menu.find('.active').length) {
-            var index = this.$menu.find('.active').index();
-            childScope[lhs] = lastItems[index];
-            instance.destroyEditor();
-            childScope.$eval(attrs.clickrow);
-          }
-          else if (!uiDatagridAutocomplete.strict) {
-            instance.destroyEditor();
-            childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
-          }
+          uiDatagridAutocomplete.highlighter = function (item) {
+            var el;
+            var optionScope = childScope.$new();
+            optionScope[lhs] = item;
+            linker(optionScope, function (elem) {
+              el = elem[0];
+              el.style.display = 'block';
+            });
+            return el;
+          };
 
-          lastQuery = void 0;
-          return this.hide();
-        };
+          uiDatagridAutocomplete.select = function () {
+            var instance = uiDatagrid.$container.data('handsontable');
+            if (this.$menu.find('.active').length) {
+              var index = this.$menu.find('.active').index();
+              childScope[lhs] = lastItems[index];
+              instance.destroyEditor();
+              childScope.$eval(attrs.clickrow);
+            }
+            else if (!uiDatagridAutocomplete.strict) {
+              instance.destroyEditor();
+              childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
+            }
+
+            lastQuery = void 0;
+            return this.hide();
+          };
+        }
       }
-    }
-  };
-  return directiveDefinitionObject;
-}]);
+    };
+    return directiveDefinitionObject;
+  });
 /**
  * Handsontable 0.7.3-dev
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs

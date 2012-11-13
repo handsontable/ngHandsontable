@@ -71,8 +71,9 @@ Whereas `item.isActive` column has autocomplete options defined directly in the 
   
  Directive                       | Attribute&nbsp;&nbsp;&nbsp; | Description
  --------------------------------|-----------------------------|-------------
- **&lt;div ui-handsontable&gt;** |                             | Defines the grid container
- &lt;div ui-handsontable&gt;     | datarows                    | Data provier for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+ **&lt;div ui-handsontable&gt;** |                             | Defines the grid container. Can also be declared as element `<ui-handsontable>`
+ &lt;div ui-handsontable&gt;     | datarows                    | Data provider for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+ &lt;div ui-handsontable&gt;     | settings                    | jquery-handsontable settings. For list of options, see: [warpech/jquery-handsontable](https://github.com/warpech/jquery-handsontable)
  **&lt;datacolumn&gt;**          |                             | Defines a column in the grid
  &lt;datacolumn&gt;              | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
  &lt;datacolumn&gt;              | value                       | Row property that will be used as data source for each cell

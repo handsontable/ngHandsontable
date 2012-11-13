@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.1.1-dev
+ * angular-ui-handsontable 0.1.1
  * 
- * Date: Tue Nov 13 2012 16:19:09 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 13 2012 18:38:55 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])

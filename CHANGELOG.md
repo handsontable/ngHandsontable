@@ -1,6 +1,6 @@
 # Changelog
 
-##0.1.1-dev
+##0.1.1
 
 - now the template inside `optionlist` is compiled along with inner Angular directives
 - now you can use the uiHandsontable directive as attribute `<div ui-handsontable="settings">` or element `<ui-handsontable settings="settings">` (both are used in split-screen.html)

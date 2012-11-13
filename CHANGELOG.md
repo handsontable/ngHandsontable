@@ -1,6 +1,6 @@
 # Changelog
 
-##0.1.0-dev
+##0.1.0
 
 Changes since Nov 5, 2012:
 

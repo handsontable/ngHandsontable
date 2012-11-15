@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.1.1
+ * angular-ui-handsontable 0.1.2-dev
  * 
- * Date: Tue Nov 13 2012 18:38:55 GMT+0100 (Central European Standard Time)
+ * Date: Thu Nov 15 2012 13:11:51 GMT+0100 (Central European Standard Time)
 */
 
 angular.module('ui.directives', [])
@@ -59,7 +59,7 @@ angular.module('ui.directives', [])
 
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (!scope.$$phase) { //if digest is not in progress
-              scope.$digest(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
+              scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
           });
 

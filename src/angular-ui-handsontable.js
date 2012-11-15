@@ -53,7 +53,7 @@ angular.module('ui.directives', [])
 
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (!scope.$$phase) { //if digest is not in progress
-              scope.$digest(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
+              scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
           });
 

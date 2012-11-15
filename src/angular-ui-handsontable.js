@@ -207,7 +207,7 @@ angular.module('ui.directives', [])
               childScope.$apply();
             }
             deinterval = setInterval(function () {
-              scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
+              childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
               childScope.$apply();
             }, 100);
             deregister = childScope.$watch(rhs, function (newVal) {

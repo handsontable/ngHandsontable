@@ -1,17 +1,18 @@
 # Changelog
 
-##0.1.2-dev
+## 0.1.2-dev
 
 - now propagates changes correctly if data source comes from parent scope (changed scope.$digest to scope.$apply)
 - IE 8 shim now is included in `full` and `full.min` JavaScript packages
+- upgrade Handsontable to 0.7.4-dev
 
-##0.1.1 (Nov 13, 2012)
+## 0.1.1 (Nov 13, 2012)
 
 - now the template inside `optionlist` is compiled along with inner Angular directives
 - now you can use the uiHandsontable directive as attribute `<div ui-handsontable="settings">` or element `<ui-handsontable settings="settings">` (both are used in split-screen.html)
 - split-screen.html now uses `img ng-src` instead of `img src` so that there is no request to the server for the unparsed "{{option.Image}}" path
 
-##0.1.0 (Nov 12, 2012)
+## 0.1.0 (Nov 12, 2012)
 
 Changes since Nov 5, 2012:
 

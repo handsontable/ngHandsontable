@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.1.2-dev
  * 
- * Date: Thu Nov 15 2012 13:23:14 GMT+0100 (Central European Standard Time)
+ * Date: Thu Nov 15 2012 13:53:49 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -27,7 +27,8 @@
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none;
+  -ms-user-select: none;
+  /*user-select: none; /*no browser supports unprefixed version*/
   border-spacing: 0;
 }
 

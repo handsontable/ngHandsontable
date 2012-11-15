@@ -32,6 +32,7 @@ module.exports = function (grunt) {
       full_js: {
         src: [
           '<banner>',
+          'src/ie-shim.js',
           'src/angular-ui-handsontable.js',
           'src/3rdparty/handsontable/jquery.handsontable.full.js'
         ],

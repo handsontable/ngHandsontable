@@ -1,9 +1,14 @@
 /**
  * angular-ui-handsontable 0.1.2-dev
  * 
- * Date: Thu Nov 15 2012 13:11:51 GMT+0100 (Central European Standard Time)
+ * Date: Thu Nov 15 2012 13:23:13 GMT+0100 (Central European Standard Time)
 */
 
+if (document.all && !document.addEventListener) { // IE8 or lower
+  document.createElement('ui-handsontable');
+  document.createElement('datacolumn');
+  document.createElement('optionlist');
+}
 angular.module('ui.directives', [])
   .directive('uiHandsontable', function () {
     var directiveDefinitionObject = {

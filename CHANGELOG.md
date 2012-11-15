@@ -3,6 +3,7 @@
 ##0.1.2-dev
 
 - now propagates changes correctly if data source comes from parent scope (changed scope.$digest to scope.$apply)
+- IE 8 shim now is included in `full` and `full.min` JavaScript packages
 
 ##0.1.1 (Nov 13, 2012)
 

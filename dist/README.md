@@ -2,15 +2,18 @@
 
 ## Bare distribution
 
-If you are a "Bob the Builder" kind of hacker, you will need to load Angular UI Handsontable JS, CSS and their dependecies:
+If you are a "Bob the Builder" kind of hacker, you will need to load Angular UI Handsontable JS, CSS and their dependecies.
 
 ```html
 <script src="lib/angular.min.js"></script>
 <script src="lib/jquery.min.js"></script>
+<script src="src/ie-shim.js"></script>
 <script src="src/angular-ui-handsontable.js"></script>
 <script src="src/3rdparty/handsontable/jquery.handsontable.full.js"></script>
 <link rel="stylesheet" media="screen" href="src/3rdparty/handsontable/jquery.handsontable.full.css">
 ```
+
+This way is generally not recommended and you are advised to use the Full or Minified distribution instead.
 
 ## Full distribution
 

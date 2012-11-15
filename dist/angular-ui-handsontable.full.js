@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.1.2-dev
  * 
- * Date: Thu Nov 15 2012 13:53:49 GMT+0100 (Central European Standard Time)
+ * Date: Thu Nov 15 2012 14:19:33 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -220,12 +220,11 @@ angular.module('ui.directives', [])
             childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
             if (uiDatagridAutocomplete.live) {
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-              childScope.$digest();
+              childScope.$apply();
             }
             deinterval = setInterval(function () {
               scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-              scope.$digest();
-              childScope.$digest();
+              childScope.$apply();
             }, 100);
             deregister = childScope.$watch(rhs, function (newVal) {
               lastItems = newVal;

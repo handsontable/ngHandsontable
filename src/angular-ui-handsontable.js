@@ -204,12 +204,11 @@ angular.module('ui.directives', [])
             childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
             if (uiDatagridAutocomplete.live) {
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-              childScope.$digest();
+              childScope.$apply();
             }
             deinterval = setInterval(function () {
               scope.currentItem = childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-              scope.$digest();
-              childScope.$digest();
+              childScope.$apply();
             }, 100);
             deregister = childScope.$watch(rhs, function (newVal) {
               lastItems = newVal;

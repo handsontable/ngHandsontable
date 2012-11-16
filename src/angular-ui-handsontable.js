@@ -94,7 +94,7 @@ angular.module('ui.directives', [])
         tElement.data("uiDatagridAutocomplete", {
           value: tAttrs.value,
           source: null,
-          live: ($.inArray('live', keys) !== -1), //true if element has attribute 'live'
+          saveOnBlur: ($.inArray('saveonblur', keys) !== -1), //true if element has attribute 'saveonblur'
           strict: ($.inArray('strict', keys) !== -1) //true if element has attribute 'strict'
         });
 
@@ -202,7 +202,7 @@ angular.module('ui.directives', [])
             }
             var row = uiDatagrid.$container.data('handsontable').getSelected()[0];
             childScope[uiDatagrid.lhs] = scope.$eval(uiDatagrid.rhs)[row];
-            if (uiDatagridAutocomplete.live) {
+            if (!uiDatagridAutocomplete.saveOnBlur) {
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
               childScope.$apply();
             }

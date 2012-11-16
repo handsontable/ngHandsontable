@@ -79,7 +79,7 @@ Whereas `item.isActive` column has autocomplete options defined directly in the 
  &lt;datacolumn&gt;              | value                       | Row property that will be used as data source for each cell
  &lt;datacolumn&gt;              | title                       | Column title
  &lt;datacolumn&gt;              | readOnly                    | If set, column will be read-only
- &lt;datacolumn&gt;              | live                        | (Autocomplete columns only) If set, `value` will be updated after each keystroke
+ &lt;datacolumn&gt;              | saveOnBlur                  | (Autocomplete columns only) If set, `value` will be updated after autocomplete is blured. This is in contrast to default behavior, where `value` is updated after each keystroke
  &lt;datacolumn&gt;              | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
  &lt;datacolumn&gt;              | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
  &lt;datacolumn&gt;              | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)

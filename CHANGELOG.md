@@ -5,6 +5,7 @@
 - now propagates changes correctly if data source comes from parent scope (changed scope.$digest to scope.$apply)
 - IE 8 shim now is included in `full` and `full.min` JavaScript packages
 - upgrade Handsontable to 0.7.4-dev
+- removed `live` attribute from autocomplete (it is now always assumed). Introduced `saveOnBlur` attribute which has the opposite behavior than `live`
 
 ## 0.1.1 (Nov 13, 2012)
 

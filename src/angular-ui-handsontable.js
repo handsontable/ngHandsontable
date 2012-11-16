@@ -1,4 +1,4 @@
-angular.module('ui.directives', [])
+angular.module('uiHandsontable', [])
   .directive('uiHandsontable', function () {
     var directiveDefinitionObject = {
       restrict: 'EA',

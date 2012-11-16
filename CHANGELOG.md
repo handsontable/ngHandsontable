@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3-dev
+
+- changed module name to `uiHandsontable` to avoid conflict with Angular UI
+- created demo page `ui.html` to test cooperability with Angular UI
+
 ## 0.1.2 (Nov 16, 2012)
 
 - now propagates changes correctly if data source comes from parent scope (changed scope.$digest to scope.$apply)

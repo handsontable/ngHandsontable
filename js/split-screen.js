@@ -1,3 +1,11 @@
+/**
+ * Below module declaration is used in ui.html
+ */
+angular.module('uiApp', ['ui', 'uiHandsontable']);
+
+/**
+ * Below controller declaration is used in ui.html and split-screen.html
+ */
 function MyCtrl($scope, $filter) {
   $scope.items = [
     {id: 1, name: {first: "Marcin", last: "Warpechowski"}, address: "Schellingstr. 58, Muenchen", isActive: 'Yes', "Product": {

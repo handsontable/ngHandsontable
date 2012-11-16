@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3-dev
+## 0.1.3 (Nov 16, 2012)
 
 - changed module name to `uiHandsontable` to avoid conflict with Angular UI
 - created demo page `ui.html` to test cooperability with Angular UI

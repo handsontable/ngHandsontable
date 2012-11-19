@@ -1,12 +1,12 @@
 /**
- * Handsontable 0.7.4-dev
+ * Handsontable 0.7.5-dev
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Thu Nov 15 2012 13:46:12 GMT+0100 (Central European Standard Time)
+ * Date: Mon Nov 19 2012 23:16:33 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -740,11 +740,23 @@ Handsontable.Core = function (rootElement, settings) {
     },
 
     /**
-     * Redraws borders around cells
+     * Destroys editor, redraws borders around cells, prepares editor
      * @param {Boolean} revertOriginal
      */
     refreshBorders: function (revertOriginal) {
       editproxy.destroy(revertOriginal);
+      if (!selection.isSelected()) {
+        return;
+      }
+      selection.refreshBorderDimensions();
+      editproxy.prepare();
+    },
+
+    /**
+     * Redraws borders around cells
+     * @param {Boolean} revertOriginal
+     */
+    refreshBorderDimensions: function () {
       if (!selection.isSelected()) {
         return;
       }
@@ -753,7 +765,6 @@ Handsontable.Core = function (rootElement, settings) {
       }
       priv.currentBorder.appear([priv.selStart]);
       highlight.on();
-      editproxy.prepare();
     },
 
     /**
@@ -1145,7 +1156,7 @@ Handsontable.Core = function (rootElement, settings) {
           self.rootElement.one("datachange.handsontable", function (event, changes, source) {
             if (changes.length) {
               var last = changes[changes.length - 1];
-              var endTd = self.view.getCellAtCoords({row: last[0], col: last[1]});
+              var endTd = self.view.getCellAtCoords({row: last[0], col: self.propToCol(last[1])});
               selection.setRangeEnd(endTd);
             }
           });
@@ -1578,6 +1589,8 @@ Handsontable.Core = function (rootElement, settings) {
     for (var i = 0, ilen = changes.length; i < ilen; i++) {
       self.view.render(changes[i][0], datamap.propToCol(changes[i][1]), changes[i][1], changes[i][3]);
     }
+    selection.refreshBorderDimensions();
+    priv.editProxy.triggerHandler('refreshBorder');
     self.rootElement.triggerHandler('cellrender.handsontable', [changes, source || 'render']);
   };
 
@@ -1614,6 +1627,7 @@ Handsontable.Core = function (rootElement, settings) {
     grid.keepEmptyRows();
     grid.clear();
     var changes = [];
+    dlen = priv.settings.data.length; //recount number of rows in case some row was removed by keepEmptyRows
     var clen = (priv.settings.columns && priv.settings.columns.length) || priv.settings.startCols;
     for (var r = 0; r < dlen; r++) {
       for (var c = 0; c < clen; c++) {
@@ -2068,7 +2082,7 @@ Handsontable.Core = function (rootElement, settings) {
   /**
    * Handsontable version
    */
-  this.version = '0.7.4-dev'; //inserted by grunt from package.json
+  this.version = '0.7.5-dev'; //inserted by grunt from package.json
 };
 
 var settings = {
@@ -3566,6 +3580,23 @@ var texteditor = {
       keyboardProxy.val('');
     }
 
+    texteditor.refreshDimensions(instance, $td, keyboardProxy);
+    keyboardProxy.parent().removeClass('htHidden');
+
+    instance.rootElement.triggerHandler('beginediting.handsontable');
+
+    setTimeout(function () {
+      //async fix for Firefox 3.6.28 (needs manual testing)
+      keyboardProxy.parent().css({
+        overflow: 'visible'
+      });
+    }, 1);
+  },
+
+  refreshDimensions: function (instance, $td, keyboardProxy) {
+    if (!texteditor.isCellEdited) {
+      return;
+    }
     var width = $td.width()
       , height = $td.outerHeight() - 4;
 
@@ -3586,16 +3617,6 @@ var texteditor = {
       animate: false,
       extraSpace: 0
     });
-    keyboardProxy.parent().removeClass('htHidden');
-
-    instance.rootElement.triggerHandler('beginediting.handsontable');
-
-    setTimeout(function () {
-      //async fix for Firefox 3.6.28 (needs manual testing)
-      keyboardProxy.parent().css({
-        overflow: 'visible'
-      });
-    }, 1);
   },
 
   /**
@@ -3691,6 +3712,14 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
   keyboardProxy.css({
     width: 0,
     height: 0
+  });
+
+  keyboardProxy.on('refreshBorder.editor', function () {
+    setTimeout(function () {
+      if (texteditor.isCellEdited) {
+        texteditor.refreshDimensions(instance, $(td), keyboardProxy);
+      }
+    }, 0);
   });
 
   keyboardProxy.on("keydown.editor", function (event) {

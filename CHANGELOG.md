@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 (Nov 19, 2012)
+
+- cell border is now always rerendered after editing
+- upgrade Handsontable to 0.7.5-dev
+
 ## 0.1.3 (Nov 16, 2012)
 
 - changed module name to `uiHandsontable` to avoid conflict with Angular UI

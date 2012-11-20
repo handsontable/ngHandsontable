@@ -5,8 +5,6 @@ angular.module('uiHandsontable', [])
       compile: function compile(tElement, tAttrs, transclude) {
 
         var defaultSettings = {
-          startRows: 0,
-          startCols: 3,
           outsideClickDeselects: false,
           autoComplete: []
         };
@@ -41,7 +39,6 @@ angular.module('uiHandsontable', [])
             uiDatagrid.settings['data'] = scope[rhs];
             if (uiDatagrid.columns.length > 0) {
               uiDatagrid.settings['columns'] = uiDatagrid.columns;
-              uiDatagrid.settings['startCols'] = uiDatagrid.columns.length;
             }
           }
 
@@ -65,8 +62,7 @@ angular.module('uiHandsontable', [])
             if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.columns.length > 0) {
               $container.handsontable('updateSettings', {
                 data: scope[rhs],
-                columns: uiDatagrid.columns,
-                startCols: uiDatagrid.columns.length
+                columns: uiDatagrid.columns
               });
             }
             else {
@@ -208,7 +204,13 @@ angular.module('uiHandsontable', [])
             }
             deinterval = setInterval(function () {
               childScope.item = uiDatagrid.$container.data('handsontable').getData()[row];
-              childScope.$apply();
+              if (childScope.item) {
+                childScope.$apply();
+              }
+              else {
+                deregister();
+                clearInterval(deinterval);
+              }
             }, 100);
             deregister = childScope.$watch(rhs, function (newVal) {
               lastItems = newVal;

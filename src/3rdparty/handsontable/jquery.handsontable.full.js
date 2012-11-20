@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Nov 20 2012 15:23:08 GMT+0100 (Central European Standard Time)
+ * Date: Wed Nov 21 2012 00:24:56 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -37,8 +37,8 @@ Handsontable.Core = function (rootElement, settings) {
     scrollable: null,
     undoRedo: null,
     extensions: {},
-    colToProp: [],
-    propToCol: {},
+    colToProp: null,
+    propToCol: null,
     dataSchema: null,
     dataType: 'array'
   };
@@ -191,7 +191,7 @@ Handsontable.Core = function (rootElement, settings) {
      */
     createCol: function (coords) {
       if (priv.dataType === 'object' || priv.settings.columns) {
-        throw new Error("cannot create column with object data source or columns option specified");
+        throw new Error("Cannot create new column. When data source in an object, you can only have as much columns as defined in first data row, data schema or in the 'columns' setting");
       }
       var r = 0;
       if (!coords || coords.col >= self.colCount) {
@@ -428,6 +428,15 @@ Handsontable.Core = function (rootElement, settings) {
         self.view.removeRow();
         recreateRows = true;
       }
+      while (self.colCount < self.countCols()) {
+        self.view.createCol();
+        self.view.renderCol(self.colCount - 1);
+        recreateRows = true;
+      }
+      while (self.colCount > self.countCols()) {
+        self.view.removeCol();
+        recreateRows = true;
+      }
 
       //count currently empty rows
       rows : for (r = self.countRows() - 1; r >= 0; r--) {
@@ -442,17 +451,17 @@ Handsontable.Core = function (rootElement, settings) {
 
       //should I add empty rows to data source to meet startRows?
       rlen = self.countRows();
-      if (rlen < priv.settings.startRows) {
-        for (r = 0; r < priv.settings.startRows - rlen; r++) {
+      if (rlen < priv.settings.minRows) {
+        for (r = 0; r < priv.settings.minRows - rlen; r++) {
           datamap.createRow();
         }
       }
 
       //should I add empty rows to table view to meet startRows?
-      if (self.rowCount < priv.settings.startRows) {
-        for (; self.rowCount < priv.settings.startRows; emptyRows++) {
+      if (self.countRows() < priv.settings.minRows) {
+        for (; self.countRows() < priv.settings.minRows; emptyRows++) {
           self.view.createRow();
-          self.view.renderRow(self.rowCount - 1);
+          self.view.renderRow(self.countRows() - 1);
           recreateRows = true;
         }
       }
@@ -462,7 +471,7 @@ Handsontable.Core = function (rootElement, settings) {
         for (; emptyRows < priv.settings.minSpareRows; emptyRows++) {
           datamap.createRow();
           self.view.createRow();
-          self.view.renderRow(self.rowCount - 1);
+          self.view.renderRow(self.countRows() - 1);
           recreateRows = true;
         }
       }
@@ -474,7 +483,7 @@ Handsontable.Core = function (rootElement, settings) {
           while ($tbody.height() <= priv.settings.minHeight) {
             datamap.createRow();
             self.view.createRow();
-            self.view.renderRow(self.rowCount - 1);
+            self.view.renderRow(self.countRows() - 1);
             recreateRows = true;
           }
         }
@@ -482,7 +491,7 @@ Handsontable.Core = function (rootElement, settings) {
 
       //count currently empty cols
       if (self.countRows() - 1 > 0) {
-        cols : for (c = self.colCount - 1; c >= 0; c--) {
+        cols : for (c = self.countCols() - 1; c >= 0; c--) {
           for (r = 0; r < self.countRows(); r++) {
             val = datamap.get(r, datamap.colToProp(c));
             if (val !== '' && val !== null && typeof val !== 'undefined') {
@@ -493,14 +502,14 @@ Handsontable.Core = function (rootElement, settings) {
         }
       }
 
-      //should I add empty cols to meet startCols?
-      if (self.colCount < priv.settings.startCols) {
-        for (; self.colCount < priv.settings.startCols; emptyCols++) {
+      //should I add empty cols to meet minCols?
+      if (self.countCols() < priv.settings.minCols) {
+        for (; self.countCols() < priv.settings.minCols; emptyCols++) {
           if (!priv.settings.columns) {
             datamap.createCol();
           }
           self.view.createCol();
-          self.view.renderCol(self.colCount - 1);
+          self.view.renderCol(self.countCols() - 1);
           recreateCols = true;
         }
       }
@@ -533,43 +542,15 @@ Handsontable.Core = function (rootElement, settings) {
       }
 
       if (!recreateRows && priv.settings.enterBeginsEditing) {
-        for (; ((priv.settings.startRows && self.rowCount > priv.settings.startRows) && (priv.settings.minSpareRows && emptyRows > priv.settings.minSpareRows) && (!priv.settings.minHeight || $tbody.height() - $tbody.find('tr:last').height() - 4 > priv.settings.minHeight)); emptyRows--) {
+        for (; ((priv.settings.minRows && self.countRows() > priv.settings.minRows) && (priv.settings.minSpareRows && emptyRows > priv.settings.minSpareRows) && (!priv.settings.minHeight || $tbody.height() - $tbody.find('tr:last').height() - 4 > priv.settings.minHeight)); emptyRows--) {
           self.view.removeRow();
           datamap.removeRow();
           recreateRows = true;
         }
       }
 
-      if (recreateRows && priv.selStart) {
-        //if selection is outside, move selection to last row
-        if (priv.selStart.row > self.rowCount - 1) {
-          priv.selStart.row = self.rowCount - 1;
-          if (priv.selEnd.row > priv.selStart.row) {
-            priv.selEnd.row = priv.selStart.row;
-          }
-        } else if (priv.selEnd.row > self.rowCount - 1) {
-          priv.selEnd.row = self.rowCount - 1;
-          if (priv.selStart.row > priv.selEnd.row) {
-            priv.selStart.row = priv.selEnd.row;
-          }
-        }
-      }
-
-      if (priv.settings.columns && priv.settings.columns.length) {
-        clen = priv.settings.columns.length;
-        if (self.colCount !== clen) {
-          while (self.colCount > clen) {
-            self.view.removeCol();
-          }
-          while (self.colCount < clen) {
-            self.view.createCol();
-            self.view.renderCol(self.colCount - 1);
-          }
-          recreateCols = true;
-        }
-      }
-      else if (!recreateCols && priv.settings.enterBeginsEditing) {
-        for (; ((priv.settings.startCols && self.colCount > priv.settings.startCols) && (priv.settings.minSpareCols && emptyCols > priv.settings.minSpareCols) && (!priv.settings.minWidth || $tbody.width() - $tbody.find('tr:last').find('td:last').width() - 4 > priv.settings.minWidth)); emptyCols--) {
+      if (!recreateCols && priv.settings.enterBeginsEditing) {
+        for (; ((priv.settings.startCols && self.countCols() > priv.settings.startCols) && (priv.settings.minSpareCols && emptyCols > priv.settings.minSpareCols) && (!priv.settings.minWidth || $tbody.width() - $tbody.find('tr:last').find('td:last').width() - 4 > priv.settings.minWidth)); emptyCols--) {
           if (!priv.settings.columns) {
             datamap.removeCol();
           }
@@ -578,15 +559,37 @@ Handsontable.Core = function (rootElement, settings) {
         }
       }
 
+      var rowCount = self.countRows();
+      var colCount = self.countCols();
+
+      if (rowCount === 0 || colCount === 0) {
+        selection.deselect();
+      }
+
+      if (recreateRows && priv.selStart) {
+        //if selection is outside, move selection to last row
+        if (priv.selStart.row > rowCount - 1) {
+          priv.selStart.row = rowCount - 1;
+          if (priv.selEnd.row > priv.selStart.row) {
+            priv.selEnd.row = priv.selStart.row;
+          }
+        } else if (priv.selEnd.row > rowCount - 1) {
+          priv.selEnd.row = rowCount - 1;
+          if (priv.selStart.row > priv.selEnd.row) {
+            priv.selStart.row = priv.selEnd.row;
+          }
+        }
+      }
+
       if (recreateCols && priv.selStart) {
         //if selection is outside, move selection to last row
-        if (priv.selStart.col > self.colCount - 1) {
-          priv.selStart.col = self.colCount - 1;
+        if (priv.selStart.col > colCount - 1) {
+          priv.selStart.col = colCount - 1;
           if (priv.selEnd.col > priv.selStart.col) {
             priv.selEnd.col = priv.selStart.col;
           }
-        } else if (priv.selEnd.col > self.colCount - 1) {
-          priv.selEnd.col = self.colCount - 1;
+        } else if (priv.selEnd.col > colCount - 1) {
+          priv.selEnd.col = colCount - 1;
           if (priv.selStart.col > priv.selEnd.col) {
             priv.selStart.col = priv.selEnd.col;
           }
@@ -595,8 +598,8 @@ Handsontable.Core = function (rootElement, settings) {
 
       if (recreateRows || recreateCols) {
         selection.refreshBorders();
-        self.blockedCols.refresh();
-        self.blockedRows.refresh();
+        self.blockedCols.update();
+        self.blockedRows.update();
       }
 
       return (recreateRows || recreateCols);
@@ -635,7 +638,7 @@ Handsontable.Core = function (rootElement, settings) {
       current.row = start.row;
       current.col = start.col;
       for (r = 0; r < rlen; r++) {
-        if ((end && current.row > end.row) || (!priv.settings.minSpareRows && current.row > self.rowCount - 1)) {
+        if ((end && current.row > end.row) || (!priv.settings.minSpareRows && current.row > self.countRows() - 1)) {
           break;
         }
         current.col = start.col;
@@ -1358,11 +1361,6 @@ Handsontable.Core = function (rootElement, settings) {
   this.init = function () {
     this.view = new Handsontable.TableView(this);
 
-    if (typeof settings.cols !== 'undefined') {
-      settings.startCols = settings.cols; //backwards compatibility
-    }
-
-    self.colCount = settings.startCols;
     self.rowCount = 0;
 
     highlight.init();
@@ -1588,8 +1586,13 @@ Handsontable.Core = function (rootElement, settings) {
   this.render = function (changes, source) {
     if (typeof changes === "undefined") {
       changes = [];
-      var r, c, p, val, clen = (priv.settings.columns && priv.settings.columns.length) || priv.settings.startCols;
-      for (r = 0; r < priv.settings.startRows; r++) {
+      var r
+        , c
+        , p
+        , val
+        , rlen = self.countRows()
+        , clen = (priv.settings.columns && priv.settings.columns.length) || priv.settings.startCols;
+      for (r = 0; r < rlen; r++) {
         for (c = 0; c < clen; c++) {
           p = datamap.colToProp(c);
           val = datamap.get(r, p);
@@ -1627,18 +1630,22 @@ Handsontable.Core = function (rootElement, settings) {
     }
     datamap.createMap();
 
-    var dlen = priv.settings.data.length;
-    while (priv.settings.startRows > dlen) {
+    var rlen = priv.settings.data.length;
+    while (priv.settings.minRows > rlen) {
       datamap.createRow();
-      dlen++;
+      rlen++;
+    }
+
+    if (self.colCount === void 0) {
+      self.colCount = self.countCols();
     }
 
     grid.keepEmptyRows();
     grid.clear();
     var changes = [];
-    dlen = priv.settings.data.length; //recount number of rows in case some row was removed by keepEmptyRows
-    var clen = (priv.settings.columns && priv.settings.columns.length) || priv.settings.startCols;
-    for (var r = 0; r < dlen; r++) {
+    rlen = priv.settings.data.length; //recount number of rows in case some row was removed by keepEmptyRows
+    var clen = self.countCols();
+    for (var r = 0; r < rlen; r++) {
       for (var c = 0; c < clen; c++) {
         var p = datamap.colToProp(c);
         changes.push([r, p, "", datamap.get(r, p)])
@@ -1676,10 +1683,10 @@ Handsontable.Core = function (rootElement, settings) {
     var i, j, recreated;
 
     if (typeof settings.rows !== "undefined") {
-      settings.startRows = settings.rows; //backwards compatibility
+      throw new Error("'rows' setting is no longer supported. do you mean startRows, minRows or maxRows?");
     }
     if (typeof settings.cols !== "undefined") {
-      settings.startCols = settings.cols; //backwards compatibility
+      throw new Error("'cols' setting is no longer supported. do you mean startCols, minCols or maxCols?");
     }
 
     if (typeof settings.fillHandle !== "undefined") {
@@ -1717,6 +1724,36 @@ Handsontable.Core = function (rootElement, settings) {
           priv.extensions[i] = new Handsontable.extension[i](self, settings[i]);
         }
       }
+    }
+
+    if (priv.settings.data === void 0) {
+      if (settings.data === void 0) {
+        settings.data = [];
+        var row;
+        for (var r = 0, rlen = priv.settings.startRows; r < rlen; r++) {
+          row = [];
+          for (var c = 0, clen = priv.settings.startCols; c < clen; c++) {
+            row.push(null);
+          }
+          settings.data.push(row);
+        }
+      }
+      else{
+        if(settings.startRows !== void 0 && settings.minRows === void 0) {
+          settings.minRows = settings.startRows;
+        }
+        if(settings.startCols !== void 0 && settings.minCols === void 0) {
+          settings.minCols = settings.startCols;
+        }
+      }
+    }
+
+    if (settings.data !== void 0) {
+      self.loadData(settings.data);
+      recreated = true;
+    }
+    else if (settings.columns !== void 0) {
+      datamap.createMap();
     }
 
     if (typeof settings.colHeaders !== "undefined") {
@@ -1786,18 +1823,7 @@ Handsontable.Core = function (rootElement, settings) {
       }
     }
 
-    if (typeof settings.data !== 'undefined') {
-      self.loadData(settings.data);
-      recreated = true;
-    }
-    else if (typeof settings.columns !== "undefined") {
-      datamap.createMap();
-    }
-
-    if (!recreated) {
-      recreated = grid.keepEmptyRows();
-    }
-
+    recreated = grid.keepEmptyRows();
     if (!recreated) {
       selection.refreshBorders();
     }
@@ -2027,7 +2053,17 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Number}
    */
   this.countCols = function () {
-    return self.colCount;
+    if (priv.dataType === 'object') {
+      if (priv.settings.columns && priv.settings.columns.length) {
+        return priv.settings.columns.length;
+      }
+      else {
+        return priv.colToProp.length;
+      }
+    }
+    else if (priv.dataType === 'array') {
+      return Math.max((priv.settings.columns && priv.settings.columns.length) || 0, (priv.settings.data && priv.settings.data[0] && priv.settings.data[0].length) || 0);
+    }
   };
 
   /**
@@ -2095,9 +2131,11 @@ Handsontable.Core = function (rootElement, settings) {
 };
 
 var settings = {
-  'data': [],
+  'data': void 0,
   'startRows': 5,
   'startCols': 5,
+  'minRows': 0,
+  'minCols': 0,
   'minSpareRows': 0,
   'minSpareCols': 0,
   'minHeight': 0,
@@ -2113,21 +2151,21 @@ var settings = {
   'autoWrapCol': false
 };
 
-$.fn.handsontable = function (action, options) {
-  var i, ilen, args, output = [];
+$.fn.handsontable = function (action) {
+  var i, ilen, args, output = [], userSettings;
   if (typeof action !== 'string') { //init
-    options = action;
+    userSettings = action || {};
     return this.each(function () {
       var $this = $(this);
       if ($this.data("handsontable")) {
         instance = $this.data("handsontable");
-        instance.updateSettings(options);
+        instance.updateSettings(userSettings);
       }
       else {
         var currentSettings = $.extend(true, {}, settings), instance;
-        for (i in options) {
-          if (options.hasOwnProperty(i)) {
-            currentSettings[i] = options[i];
+        for (i in userSettings) {
+          if (userSettings.hasOwnProperty(i)) {
+            currentSettings[i] = userSettings[i];
           }
         }
         instance = new Handsontable.Core($this, currentSettings);
@@ -2397,7 +2435,7 @@ Handsontable.TableView.prototype.createRow = function (coords) {
     tr.appendChild(td = document.createElement('td'));
     this.instance.minWidthFix(td);
   }
-  if (!coords || coords.row >= this.instance.rowCount) {
+  if (!coords || coords.row >= this.instance.countRows()) {
     this.$tableBody.appendChild(tr);
   }
   else {
@@ -2414,7 +2452,7 @@ Handsontable.TableView.prototype.createRow = function (coords) {
 Handsontable.TableView.prototype.createCol = function (coords) {
   var trs = this.$tableBody.childNodes, r, c, td;
   this.instance.blockedRows.createCol();
-  if (!coords || coords.col >= this.instance.colCount) {
+  if (!coords || coords.col >= this.instance.countCols()) {
     for (r = 0; r < this.instance.rowCount; r++) {
       trs[r].appendChild(td = document.createElement('td'));
       this.instance.minWidthFix(td);

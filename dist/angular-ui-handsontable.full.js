@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.1.4
+ * angular-ui-handsontable 0.1.5-dev
  * 
- * Date: Mon Nov 19 2012 23:19:31 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 20 2012 15:27:05 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -278,7 +278,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Mon Nov 19 2012 23:16:33 GMT+0100 (Central European Standard Time)
+ * Date: Tue Nov 20 2012 15:23:08 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -689,6 +689,17 @@ Handsontable.Core = function (rootElement, settings) {
       var r, c, rlen, clen, emptyRows = 0, emptyCols = 0, recreateRows = false, recreateCols = false, val;
 
       var $tbody = $(priv.tableBody);
+
+      //fix changes that may have come from loadData
+      var dlen = priv.settings.data.length;
+      while (self.rowCount < dlen) {
+        self.view.createRow();
+        recreateRows = true;
+      }
+      while (self.rowCount > dlen) {
+        self.view.removeRow();
+        recreateRows = true;
+      }
 
       //count currently empty rows
       rows : for (r = self.countRows() - 1; r >= 0; r--) {
@@ -1887,13 +1898,11 @@ Handsontable.Core = function (rootElement, settings) {
       priv.duckDataSchema = {};
     }
     datamap.createMap();
+
     var dlen = priv.settings.data.length;
     while (priv.settings.startRows > dlen) {
       datamap.createRow();
       dlen++;
-    }
-    while (self.rowCount < dlen) {
-      self.view.createRow();
     }
 
     grid.keepEmptyRows();

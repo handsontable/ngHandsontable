@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5-dev
+
+- fix for removing rows in data source
+
 ## 0.1.4 (Nov 19, 2012)
 
 - cell border is now always rerendered after editing

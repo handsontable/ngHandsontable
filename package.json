@@ -6,7 +6,7 @@
     "url": "https://github.com/warpech/angular-ui-handsontable/issues"
   },
   "author": "Marcin Warpechowski <marcin@nextgen.pl>",
-  "version": "0.1.4",
+  "version": "0.1.5-dev",
   "devDependencies": {
     "grunt-css": "~0.3.0"
   }

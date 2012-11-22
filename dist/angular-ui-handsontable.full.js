@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.1.5-dev
+ * angular-ui-handsontable 0.1.5
  * 
- * Date: Wed Nov 21 2012 01:08:08 GMT+0100 (Central European Standard Time)
+ * Date: Thu Nov 22 2012 12:55:50 GMT+0100 (Central European Standard Time)
 */
 
 /**

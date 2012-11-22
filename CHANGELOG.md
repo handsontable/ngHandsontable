@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.5-dev
+## 0.1.5 (Nov 22, 2012)
 
 - fix for removing rows in data source
 

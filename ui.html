@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" ng-app="uiApp">
+<head>
+  <meta charset="utf-8">
+  <title>Angular UI Handsontable with Angular UI</title>
+
+  <script src="js/lib/jquery.min.js"></script>
+  <script src="js/lib/angular.min.js"></script>
+
+  <script src="http://angular-ui.github.com/angular-ui/build/angular-ui.js"></script>
+  <script src="http://angular-ui.github.com/lib/select2/select2.js"></script>
+  <link rel="stylesheet" media="screen" href="http://angular-ui.github.com/lib/select2/select2.css">
+
+  <script src="dist/angular-ui-handsontable.full.js"></script>
+  <link rel="stylesheet" media="screen" href="dist/angular-ui-handsontable.full.css">
+
+  <script src="js/split-screen.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+    }
+  </style>
+</head>
+<body ng-controller="MyCtrl">
+
+<h1>Handsontable with Angular UI</h1>
+
+<p>Angular UI Handsontable <b>can</b> coexist with <a href="http://angular-ui.github.com/">Angular UI</a>, but <b>does not</b> have dependency on it.</p>
+
+<ui-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="item in items">
+  <datacolumn value="item.id" title="'ID'"></datacolumn>
+  <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
+  <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
+  <datacolumn value="item.address" title="'Address'"></datacolumn>
+  <datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'">
+    <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = option.Description">
+      <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
+    </optionlist>
+  </datacolumn>
+</ui-handsontable>
+
+<p>Address of the first person:</p>
+
+<input type="text" ng-model="items[0].address" style="width: 300px">
+
+<p>Select favorite food of first person:</p>
+
+<select ui-select2 ng-model="items[0].Product.Description" data-placeholder="-- Select One --" style="width: 150px">
+  <option></option>
+  <option ng-repeat="option in items[0].Product.Options" value="{{option.Description}}">{{option.Description}}</option>
+</select>
+
+</body>
+</html>

@@ -7,26 +7,42 @@ angular.module('uiApp', ['ui', 'uiHandsontable']);
  * Below controller declaration is used in ui.html and split-screen.html
  */
 function MyCtrl($scope, $filter) {
-  $scope.items = [
-    {id: 1, name: {first: "Marcin", last: "Warpechowski"}, address: "Schellingstr. 58, Muenchen", isActive: 'Yes', "Product": {
+  var products = [
+    {
       "Description": "Big Mac",
       "Options": [
         {"Description": "Big Mac", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
         {"Description": "Big Mac & Co", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
-      ]}},
-    {id: 2, name: {first: "John", last: "Irving"}, address: "Chengdu Road, Wanhua, Taipei 108", isActive: 'Yes', "Product": {
+      ]
+    },
+    {
       "Description": "Fried Potatoes",
       "Options": [
         {"Description": "Fried Potatoes", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null},
         {"Description": "Fried Onions", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null}
-      ]}},
-    {id: 3, name: {first: "Jeremy", last: "Springsteen"}, address: "4 New York Plaza, New York, NY 10004", isActive: 'Yes', "Product": {
-      "Description": "McRoyal",
-      "Options": [
-        {"Description": "McRoyal", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-        {"Description": "McRoyal with Cheese", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
-      ]}}
+      ]
+    }
   ];
+
+  var firstNames = ["Ted", "John", "Macy", "Rob", "Gwen", "Fiona", "Mario", "Ben", "Kate", "Kevin", "Thomas", "Frank"];
+  var lastNames = ["Tired", "Johnson", "Moore", "Rocket", "Goodman", "Farewell", "Manson", "Bentley", "Kowalski", "Schmidt", "Tucker", "Fancy"];
+  var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
+
+  $scope.items = [];
+  for (var i = 0; i < 10; i++) {
+    $scope.items.push(
+      {
+        id: i + 1,
+        name: {
+          first: firstNames[Math.floor(Math.random() * firstNames.length)],
+          last: lastNames[Math.floor(Math.random() * lastNames.length)]
+        },
+        address: Math.floor(Math.random() * 100000) + ' ' + address[Math.floor(Math.random() * address.length)],
+        isActive: 'Yes',
+        Product: $.extend({}, products[Math.floor(Math.random() * products.length)])
+      }
+    );
+  }
 
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);

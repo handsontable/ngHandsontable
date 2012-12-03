@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2-dev
+
+- virtual rendering allowing for big number of editable rows
+
 ## 0.1.5 (Nov 22, 2012)
 
 - fix for removing rows in data source

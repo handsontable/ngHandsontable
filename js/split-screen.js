@@ -29,7 +29,7 @@ function MyCtrl($scope, $filter) {
   var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
 
   $scope.items = [];
-  for (var i = 0; i < 1000; i++) {
+  for (var i = 0; i < 10000; i++) {
     $scope.items.push(
       {
         id: i + 1,

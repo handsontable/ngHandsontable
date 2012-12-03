@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-dev
  * 
- * Date: Mon Dec 03 2012 23:04:43 GMT+0100 (Central European Standard Time)
+ * Date: Mon Dec 03 2012 23:14:27 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -67,6 +67,10 @@ angular.module('uiHandsontable', [])
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (!scope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
+
+              $('div.ui-handsontable-container').each(function(){
+                $(this).handsontable('render'); //TEMPORARY HIGH SPEED FIX (compare below)
+              });
             }
           });
 
@@ -84,7 +88,8 @@ angular.module('uiHandsontable', [])
             else {
               $container.handsontable('loadData', scope[rhs]);
             }
-          }, true);
+          //}, true);
+          }, false); //TEMPORARY HIGH SPEED FIX (compare above)
         }
       }
     };

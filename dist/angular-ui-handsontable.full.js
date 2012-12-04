@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-dev
  * 
- * Date: Mon Dec 03 2012 23:19:35 GMT+0100 (Central European Standard Time)
+ * Date: Tue Dec 04 2012 11:54:21 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -285,7 +285,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Mon Dec 03 2012 21:20:22 GMT+0100 (Central European Standard Time)
+ * Date: Tue Dec 04 2012 11:53:01 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2435,7 +2435,8 @@ Handsontable.TableView = function (instance) {
     offsetColumn: 0,
     displayRows: null,
     displayColumns: null,
-    height: 160,
+    width: settings.width,
+    height: settings.height,
     rowHeaders: settings.rowHeaders ? instance.getRowHeader : null,
     columnHeaders: settings.colHeaders ? instance.getColHeader : null,
     cellRenderer: function (row, column, TD) {

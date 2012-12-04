@@ -28,7 +28,7 @@
 
 <p>Selection: {{currentSelection}}</p>
 
-<ui-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="item in items">
+<ui-handsontable settings="{minSpareRows: 1, rowHeaders: true, height: 160}" datarows="item in items">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -46,7 +46,7 @@
 
 <p>Filter: <input ng-model="query"></p>
 
-<div ui-handsontable="{rowHeaders: true}" datarows="item in filteredItems">
+<div ui-handsontable="{rowHeaders: true, height: 160}" datarows="item in filteredItems">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn value="item.name.last" title="'Last Name'"></datacolumn>
   <datacolumn value="item.name.first" title="'First Name'"></datacolumn>

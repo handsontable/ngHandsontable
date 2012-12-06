@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-dev
  * 
- * Date: Thu Dec 06 2012 00:51:40 GMT+0100 (Central European Standard Time)
+ * Date: Thu Dec 06 2012 02:30:37 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -285,7 +285,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Thu Dec 06 2012 00:49:03 GMT+0100 (Central European Standard Time)
+ * Date: Thu Dec 06 2012 02:24:41 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2418,8 +2418,9 @@ Handsontable.TableView = function (instance) {
 
   $table.on('mouseleave', function (event) {
     var tolerance = 1 //this is needed because width() and height() contains stuff like cell borders
-      , offsetTop = $table.offset().top + tolerance
-      , offsetLeft = $table.offset().left + tolerance
+      , offset = that.wt.wtDom.offset($table[0])
+      , offsetTop = offset.top + tolerance
+      , offsetLeft = offset.left + tolerance
       , width = $table.width() - 2 * tolerance
       , height = $table.height() - 2 * tolerance
       , method
@@ -2603,7 +2604,7 @@ Handsontable.TableView.prototype.getAllCells = function () {
  * @param coords
  */
 Handsontable.TableView.prototype.scrollViewport = function (coords) {
-  this.wt.scrollViewport([coords.row, coords.col]).draw();
+  this.wt.scrollViewport([coords.row, coords.col]);
 };
 /**
  * Returns true if keyCode represents a printable character
@@ -3209,6 +3210,7 @@ var texteditor = {
 
     var coords = {row: row, col: col};
     instance.view.scrollViewport(coords);
+    instance.view.render();
     td = instance.getCell(row, col); //because old td may have been scrolled out with scrollViewport
 
     keyboardProxy.on('cut.editor', function (event) {
@@ -4301,13 +4303,14 @@ Handsontable.PluginHooks.push('afterGetCellMeta', function (row, col, cellProper
 /**
  * walkontable 0.1
  * 
- * Date: Thu Dec 06 2012 00:48:27 GMT+0100 (Central European Standard Time)
+ * Date: Thu Dec 06 2012 02:21:23 GMT+0100 (Central European Standard Time)
 */
 
 function WalkontableBorder(instance, settings) {
   //reference to instance
   this.instance = instance;
   this.settings = settings;
+  this.wtDom = new WalkontableDom();
 
   this.main = document.createElement("div");
   this.main.style.position = 'absolute';
@@ -4337,7 +4340,7 @@ function WalkontableBorder(instance, settings) {
  * @param {Array} corners
  */
 WalkontableBorder.prototype.appear = function (corners) {
-  var $from, $to, fromOffset, toOffset, containerOffset, top, minTop, left, minLeft, height, width;
+  var isMultiple, $from, $to, fromOffset, toOffset, containerOffset, top, minTop, left, minLeft, height, width;
   if (this.disabled) {
     return;
   }
@@ -4382,11 +4385,12 @@ WalkontableBorder.prototype.appear = function (corners) {
   }
 
   if (!(hideTop == hideLeft == hideBottom == hideRight == true)) {
+    isMultiple = (corners[0] !== corners[2] || corners[1] !== corners[3]);
     $from = $(this.instance.wtTable.getCell([corners[0], corners[1]]));
-    $to = (corners.length > 2) ? $(this.instance.wtTable.getCell([corners[2], corners[3]])) : $from;
-    fromOffset = $from.offset();
-    toOffset = (corners.length > 2) ? $to.offset() : fromOffset;
-    containerOffset = $(this.instance.wtTable.TABLE).offset();
+    $to = isMultiple ? $(this.instance.wtTable.getCell([corners[2], corners[3]])) : $from;
+    fromOffset = this.wtDom.offset($from[0]);
+    toOffset = isMultiple ? this.wtDom.offset($to[0]) : fromOffset;
+    containerOffset = this.wtDom.offset(this.instance.wtTable.TABLE);
 
     minTop = fromOffset.top;
     height = toOffset.top + $to.outerHeight() - minTop;
@@ -4713,6 +4717,42 @@ WalkontableDom.prototype.removeTextNodes = function (elem, parent) {
     }
   }
 };
+
+WalkontableDom.prototype.offset = function (elem) {
+  return elem.getBoundingClientRect();
+};
+
+//seems getBounding is always faster: http://jsperf.com/offset-vs-getboundingclientrect/3
+/*
+ WalkontableDom.prototype.offsetLeft = function (elem) {
+ var offset = elem.offsetLeft;
+ while (elem = elem.offsetParent) {
+ offset += elem.offsetLeft;
+ }
+ return offset;
+ };
+
+ WalkontableDom.prototype.offsetTop = function (elem) {
+ var offset = elem.offsetTop;
+ while (elem = elem.offsetParent) {
+ offset += elem.offsetTop;
+ }
+ return offset;
+ };
+
+ WalkontableDom.prototype.offset = function (elem) {
+ var offsetLeft = elem.offsetLeft
+ , offsetTop = elem.offsetTop;
+ while (elem = elem.offsetParent) {
+ offsetLeft += elem.offsetLeft;
+ offsetTop += elem.offsetTop;
+ }
+ return {
+ left: offsetLeft,
+ top: offsetTop
+ };
+ };
+ */
 function WalkontableEvent(instance) {
   var that = this;
 
@@ -5282,6 +5322,7 @@ WalkontableTable.prototype.draw = function () {
     , TD
     , cellData;
   this.adjustAvailableNodes();
+  this.tableOffset = this.wtDom.offset(this.TABLE);
 
   displayRows = Math.min(displayRows, totalRows);
   displayTds = Math.min(displayColumns, totalColumns);

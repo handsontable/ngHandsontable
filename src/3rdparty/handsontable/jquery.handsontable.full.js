@@ -2104,6 +2104,8 @@ Handsontable.TableView = function (instance) {
     }
   });
 
+  console.log('settings.colWidths', settings.colWidths);
+
   var walkontableConfig = {
     table: $table[0],
     data: instance.getDataAtCell,

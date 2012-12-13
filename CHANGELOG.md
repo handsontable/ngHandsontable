@@ -1,10 +1,11 @@
 # Changelog
 
-## 0.2-dev2
+## 0.2-beta2 (Dec 13, 2012)
 
 - numerous virtual rendering fixes and optimizations
+- defining column widths using the `width` attribute
 
-## 0.2-dev
+## 0.2-beta1 (Dec 6, 2012)
 
 - virtual rendering allowing for big number of editable rows
 

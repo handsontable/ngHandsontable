@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3-dev
  * 
- * Date: Thu Dec 13 2012 10:07:05 GMT+0100 (Central European Standard Time)
+ * Date: Thu Dec 13 2012 10:16:07 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -40,6 +40,7 @@ angular.module('uiHandsontable', [])
           lhs: lhs,
           rhs: rhs,
           colHeaders: [],
+          colWidths: [],
           columns: [],
           settings: angular.extend({}, defaultSettings),
           $container: $container
@@ -60,6 +61,10 @@ angular.module('uiHandsontable', [])
 
           if (uiDatagrid.colHeaders.length > 0) {
             uiDatagrid.settings['colHeaders'] = uiDatagrid.colHeaders;
+          }
+
+          if (uiDatagrid.colWidths.length > 0) {
+            uiDatagrid.settings['colWidths'] = uiDatagrid.colWidths;
           }
 
           $container.handsontable(uiDatagrid.settings);
@@ -122,6 +127,7 @@ angular.module('uiHandsontable', [])
           var pattern = new RegExp("^(" + uiDatagrid.lhs + "\\.)")
             , value = attrs.value.replace(pattern, '')
             , title = scope.$eval(attrs.title)
+            , width = scope.$eval(attrs.width)
             , type = scope.$eval(attrs.type)
             , options = attrs.options
             , tmp;
@@ -132,6 +138,7 @@ angular.module('uiHandsontable', [])
           column.data = value;
 
           uiDatagrid.colHeaders.push(title);
+          uiDatagrid.colWidths.push(width);
 
           switch (type) {
             case 'autocomplete':
@@ -2382,6 +2389,8 @@ Handsontable.TableView = function (instance) {
       dragInterval = setInterval(dragFn, 100);
     }
   });
+
+  console.log('settings.colWidths', settings.colWidths);
 
   var walkontableConfig = {
     table: $table[0],

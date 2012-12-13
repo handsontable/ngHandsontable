@@ -24,6 +24,7 @@ angular.module('uiHandsontable', [])
           lhs: lhs,
           rhs: rhs,
           colHeaders: [],
+          colWidths: [],
           columns: [],
           settings: angular.extend({}, defaultSettings),
           $container: $container
@@ -44,6 +45,10 @@ angular.module('uiHandsontable', [])
 
           if (uiDatagrid.colHeaders.length > 0) {
             uiDatagrid.settings['colHeaders'] = uiDatagrid.colHeaders;
+          }
+
+          if (uiDatagrid.colWidths.length > 0) {
+            uiDatagrid.settings['colWidths'] = uiDatagrid.colWidths;
           }
 
           $container.handsontable(uiDatagrid.settings);
@@ -106,6 +111,7 @@ angular.module('uiHandsontable', [])
           var pattern = new RegExp("^(" + uiDatagrid.lhs + "\\.)")
             , value = attrs.value.replace(pattern, '')
             , title = scope.$eval(attrs.title)
+            , width = scope.$eval(attrs.width)
             , type = scope.$eval(attrs.type)
             , options = attrs.options
             , tmp;
@@ -116,6 +122,7 @@ angular.module('uiHandsontable', [])
           column.data = value;
 
           uiDatagrid.colHeaders.push(title);
+          uiDatagrid.colWidths.push(width);
 
           switch (type) {
             case 'autocomplete':

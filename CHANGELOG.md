@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2-dev2
+
+- numerous virtual rendering fixes and optimizations
+
 ## 0.2-dev
 
 - virtual rendering allowing for big number of editable rows

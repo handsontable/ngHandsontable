@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3-dev
  * 
- * Date: Thu Dec 13 2012 10:16:07 GMT+0100 (Central European Standard Time)
+ * Date: Thu Dec 13 2012 10:26:39 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -275,6 +275,10 @@ angular.module('uiHandsontable', [])
               instance.destroyEditor();
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
             }
+            //instance.render();
+            $('.handsontable').each(function(){
+              $(this).handsontable('render');//render all Handsontables in the page
+            });
 
             lastQuery = void 0;
             return this.hide();
@@ -2389,8 +2393,6 @@ Handsontable.TableView = function (instance) {
       dragInterval = setInterval(dragFn, 100);
     }
   });
-
-  console.log('settings.colWidths', settings.colWidths);
 
   var walkontableConfig = {
     table: $table[0],

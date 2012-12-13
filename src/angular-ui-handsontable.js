@@ -259,6 +259,10 @@ angular.module('uiHandsontable', [])
               instance.destroyEditor();
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
             }
+            //instance.render();
+            $('.handsontable').each(function(){
+              $(this).handsontable('render');//render all Handsontables in the page
+            });
 
             lastQuery = void 0;
             return this.hide();

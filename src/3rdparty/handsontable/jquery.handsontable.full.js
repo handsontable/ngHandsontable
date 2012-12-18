@@ -1,12 +1,12 @@
 /**
- * Handsontable 0.8.0-beta1
+ * Handsontable 0.8.0-beta3
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Dec 11 2012 12:24:27 GMT+0100 (Central European Standard Time)
+ * Date: Tue Dec 18 2012 01:00:02 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -41,38 +41,6 @@ Handsontable.Core = function (rootElement, settings) {
     propToCol: null,
     dataSchema: null,
     dataType: 'array'
-  };
-
-  var hasMinWidthProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
-  /**
-   * Used to get over IE7 not respecting CSS min-width (and also not showing border around empty cells)
-   * @param {Element} td
-   */
-  this.minWidthFix = function (td) {
-    if (hasMinWidthProblem) {
-      if (td.className) {
-        td.innerHTML = '<div class="minWidthFix ' + td.className + '">' + td.innerHTML + '</div>';
-      }
-      else {
-        td.innerHTML = '<div class="minWidthFix">' + td.innerHTML + '</div>';
-      }
-    }
-  };
-
-  var hasPositionProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
-  /**
-   * Used to get over IE7 returning negative position in demo/buttons.html
-   * @param {Object} position
-   */
-  this.positionFix = function (position) {
-    if (hasPositionProblem) {
-      if (position.top < 0) {
-        position.top = 0;
-      }
-      if (position.left < 0) {
-        position.left = 0;
-      }
-    }
   };
 
   datamap = {
@@ -472,17 +440,15 @@ Handsontable.Core = function (rootElement, settings) {
       }
 
       if (!recreateRows && priv.settings.enterBeginsEditing) {
-        for (; ((priv.settings.minRows && self.countRows() > priv.settings.minRows) && (priv.settings.minSpareRows && emptyRows > priv.settings.minSpareRows) && (!priv.settings.minHeight || $tbody.height() - $tbody.find('tr:last').height() - 4 > priv.settings.minHeight)); emptyRows--) {
+        for (; (((priv.settings.minRows || priv.settings.minSpareRows) && self.countRows() > priv.settings.minRows) && (priv.settings.minSpareRows && emptyRows > priv.settings.minSpareRows) && (!priv.settings.minHeight || $tbody.height() - $tbody.find('tr:last').height() - 4 > priv.settings.minHeight)); emptyRows--) {
           datamap.removeRow();
           recreateRows = true;
         }
       }
 
-      if (!recreateCols && priv.settings.enterBeginsEditing) {
-        for (; ((priv.settings.startCols && self.countCols() > priv.settings.startCols) && (priv.settings.minSpareCols && emptyCols > priv.settings.minSpareCols) && (!priv.settings.minWidth || $tbody.width() - $tbody.find('tr:last').find('td:last').width() - 4 > priv.settings.minWidth)); emptyCols--) {
-          if (!priv.settings.columns) {
-            datamap.removeCol();
-          }
+      if (!recreateCols && priv.settings.enterBeginsEditing && !priv.settings.columns) {
+        for (; (((priv.settings.minCols || priv.settings.minSpareCols) && self.countCols() > priv.settings.minCols) && (priv.settings.minSpareCols && emptyCols > priv.settings.minSpareCols) && (!priv.settings.minWidth || $tbody.width() - $tbody.find('tr:last').find('td:last').width() - 4 > priv.settings.minWidth)); emptyCols--) {
+          datamap.removeCol();
           recreateCols = true;
         }
       }
@@ -676,6 +642,8 @@ Handsontable.Core = function (rootElement, settings) {
      * @param {Boolean} [scrollToCell=true] If true, viewport will be scrolled to range end
      */
     setRangeEnd: function (coords, scrollToCell) {
+      var r, c, intermediateCoords;
+
       priv.selEnd.coords(coords);
       if (!priv.settings.multiSelect) {
         priv.selStart.coords(coords);
@@ -688,12 +656,11 @@ Handsontable.Core = function (rootElement, settings) {
       //set up area selection
       self.view.wt.selections.area.clear();
       if (selection.isMultiple()) {
-        var coords = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()])
-          , r = coords.TL.row
-          , c;
-        while (r <= coords.BR.row) {
-          c = coords.TL.col;
-          while (c <= coords.BR.col) {
+        intermediateCoords = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()]);
+        r = intermediateCoords.TL.row;
+        while (r <= intermediateCoords.BR.row) {
+          c = intermediateCoords.TL.col;
+          while (c <= intermediateCoords.BR.col) {
             self.view.wt.selections.area.add([r, c]);
             c++;
           }
@@ -738,7 +705,7 @@ Handsontable.Core = function (rootElement, settings) {
       if (autofill.handle) {
         autofill.showHandle();
       }
-      self.view.render();
+      self.view.render(true);
     },
 
     /**
@@ -908,23 +875,16 @@ Handsontable.Core = function (rootElement, settings) {
 
   this.autofill = autofill = { //this public assignment is only temporary
     handle: null,
-    fillBorder: null,
 
     /**
      * Create fill handle and fill border objects
      */
     init: function () {
       if (!autofill.handle) {
-        autofill.handle = new Handsontable.FillHandle(self);
-        /*autofill.fillBorder = new Handsontable.Border(self, {
-         className: 'htFillBorder'
-         });*/
-
-        $(autofill.handle.handle).on('dblclick', autofill.selectAdjacent);
+        autofill.handle = {};
       }
       else {
         autofill.handle.disabled = false;
-        autofill.fillBorder.disabled = false;
       }
 
       self.rootElement.on('beginediting.handsontable', function () {
@@ -943,7 +903,6 @@ Handsontable.Core = function (rootElement, settings) {
      */
     disable: function () {
       autofill.handle.disabled = true;
-      autofill.fillBorder.disabled = true;
     },
 
     /**
@@ -986,95 +945,115 @@ Handsontable.Core = function (rootElement, settings) {
 
       autofill.handle.isDragged = 0;
 
-      drag = autofill.fillBorder.corners;
+      drag = self.view.wt.selections.fill.getCorners();
       if (!drag) {
         return;
       }
 
-      autofill.fillBorder.disappear();
+      self.view.wt.selections.fill.clear();
 
       if (selection.isMultiple()) {
-        select = priv.selectionBorder.corners;
+        select = self.view.wt.selections.area.getCorners();
       }
       else {
-        select = priv.currentBorder.corners;
+        select = self.view.wt.selections.current.getCorners();
       }
 
-      if (drag.TL.row === select.TL.row && drag.TL.col < select.TL.col) {
-        start = drag.TL;
-        end = {
-          row: drag.BR.row,
-          col: select.TL.col - 1
-        };
-      }
-      else if (drag.TL.row === select.TL.row && drag.BR.col > select.BR.col) {
+      if (drag[0] === select[0] && drag[1] < select[1]) {
         start = {
-          row: drag.TL.row,
-          col: select.BR.col + 1
+          row: drag[0],
+          col: drag[1]
         };
-        end = drag.BR;
-      }
-      else if (drag.TL.row < select.TL.row && drag.TL.col === select.TL.col) {
-        start = drag.TL;
         end = {
-          row: select.TL.row - 1,
-          col: drag.BR.col
+          row: drag[2],
+          col: select[1] - 1
         };
       }
-      else if (drag.BR.row > select.BR.row && drag.TL.col === select.TL.col) {
+      else if (drag[0] === select[0] && drag[3] > select[3]) {
         start = {
-          row: select.BR.row + 1,
-          col: drag.TL.col
+          row: drag[0],
+          col: select[3] + 1
         };
-        end = drag.BR;
+        end = {
+          row: drag[2],
+          col: drag[3]
+        };
+      }
+      else if (drag[0] < select[0] && drag[1] === select[1]) {
+        start = {
+          row: drag[0],
+          col: drag[1]
+        };
+        end = {
+          row: select[0] - 1,
+          col: drag[3]
+        };
+      }
+      else if (drag[2] > select[2] && drag[1] === select[1]) {
+        start = {
+          row: select[2] + 1,
+          col: drag[1]
+        };
+        end = {
+          row: drag[2],
+          col: drag[3]
+        };
       }
 
       if (start) {
-        grid.populateFromArray(start, SheetClip.parse(priv.editProxy.val()), end, 'autofill');
+        //grid.populateFromArray(start, SheetClip.parse(priv.editProxy[0].value), end, 'autofill');
+        grid.populateFromArray(start, SheetClip.parse(datamap.getText(priv.selStart.coords(), priv.selEnd.coords())), end, 'autofill');
 
-        selection.setRangeStart(drag.TL);
-        selection.setRangeEnd(drag.BR);
+        selection.setRangeStart({row: drag[0], col: drag[1]});
+        selection.setRangeEnd({row: drag[2], col: drag[3]});
       }
-      else {
-        //reset to avoid some range bug
-        selection.refreshBorders();
-      }
+      /*else {
+       //reset to avoid some range bug
+       selection.refreshBorders();
+       }*/
     },
 
     /**
      * Show fill handle
      */
     showHandle: function () {
-      autofill.handle.appear([priv.selStart.coords(), priv.selEnd.coords()]);
+      //autofill.handle.appear([priv.selStart.coords(), priv.selEnd.coords()]);
     },
 
     /**
      * Hide fill handle
      */
     hideHandle: function () {
-      autofill.handle.disappear();
+      //autofill.handle.disappear();
     },
 
     /**
      * Show fill border
      */
-    showBorder: function (td) {
-      var coords = self.view.getCellCoords(td);
+    showBorder: function (coords) {
+      coords.row = coords[0];
+      coords.col = coords[1];
+
       var corners = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()]);
       if (priv.settings.fillHandle !== 'horizontal' && (corners.BR.row < coords.row || corners.TL.row > coords.row)) {
-        coords = {row: coords.row, col: corners.BR.col};
+        coords = [coords.row, corners.BR.col];
       }
       else if (priv.settings.fillHandle !== 'vertical') {
-        coords = {row: corners.BR.row, col: coords.col};
+        coords = [corners.BR.row, coords.col];
       }
       else {
         return; //wrong direction
       }
-      autofill.fillBorder.appear([priv.selStart.coords(), priv.selEnd.coords(), coords]);
+
+      self.view.wt.selections.fill.clear();
+      self.view.wt.selections.fill.add([priv.selStart.coords().row, priv.selStart.coords().col]);
+      self.view.wt.selections.fill.add([priv.selEnd.coords().row, priv.selEnd.coords().col]);
+      self.view.wt.selections.fill.add(coords);
+      self.view.render(true);
     }
   };
 
-  this.editproxy = editproxy = { //this public assignment is only temporary
+  editproxy = { //this public assignment is only temporary
     /**
      * Create input field
      */
@@ -1102,7 +1081,7 @@ Handsontable.Core = function (rootElement, settings) {
             }
           });
 
-          var input = priv.editProxy.val().replace(/^[\r\n]*/g, '').replace(/[\r\n]*$/g, ''), //remove newline from the start and the end of the input
+          var input = priv.editProxy[0].value.replace(/^[\r\n]*/g, '').replace(/[\r\n]*$/g, ''), //remove newline from the start and the end of the input
             inputArray = SheetClip.parse(input),
             coords = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()]);
 
@@ -1117,6 +1096,14 @@ Handsontable.Core = function (rootElement, settings) {
 
       function onKeyDown(event) {
         if ($body.children('.context-menu-list:visible').length) {
+          return;
+        }
+
+        if (event.keyCode === 17 || event.keyCode === 224 || event.keyCode === 91 || event.keyCode === 93) {
+          //when CTRL is pressed, prepare selectable text in textarea
+          //http://stackoverflow.com/questions/3902635/how-does-one-capture-a-macs-command-key-via-javascript
+          priv.editProxy[0].value = datamap.getText(priv.selStart.coords(), priv.selEnd.coords());
+          setTimeout(editproxy.focus, 1);
           return;
         }
 
@@ -1272,9 +1259,17 @@ Handsontable.Core = function (rootElement, settings) {
      */
     prepare: function () {
       priv.editProxy.height(priv.editProxy.parent().innerHeight() - 4);
-      priv.editProxy.val(datamap.getText(priv.selStart.coords(), priv.selEnd.coords()));
+      //priv.editProxy[0].value = datamap.getText(priv.selStart.coords(), priv.selEnd.coords());
       setTimeout(editproxy.focus, 1);
-      priv.editorDestroyer = self.view.applyCellTypeMethod('editor', self.view.getCellAtCoords(priv.selStart.coords()), priv.selStart.coords(), priv.editProxy);
+      if (priv.settings.asyncRendering) {
+        clearTimeout(window.prepareFrame);
+        window.prepareFrame = setTimeout(function () {
+          priv.editorDestroyer = self.view.applyCellTypeMethod('editor', self.view.getCellAtCoords(priv.selStart.coords()), priv.selStart.coords(), priv.editProxy);
+        }, 0);
+      }
+      else {
+        priv.editorDestroyer = self.view.applyCellTypeMethod('editor', self.view.getCellAtCoords(priv.selStart.coords()), priv.selStart.coords(), priv.editProxy);
+      }
     },
 
     /**
@@ -1518,6 +1513,7 @@ Handsontable.Core = function (rootElement, settings) {
    * @param {Array} data
    */
   this.loadData = function (data, isInitial) {
+    var changes, r, rlen, c, clen, p;
     priv.isPopulated = false;
     priv.settings.data = data;
     if ($.isPlainObject(priv.settings.dataSchema) || $.isPlainObject(data[0])) {
@@ -1535,7 +1531,7 @@ Handsontable.Core = function (rootElement, settings) {
     datamap.createMap();
 
     if (isInitial) {
-      var rlen = priv.settings.data.length;
+      rlen = self.countRows();
       if (priv.settings.startRows) {
         while (priv.settings.startRows > rlen) {
           datamap.createRow();
@@ -1546,12 +1542,12 @@ Handsontable.Core = function (rootElement, settings) {
 
     grid.keepEmptyRows();
     grid.clear();
-    var changes = [];
-    var rlen = priv.settings.data.length; //recount number of rows in case some row was removed by keepEmptyRows
-    var clen = self.countCols();
-    for (var r = 0; r < rlen; r++) {
-      for (var c = 0; c < clen; c++) {
-        var p = datamap.colToProp(c);
+    changes = [];
+    rlen = self.countRows(); //recount number of rows in case some row was removed by keepEmptyRows
+    clen = self.countCols();
+    for (r = 0; r < rlen; r++) {
+      for (c = 0; c < clen; c++) {
+        p = datamap.colToProp(c);
         changes.push([r, p, "", datamap.get(r, p)])
       }
     }
@@ -1637,16 +1633,14 @@ Handsontable.Core = function (rootElement, settings) {
       datamap.createMap();
     }
 
-    /*
-     TODO implement it in 0.8.0
-     if (typeof settings.fillHandle !== "undefined") {
-     if (autofill.handle && settings.fillHandle === false) {
-     autofill.disable();
-     }
-     else if (!autofill.handle && settings.fillHandle !== false) {
-     autofill.init();
-     }
-     }*/
+    if (typeof settings.fillHandle !== "undefined") {
+      if (autofill.handle && settings.fillHandle === false) {
+        autofill.disable();
+      }
+      else if (!autofill.handle && settings.fillHandle !== false) {
+        autofill.init();
+      }
+    }
 
     recreated = grid.keepEmptyRows();
     if (!recreated) {
@@ -1828,17 +1822,17 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Array|String}
    */
   this.getRowHeader = function (row) {
-    if (priv.settings.rowHeaders === true) {
-      return row + 1;
+    if (Object.prototype.toString.call(priv.settings.rowHeaders) === '[object Array]' && priv.settings.rowHeaders[row] !== void 0) {
+      return priv.settings.rowHeaders[row];
     }
     else if (typeof priv.settings.rowHeaders === 'function') {
-      return priv.settings.colHeaders(row);
+      return priv.settings.rowHeaders(row);
     }
-    else if (Object.prototype.toString.call(priv.settings.rowHeaders) === '[object Array]') {
-      return priv.settings.colHeaders[row];
+    else if (priv.settings.rowHeaders && typeof priv.settings.rowHeaders !== 'string' && typeof priv.settings.rowHeaders !== 'number') {
+      return row + 1;
     }
     else {
-      return priv.settings.colHeaders;
+      return priv.settings.rowHeaders;
     }
   };
 
@@ -1848,7 +1842,13 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Array|String}
    */
   this.getColHeader = function (col) {
-    if (priv.settings.colHeaders === true) {
+    if (Object.prototype.toString.call(priv.settings.colHeaders) === '[object Array]' && priv.settings.colHeaders[col] !== void 0) {
+      return priv.settings.colHeaders[col];
+    }
+    else if (typeof priv.settings.colHeaders === 'function') {
+      return priv.settings.colHeaders(col);
+    }
+    else if (priv.settings.colHeaders && typeof priv.settings.colHeaders !== 'string' && typeof priv.settings.colHeaders !== 'number') {
       var dividend = col + 1;
       var columnLabel = '';
       var modulo;
@@ -1858,12 +1858,6 @@ Handsontable.Core = function (rootElement, settings) {
         dividend = parseInt((dividend - modulo) / 26);
       }
       return columnLabel;
-    }
-    else if (typeof priv.settings.colHeaders === 'function') {
-      return priv.settings.colHeaders(col);
-    }
-    else if (Object.prototype.toString.call(priv.settings.colHeaders) === '[object Array]') {
-      return priv.settings.colHeaders[col];
     }
     else {
       return priv.settings.colHeaders;
@@ -1957,7 +1951,7 @@ Handsontable.Core = function (rootElement, settings) {
   /**
    * Handsontable version
    */
-  this.version = '0.8.0-beta1'; //inserted by grunt from package.json
+  this.version = '0.8.0-beta3'; //inserted by grunt from package.json
 };
 
 var settings = {
@@ -1981,7 +1975,8 @@ var settings = {
   'tabMoves': {row: 0, col: 1},
   'autoWrapRow': false,
   'autoWrapCol': false,
-  'viewEngine': 'walkontable'
+  'viewEngine': 'walkontable',
+  'asyncRendering': window.jasmine ? false : true //disable async for testing
 };
 
 $.fn.handsontable = function (action) {
@@ -2037,7 +2032,7 @@ Handsontable.TableView = function (instance) {
   var myWidth = settings.width;
   var myHeight = settings.height;
   if (overflow === 'scroll' || overflow === 'auto') {
-    instance.rootElement.css('overflow', '');
+    instance.rootElement.css('overflow', 'visible');
     if (settings.width === void 0 && parseInt(instance.rootElement.css('width')) > 0) {
       myWidth = parseInt(instance.rootElement.css('width'));
       instance.rootElement[0].style.width = '';
@@ -2055,21 +2050,39 @@ Handsontable.TableView = function (instance) {
     isMouseDown = false;
     clearInterval(dragInterval);
     dragInterval = null;
+
+    if (instance.autofill.handle && instance.autofill.handle.isDragged) {
+      if (instance.autofill.handle.isDragged > 1) {
+        instance.autofill.apply();
+      }
+      instance.autofill.handle.isDragged = 0;
+    }
   });
+
+  $table.on('selectstart', function (event) {
+    //https://github.com/warpech/jquery-handsontable/issues/160
+    //selectstart is IE only event. Prevent text from being selected when performing drag down in IE8
+    event.preventDefault();
+  });
+
   $table.on('mouseenter', function () {
-    if (dragInterval) { //if dragInterval was set (that means mouse was really outide of table, not over an element that is outside of <table> in DOM
+    if (dragInterval) { //if dragInterval was set (that means mouse was really outside of table, not over an element that is outside of <table> in DOM
       clearInterval(dragInterval);
       dragInterval = null;
     }
   });
 
   $table.on('mouseleave', function (event) {
+    if (!(isMouseDown || (instance.autofill.handle && instance.autofill.handle.isDragged))) {
+      return;
+    }
+
     var tolerance = 1 //this is needed because width() and height() contains stuff like cell borders
       , offset = that.wt.wtDom.offset($table[0])
       , offsetTop = offset.top + tolerance
       , offsetLeft = offset.left + tolerance
-      , width = $table.width() - 2 * tolerance
-      , height = $table.height() - 2 * tolerance
+      , width = myWidth - that.wt.settings.scrollbarWidth - 2 * tolerance
+      , height = myHeight - that.wt.settings.scrollbarHeight - 2 * tolerance
       , method
       , row = 0
       , col = 0
@@ -2094,8 +2107,8 @@ Handsontable.TableView = function (instance) {
 
     if (method) {
       dragFn = function () {
-        if (isMouseDown) {
-          instance.selection.transformEnd(row, col);
+        if (isMouseDown || (instance.autofill.handle && instance.autofill.handle.isDragged)) {
+          //instance.selection.transformEnd(row, col);
           that.wt[method](row + col).draw();
         }
       };
@@ -2106,6 +2119,7 @@ Handsontable.TableView = function (instance) {
 
   var walkontableConfig = {
     table: $table[0],
+    async: settings.asyncRendering,
     data: instance.getDataAtCell,
     totalRows: instance.countRows,
     totalColumns: instance.countCols,
@@ -2127,7 +2141,10 @@ Handsontable.TableView = function (instance) {
         border: {
           width: 2,
           color: '#5292F7',
-          style: 'solid'
+          style: 'solid',
+          cornerVisible: function () {
+            return settings.fillHandle && !texteditor.isCellEdited && !instance.selection.isMultiple()
+          }
         }
       },
       area: {
@@ -2135,6 +2152,17 @@ Handsontable.TableView = function (instance) {
         border: {
           width: 1,
           color: '#89AFF9',
+          style: 'solid',
+          cornerVisible: function () {
+            return settings.fillHandle && !texteditor.isCellEdited && instance.selection.isMultiple()
+          }
+        }
+      },
+      fill: {
+        className: 'fill',
+        border: {
+          width: 1,
+          color: 'red',
           style: 'solid'
         }
       }
@@ -2157,21 +2185,28 @@ Handsontable.TableView = function (instance) {
       if (isMouseDown) {
         instance.selection.setRangeEnd(coordsObj);
       }
-      else if (that.instance.autofill.handle && that.instance.autofill.handle.isDragged) {
-        that.instance.autofill.handle.isDragged++;
-        that.instance.autofill.showBorder(this);
+      else if (instance.autofill.handle && instance.autofill.handle.isDragged) {
+        instance.autofill.handle.isDragged++;
+        instance.autofill.showBorder(coords);
       }
+    },
+    onCellCornerMouseDown: function (event) {
+      instance.autofill.handle.isDragged = 1;
+      event.preventDefault();
+    },
+    onCellCornerDblClick: function (event) {
+      instance.autofill.selectAdjacent();
     }
   };
 
   Handsontable.PluginHooks.run(this.instance, 'walkontableConfig', [walkontableConfig]);
 
   this.wt = new Walkontable(walkontableConfig);
-  this.wt.draw();
+  this.render();
 };
 
-Handsontable.TableView.prototype.render = function (row, col, prop, value) {
-  this.wt.draw();
+Handsontable.TableView.prototype.render = function (selectionsOnly) {
+  this.wt.draw(selectionsOnly);
   this.instance.rootElement.triggerHandler('render.handsontable');
 };
 
@@ -2248,74 +2283,6 @@ Handsontable.helper.stringify = function (value) {
   }
 };
 
-/**
- * Create DOM element for drag-down handle
- * @constructor
- * @param {Object} instance Handsontable instance
- */
-Handsontable.FillHandle = function (instance) {
-  return;
-
-  this.instance = instance;
-  this.rootElement = instance.rootElement;
-  var container = this.rootElement[0];
-
-  this.handle = document.createElement("div");
-  this.handle.className = "htFillHandle";
-  this.disappear();
-  container.appendChild(this.handle);
-
-  var that = this;
-  $(this.handle).mousedown(function () {
-    that.isDragged = 1;
-  });
-
-  this.rootElement.find('table').on('selectstart', function (event) {
-    //https://github.com/warpech/jquery-handsontable/issues/160
-    //selectstart is IE only event. Prevent text from being selected when performing drag down in IE8
-    event.preventDefault();
-  });
-};
-
-Handsontable.FillHandle.prototype = {
-  /**
-   * Show handle in cell cornerł
-   * @param {Object[]} coordsArr
-   */
-  appear: function (coordsArr) {
-    return;
-
-    if (this.disabled) {
-      return;
-    }
-
-    var $td, tdOffset, containerOffset, top, left, height, width;
-
-    var corners = this.instance.getCornerCoords(coordsArr);
-
-    $td = $(this.instance.getCell(corners.BR.row, corners.BR.col));
-    tdOffset = $td.offset();
-    containerOffset = this.$container.offset();
-
-    top = tdOffset.top - containerOffset.top + this.rootElement.scrollTop() - 1;
-    left = tdOffset.left - containerOffset.left + this.rootElement.scrollLeft() - 1;
-    height = $td.outerHeight();
-    width = $td.outerWidth();
-
-    this.handle.style.top = top + height - 3 + 'px';
-    this.handle.style.left = left + width - 3 + 'px';
-    this.handle.style.display = 'block';
-  },
-
-  /**
-   * Hide handle
-   */
-  disappear: function () {
-    return;
-
-    this.handle.style.display = 'none';
-  }
-};
 /**
  * Handsontable UndoRedo class
  */
@@ -2579,6 +2546,7 @@ var texteditor = {
     if (texteditor.isCellEdited) {
       return;
     }
+    texteditor.isCellEdited = true;
 
     var coords = {row: row, col: col};
     instance.view.scrollViewport(coords);
@@ -2596,8 +2564,6 @@ var texteditor = {
     if (!instance.getCellMeta(row, col).isWritable) {
       return;
     }
-
-    texteditor.isCellEdited = true;
 
     if (useOriginalValue) {
       var original = instance.getDataAtCell(row, prop);
@@ -2706,7 +2672,7 @@ var texteditor = {
         ];
       }
       if (ctrlDown) { //if ctrl+enter and multiple cells selected, behave like Excel (finish editing and apply to all cells)
-        var sel = instance.handsontable('getSelected');
+        var sel = instance.getSelected();
         instance.populateFromArray({row: sel[0], col: sel[1]}, val, {row: sel[2], col: sel[3]}, false, 'edit');
       }
       else {
@@ -2780,6 +2746,12 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, keyboardProxy,
           event.stopPropagation();
         }
       }
+      return;
+    }
+
+    if (texteditor.isCellEdited && (event.keyCode === 17 || event.keyCode === 224 || event.keyCode === 91 || event.keyCode === 93)) {
+      //when CTRL is pressed and cell is edited, don't prepare selectable text in textarea
+      event.stopPropagation();
       return;
     }
 
@@ -3682,7 +3654,7 @@ Handsontable.PluginHooks.push('afterGetCellMeta', function (row, col, cellProper
 /**
  * walkontable 0.1
  * 
- * Date: Tue Dec 11 2012 11:27:15 GMT+0100 (Central European Standard Time)
+ * Date: Mon Dec 17 2012 15:29:12 GMT+0100 (Central European Standard Time)
 */
 
 function WalkontableBorder(instance, settings) {
@@ -3696,7 +3668,7 @@ function WalkontableBorder(instance, settings) {
   this.main.style.top = 0;
   this.main.style.left = 0;
 
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 5; i++) {
     var DIV = document.createElement('DIV');
     DIV.className = 'wtBorder ' + settings.className;
     DIV.style.backgroundColor = settings.border.color;
@@ -3710,8 +3682,14 @@ function WalkontableBorder(instance, settings) {
   this.bottom = this.main.childNodes[2];
   this.right = this.main.childNodes[3];
 
+  this.corner = this.main.childNodes[4];
+  this.corner.className += ' corner';
+  this.corner.style.width = '5px';
+  this.corner.style.height = '5px';
+  this.corner.style.border = '2px solid #FFF';
+
   this.disappear();
-  instance.wtTable.parent.appendChild(this.main);
+  instance.wtTable.hider.appendChild(this.main);
 }
 
 /**
@@ -3830,6 +3808,15 @@ WalkontableBorder.prototype.appear = function (corners) {
     this.right.style.height = height + 1 + 'px';
     this.right.style.display = 'block';
   }
+
+  if (hideBottom && hideRight || !this.hasSetting(this.settings.border.cornerVisible)) {
+    this.corner.style.display = 'none';
+  }
+  else {
+    this.corner.style.top = top + height - 4 + 'px';
+    this.corner.style.left = left + width - 4 + 'px';
+    this.corner.style.display = 'block';
+  }
 };
 
 /**
@@ -3840,14 +3827,23 @@ WalkontableBorder.prototype.disappear = function () {
   this.left.style.display = 'none';
   this.bottom.style.display = 'none';
   this.right.style.display = 'none';
+  this.corner.style.display = 'none';
+};
+
+WalkontableBorder.prototype.hasSetting = function (setting) {
+  if (typeof setting === 'function') {
+    return setting();
+  }
+  return !!setting;
 };
 function Walkontable(settings) {
   var that = this;
   var originalHeaders = [];
 
   //default settings. void 0 means it is required, null means it can be empty
-  var defaults = {
+  this.defaults = {
     table: void 0,
+    async: false,
     data: void 0,
     offsetRow: 0,
     offsetColumn: 0,
@@ -3872,21 +3868,25 @@ function Walkontable(settings) {
     selections: null,
     onCellMouseDown: null,
     onCellMouseOver: null,
-    onCellDblClick: null
+    onCellDblClick: null,
+    onCellCornerMouseDown: null,
+    onCellCornerDblClick: null,
+    scrollbarWidth: 9,
+    scrollbarHeight: 9
   };
 
   //reference to settings
   this.settings = {};
-  for (var i in defaults) {
-    if (defaults.hasOwnProperty(i)) {
+  for (var i in this.defaults) {
+    if (this.defaults.hasOwnProperty(i)) {
       if (settings[i] !== void 0) {
         this.settings[i] = settings[i];
       }
-      else if (defaults[i] === void 0) {
+      else if (this.defaults[i] === void 0) {
         throw new Error('A required setting "' + i + '" was not provided');
       }
       else {
-        this.settings[i] = defaults[i];
+        this.settings[i] = this.defaults[i];
       }
     }
   }
@@ -3923,11 +3923,25 @@ function Walkontable(settings) {
   this.drawn = false;
 }
 
-Walkontable.prototype.draw = function () {
-  this.wtTable.draw();
-  this.wtScroll.refreshScrollbars();
-  this.drawn = true;
+Walkontable.prototype.draw = function (selectionsOnly) {
+  //this.instance.scrollViewport([this.instance.getSetting('offsetRow'), this.instance.getSetting('offsetColumn')]); //needed by WalkontableScroll -> remove row from the last scroll page should scroll viewport a row up if needed
+  if (this.hasSetting('async')) {
+    var that = this;
+    that.drawFrame = setTimeout(function () {
+      that._doDraw(selectionsOnly);
+    }, 0);
+  }
+  else {
+    this._doDraw(selectionsOnly);
+  }
   return this;
+};
+
+Walkontable.prototype._doDraw = function (selectionsOnly) {
+  selectionsOnly = selectionsOnly && this.settings.offsetRow === this.lastOffsetRow && this.settings.offsetColumn === this.lastOffsetColumn;
+  this.lastOffsetRow = this.settings.offsetRow;
+  this.lastOffsetColumn = this.settings.offsetColumn;
+  this.wtTable.draw(selectionsOnly);
 };
 
 Walkontable.prototype.update = function (settings, value) {
@@ -3953,15 +3967,24 @@ Walkontable.prototype.scrollHorizontal = function (delta) {
 };
 
 Walkontable.prototype.scrollViewport = function (coords) {
-  return this.wtScroll.scrollViewport(coords);
+  if (this.hasSetting('async')) {
+    var that = this;
+    that.scrollFrame = setTimeout(function () {
+      that.wtScroll.scrollViewport(coords);
+    }, 0);
+  }
+  else {
+    this.wtScroll.scrollViewport(coords);
+  }
+  return this;
 };
 
 Walkontable.prototype.getSetting = function (key, param1, param2, param3) {
   if (key === 'displayRows' && this.settings['height']) {
-    return this.settings['height'] / 20; //silly assumption but should be fine for now
+    return Math.min(this.settings['height'] / 20, this.getSetting('totalRows') - this.getSetting('offsetRow')); //silly assumption but should be fine for now
   }
   else if (key === 'displayColumns' && this.settings['width']) {
-    return this.settings['width'] / 50; //silly assumption but should be fine for now
+    return Math.min(this.settings['width'] / 50, this.getSetting('totalColumns') - this.getSetting('offsetColumn')); //silly assumption but should be fine for now
   }
   else if (key === 'displayRows' && this.settings['displayRows'] === null) {
     return this.getSetting('totalRows');
@@ -3969,11 +3992,23 @@ Walkontable.prototype.getSetting = function (key, param1, param2, param3) {
   else if (key === 'displayColumns' && this.settings['displayColumns'] === null) {
     return this.settings['rowHeaders'] ? this.getSetting('totalColumns') + 1 : this.getSetting('totalColumns');
   }
+  else if (key === 'viewportRows') {
+    if (this.wtTable.visibilityEdgeRow) {
+      return this.wtTable.visibilityEdgeRow - this.getSetting('offsetRow');
+    }
+    return this.getSetting('displayRows');
+  }
+  else if (key === 'viewportColumns') {
+    if (this.wtTable.visibilityEdgeColumn) {
+      return this.wtTable.visibilityEdgeColumn - this.getSetting('offsetColumn');
+    }
+    return this.getSetting('displayColumns');
+  }
 
   if (typeof this.settings[key] === 'function') {
     return this.settings[key](param1, param2, param3);
   }
-  else if (param1 !== void 0 && typeof this.settings[key] === 'object' && this.settings[key][param1] !== void 0) {
+  else if (param1 !== void 0 && Object.prototype.toString.call(this.settings[key]) === '[object Array]' && param1 !== void 0) {
     return this.settings[key][param1];
   }
   else {
@@ -4104,14 +4139,15 @@ WalkontableDom.prototype.removeTextNodes = function (elem, parent) {
 /**
  * seems getBounding is usually faster: http://jsperf.com/offset-vs-getboundingclientrect/4
  * but maybe offset + cache would work?
+ * edit: after more tests turns out offsetLeft/Top is faster
  */
-WalkontableDom.prototype.offset = function (elem) {
-  var rect = elem.getBoundingClientRect();
-  return {
-    top: rect.top + document.documentElement.scrollTop,
-    left: rect.left + document.documentElement.scrollLeft
-  };
-};
+/*WalkontableDom.prototype.offset = function (elem) {
+ var rect = elem.getBoundingClientRect();
+ return {
+ top: rect.top + document.documentElement.scrollTop,
+ left: rect.left + document.documentElement.scrollLeft
+ };
+ };*/
 
 /*
  WalkontableDom.prototype.offsetLeft = function (elem) {
@@ -4128,21 +4164,20 @@ WalkontableDom.prototype.offset = function (elem) {
  offset += elem.offsetTop;
  }
  return offset;
- };
+ };*/
 
- WalkontableDom.prototype.offset = function (elem) {
- var offsetLeft = elem.offsetLeft
- , offsetTop = elem.offsetTop;
- while (elem = elem.offsetParent) {
- offsetLeft += elem.offsetLeft;
- offsetTop += elem.offsetTop;
- }
- return {
- left: offsetLeft,
- top: offsetTop
- };
- };
- */
+WalkontableDom.prototype.offset = function (elem) {
+  var offsetLeft = elem.offsetLeft
+    , offsetTop = elem.offsetTop;
+  while (elem = elem.offsetParent) {
+    offsetLeft += elem.offsetLeft;
+    offsetTop += elem.offsetTop;
+  }
+  return {
+    left: offsetLeft,
+    top: offsetTop
+  };
+};
 function WalkontableEvent(instance) {
   var that = this;
 
@@ -4151,19 +4186,29 @@ function WalkontableEvent(instance) {
 
   this.wtDom = new WalkontableDom();
 
+  var dblClickOrigin = [null, null, null, null]
+    , dblClickTimeout = null;
+
   var onMouseDown = function (event) {
-    if (that.instance.settings.onCellMouseDown) {
-      var coords
-        , TD = that.wtDom.closest(event.target, ['TD', 'TH']);
-      if (TD) {
-        coords = that.instance.wtTable.getCoords(TD);
+    var cell = that.parentCell(event.target);
+
+    if (cell.TD && cell.TD.nodeName === 'TD') {
+      if (that.instance.settings.onCellMouseDown) {
+        that.instance.getSetting('onCellMouseDown', event, cell.coords, cell.TD);
       }
-      else if (!TD && that.wtDom.hasClass(event.target, 'wtBorder') && that.wtDom.hasClass(event.target, 'current')) {
-        coords = that.instance.selections.current.selected[0];
-        TD = that.instance.wtTable.getCell(coords);
+    }
+    else if (that.wtDom.hasClass(event.target, 'corner')) {
+      that.instance.getSetting('onCellCornerMouseDown', event, event.target);
+    }
+
+    if (event.button !== 2) { //if not right mouse button
+      if (cell.TD && cell.TD.nodeName === 'TD') {
+        dblClickOrigin.shift();
+        dblClickOrigin.push(cell.TD);
       }
-      if(TD) {
-        that.instance.getSetting('onCellMouseDown', event, coords, TD);
+      else if (that.wtDom.hasClass(event.target, 'corner')) {
+        dblClickOrigin.shift();
+        dblClickOrigin.push(event.target);
       }
     }
   };
@@ -4172,37 +4217,46 @@ function WalkontableEvent(instance) {
   var onMouseOver = function (event) {
     if (that.instance.settings.onCellMouseOver) {
       var TD = that.wtDom.closest(event.target, ['TD', 'TH']);
-      if (TD !== lastMouseOver) {
+      if (TD && TD !== lastMouseOver) {
         lastMouseOver = TD;
-        that.instance.getSetting('onCellMouseOver', event, that.instance.wtTable.getCoords(TD), TD);
+        if (TD.nodeName === 'TD') {
+          that.instance.getSetting('onCellMouseOver', event, that.instance.wtTable.getCoords(TD), TD);
+        }
       }
     }
   };
 
-  var dblClickOrigin
-    , dblClickTimeout;
   var onMouseUp = function (event) {
-    if (event.button !== 2 && that.instance.settings.onCellDblClick) { //if not right mouse button
-      var coords
-        , TD = that.wtDom.closest(event.target, ['TD', 'TH']);
-      if (TD) {
-        coords = that.instance.wtTable.getCoords(TD);
-      }
-      else if (!TD && that.wtDom.hasClass(event.target, 'wtBorder') && that.wtDom.hasClass(event.target, 'current')) {
-        coords = that.instance.selections.current.selected[0];
-        TD = that.instance.wtTable.getCell(coords);
-      }
+    if (event.button !== 2) { //if not right mouse button
+      var cell = that.parentCell(event.target);
 
-      if (TD && dblClickOrigin === TD) {
-        that.instance.getSetting('onCellDblClick', event, coords, TD);
-        dblClickOrigin = null;
+      if (cell.TD && cell.TD.nodeName === 'TD') {
+        dblClickOrigin.shift();
+        dblClickOrigin.push(cell.TD);
       }
       else {
-        dblClickOrigin = TD;
-        clearTimeout(dblClickTimeout);
-        dblClickTimeout = setTimeout(function () {
-          dblClickOrigin = null;
-        }, 500);
+        dblClickOrigin.shift();
+        dblClickOrigin.push(event.target);
+      }
+
+      if (dblClickOrigin[3] !== null && dblClickOrigin[3] === dblClickOrigin[2]) {
+        if (dblClickTimeout && dblClickOrigin[2] === dblClickOrigin[1] && dblClickOrigin[1] === dblClickOrigin[0]) {
+          if (cell.TD) {
+            that.instance.getSetting('onCellDblClick', event, cell.coords, cell.TD);
+          }
+          else if (that.wtDom.hasClass(event.target, 'corner')) {
+            that.instance.getSetting('onCellCornerDblClick', event, cell.coords, cell.TD);
+          }
+
+          clearTimeout(dblClickTimeout);
+          dblClickTimeout = null;
+        }
+        else {
+          clearTimeout(dblClickTimeout);
+          dblClickTimeout = setTimeout(function () {
+            dblClickTimeout = null;
+          }, 500);
+        }
       }
     }
   };
@@ -4211,6 +4265,19 @@ function WalkontableEvent(instance) {
   $(this.instance.settings.table).on('mouseover', onMouseOver);
   $(this.instance.wtTable.parent).on('mouseup', onMouseUp);
 }
+
+WalkontableEvent.prototype.parentCell = function (elem) {
+  var cell = {};
+  cell.TD = this.wtDom.closest(elem, ['TD', 'TH']);
+  if (cell.TD) {
+    cell.coords = this.instance.wtTable.getCoords(cell.TD);
+  }
+  else if (!cell.TD && this.wtDom.hasClass(elem, 'wtBorder') && this.wtDom.hasClass(elem, 'current') && !this.wtDom.hasClass(elem, 'corner')) {
+    cell.coords = this.instance.selections.current.selected[0];
+    cell.TD = this.instance.wtTable.getCell(cell.coords);
+  }
+  return cell;
+};
 //http://stackoverflow.com/questions/3629183/why-doesnt-indexof-work-on-an-array-ie8
 if (!Array.prototype.indexOf) {
   Array.prototype.indexOf = function (elt /*, from*/) {
@@ -4231,6 +4298,29 @@ if (!Array.prototype.indexOf) {
     return -1;
   };
 }
+
+/**
+ * http://notes.jetienne.com/2011/05/18/cancelRequestAnimFrame-for-paul-irish-requestAnimFrame.html
+ */
+window.requestAnimFrame = (function () {
+  return  window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (/* function */ callback, /* DOMElement */ element) {
+      return window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+window.cancelRequestAnimFrame = (function () {
+  return window.cancelAnimationFrame ||
+    window.webkitCancelRequestAnimationFrame ||
+    window.mozCancelRequestAnimationFrame ||
+    window.oCancelRequestAnimationFrame ||
+    window.msCancelRequestAnimationFrame ||
+    clearTimeout
+})();
 function WalkontableScroll(instance) {
   this.instance = instance;
   this.wtScrollbarV = new WalkontableScrollbar(instance, 'vertical');
@@ -4244,37 +4334,43 @@ WalkontableScroll.prototype.refreshScrollbars = function () {
 
 WalkontableScroll.prototype.scrollVertical = function (delta) {
   var offsetRow = this.instance.getSetting('offsetRow')
-    , max = this.instance.getSetting('totalRows') - this.instance.getSetting('displayRows');
+    , newOffsetRow
+    , max = this.instance.getSetting('totalRows') - this.instance.getSetting('viewportRows');
   if (max < 0) {
     max = 0;
   }
-  offsetRow = offsetRow + delta;
-  if (offsetRow < 0) {
-    offsetRow = 0;
+  newOffsetRow = offsetRow + delta;
+  if (newOffsetRow < 0) {
+    newOffsetRow = 0;
   }
-  else if (offsetRow >= max) {
-    offsetRow = max;
+  else if (newOffsetRow >= max) {
+    newOffsetRow = max;
   }
-  this.instance.update('offsetRow', offsetRow);
+  if (newOffsetRow !== offsetRow) {
+    this.instance.update('offsetRow', newOffsetRow);
+  }
   return this.instance;
 };
 
 WalkontableScroll.prototype.scrollHorizontal = function (delta) {
-  var displayColumns = this.instance.getSetting('displayColumns');
-  if (displayColumns !== null) {
+  var viewportColumns = this.instance.getSetting('viewportColumns');
+  if (viewportColumns !== null) {
     var offsetColumn = this.instance.getSetting('offsetColumn')
-      , max = this.instance.getSetting('totalColumns') - displayColumns;
+      , newOffsetColumn
+      , max = this.instance.getSetting('totalColumns') - viewportColumns;
     if (max < 0) {
       max = 0;
     }
-    offsetColumn = offsetColumn + delta;
-    if (offsetColumn < 0) {
-      offsetColumn = 0;
+    newOffsetColumn = offsetColumn + delta;
+    if (newOffsetColumn < 0) {
+      newOffsetColumn = 0;
     }
-    else if (offsetColumn >= max) {
-      offsetColumn = max;
+    else if (newOffsetColumn >= max) {
+      newOffsetColumn = max;
     }
-    this.instance.update('offsetColumn', offsetColumn);
+    if (newOffsetColumn !== offsetColumn) {
+      this.instance.update('offsetColumn', newOffsetColumn);
+    }
   }
   return this.instance;
 };
@@ -4285,8 +4381,8 @@ WalkontableScroll.prototype.scrollHorizontal = function (delta) {
 WalkontableScroll.prototype.scrollViewport = function (coords) {
   var offsetRow = this.instance.getSetting('offsetRow')
     , offsetColumn = this.instance.getSetting('offsetColumn')
-    , displayRows = this.instance.getSetting('displayRows')
-    , displayColumns = this.instance.getSetting('displayColumns')
+    , viewportRows = this.instance.getSetting('viewportRows')
+    , viewportColumns = this.instance.getSetting('viewportColumns')
     , totalRows = this.instance.getSetting('totalRows')
     , totalColumns = this.instance.getSetting('totalColumns');
 
@@ -4297,22 +4393,34 @@ WalkontableScroll.prototype.scrollViewport = function (coords) {
     throw new Error('column ' + coords[1] + ' does not exist');
   }
 
-  if (displayRows < totalRows) {
-    if (coords[0] > offsetRow + displayRows - 1) {
-      this.scrollVertical(coords[0] - (offsetRow + displayRows - 1));
+  if (viewportRows < totalRows) {
+    if (coords[0] > offsetRow + viewportRows - 1) {
+      this.scrollVertical(coords[0] - (offsetRow + viewportRows - 1));
     }
     else if (coords[0] < offsetRow) {
       this.scrollVertical(coords[0] - offsetRow);
     }
+    else {
+      this.scrollVertical(0); //Craig's issue: remove row from the last scroll page should scroll viewport a row up if needed
+    }
+  }
+  else {
+    this.scrollVertical(0); //Craig's issue
   }
 
-  if (displayColumns < totalColumns) {
-    if (coords[1] > offsetColumn + displayColumns - 1) {
-      this.scrollHorizontal(coords[1] - (offsetColumn + displayColumns - 1));
+  if (viewportColumns > 0 && viewportColumns < totalColumns) {
+    if (coords[1] > offsetColumn + viewportColumns - 1) {
+      this.scrollHorizontal(coords[1] - (offsetColumn + viewportColumns - 1));
     }
     else if (coords[1] < offsetColumn) {
       this.scrollHorizontal(coords[1] - offsetColumn);
     }
+    else {
+      this.scrollHorizontal(0); //Craig's issue
+    }
+  }
+  else {
+    this.scrollHorizontal(0); //Craig's issue
   }
 
   return this.instance;
@@ -4338,20 +4446,45 @@ function WalkontableScrollbar(instance, type) {
   this.slider.appendChild(this.handle);
   this.instance.wtTable.parent.appendChild(this.slider);
 
+  that.waitTimeout = null;
+  that.queuedAnimationCallback = null;
   this.dragdealer = new Dragdealer(this.slider, {
     vertical: (type === 'vertical'),
     horizontal: (type === 'horizontal'),
     speed: 100,
     yPrecision: 100,
     animationCallback: function (x, y) {
+      that.skipRefresh = true;
+      var nextRender = function () {
+        if (that.skipRefresh) { //mouse button still not released
+          that.onScroll(type === 'vertical' ? y : x);
+        }
+        that.waitTimeout = setTimeout(function () {
+          that.waitTimeout = null;
+          if (that.queuedAnimationCallback) {
+            that.queuedAnimationCallback();
+            that.queuedAnimationCallback = null;
+          }
+        }, 100);
+      };
+      if (that.waitTimeout === null) {
+        nextRender();
+      }
+      else {
+        that.queuedAnimationCallback = nextRender;
+      }
+    },
+    callback: function (x, y) {
+      that.skipRefresh = false;
       that.onScroll(type === 'vertical' ? y : x);
     }
   });
+  that.skipRefresh = false;
 }
 
 WalkontableScrollbar.prototype.onScroll = function (delta) {
   if (this.instance.drawn) {
-    var keys = this.type === 'vertical' ? ['offsetRow', 'totalRows', 'displayRows'] : ['offsetColumn', 'totalColumns', 'displayColumns'];
+    var keys = this.type === 'vertical' ? ['offsetRow', 'totalRows', 'viewportRows'] : ['offsetColumn', 'totalColumns', 'viewportColumns'];
     var total = this.instance.getSetting(keys[1]);
     var display = this.instance.getSetting(keys[2]);
     if (total > display) {
@@ -4365,6 +4498,9 @@ WalkontableScrollbar.prototype.onScroll = function (delta) {
 };
 
 WalkontableScrollbar.prototype.refresh = function () {
+  if (this.skipRefresh) {
+    return;
+  }
   var ratio = 1
     , handleSize
     , handlePosition
@@ -4372,10 +4508,10 @@ WalkontableScrollbar.prototype.refresh = function () {
     , offsetColumn = this.instance.getSetting('offsetColumn')
     , totalRows = this.instance.getSetting('totalRows')
     , totalColumns = this.instance.getSetting('totalColumns')
-    , tableWidth = this.$table.outerWidth()
-    , tableHeight = this.$table.outerHeight()
-    , displayRows = Math.min(this.instance.getSetting('displayRows'), totalRows)
-    , displayColumns = Math.min(this.instance.getSetting('displayColumns'), totalColumns);
+    , tableWidth = this.instance.hasSetting('width') ? this.instance.getSetting('width') - this.instance.getSetting('scrollbarWidth') : this.$table.outerWidth()
+    , tableHeight = this.instance.hasSetting('height') ? this.instance.getSetting('height') - this.instance.getSetting('scrollbarHeight') : this.$table.outerHeight()
+    , viewportRows = Math.min(this.instance.getSetting('viewportRows'), totalRows)
+    , viewportColumns = Math.min(this.instance.getSetting('viewportColumns'), totalColumns);
 
   if (!tableWidth) {
     throw new Error("I could not compute table width. Is the <table> element attached to the DOM?");
@@ -4390,7 +4526,7 @@ WalkontableScrollbar.prototype.refresh = function () {
     this.slider.style.height = tableHeight - 2 + 'px'; //2 is sliders border-width
 
     if (totalRows) {
-      ratio = displayRows / totalRows;
+      ratio = viewportRows / totalRows;
     }
     handleSize = Math.round($(this.slider).height() * ratio);
     if (handleSize < 10) {
@@ -4398,7 +4534,7 @@ WalkontableScrollbar.prototype.refresh = function () {
     }
     this.handle.style.height = handleSize + 'px';
 
-    handlePosition = tableHeight * (offsetRow / totalRows);
+    handlePosition = (tableHeight - handleSize) * (offsetRow / totalRows);
     if (handlePosition > tableHeight - handleSize) {
       handlePosition = tableHeight - handleSize;
     }
@@ -4410,7 +4546,7 @@ WalkontableScrollbar.prototype.refresh = function () {
     this.slider.style.width = tableWidth - 2 + 'px'; //2 is sliders border-width
 
     if (totalColumns) {
-      ratio = displayColumns / totalColumns;
+      ratio = viewportColumns / totalColumns;
     }
     handleSize = Math.round($(this.slider).width() * ratio);
     if (handleSize < 10) {
@@ -4418,13 +4554,14 @@ WalkontableScrollbar.prototype.refresh = function () {
     }
     this.handle.style.width = handleSize + 'px';
 
-    handlePosition = tableWidth * (offsetColumn / totalColumns);
+    handlePosition = (tableWidth - handleSize) * (offsetColumn / totalColumns);
     if (handlePosition > tableWidth - handleSize) {
       handlePosition = tableWidth - handleSize;
     }
-    else if (handlePosition < 0) {
-      handlePosition = 0;
-    }
+    /* it should be needed here if it was not needed above
+     else if (handlePosition < 0) {
+     handlePosition = 0;
+     }*/
     this.handle.style.left = handlePosition + 'px';
   }
 
@@ -4435,6 +4572,7 @@ WalkontableScrollbar.prototype.refresh = function () {
 };
 function WalkontableSelection(instance, settings) {
   this.instance = instance;
+  this.settings = settings;
   this.selected = [];
   if (settings.border) {
     this.border = new WalkontableBorder(instance, settings);
@@ -4469,9 +4607,7 @@ WalkontableSelection.prototype.remove = function (coords) {
 };
 
 WalkontableSelection.prototype.clear = function () {
-  for (var i = this.selected.length - 1; i >= 0; i--) {
-    this.remove(this.selected[i]);
-  }
+  this.selected.length = 0; //http://jsperf.com/clear-arrayxxx
 };
 
 WalkontableSelection.prototype.isSelected = function (coords) {
@@ -4525,9 +4661,17 @@ WalkontableSelection.prototype.getCorners = function () {
   return [minRow, minColumn, maxRow, maxColumn];
 };
 
-WalkontableSelection.prototype.draw = function () {
-  var TD;
-  for (var i = 0, ilen = this.selected.length; i < ilen; i++) {
+WalkontableSelection.prototype.draw = function (selectionsOnly) {
+  var TDs, TD, i, ilen;
+
+  if (selectionsOnly && this.settings.className) {
+    TDs = this.instance.wtTable.TABLE.getElementsByTagName('TD');
+    for (i = 0, ilen = TDs.length; i < ilen; i++) {
+      this.instance.wtDom.removeClass(TDs[i], this.settings.className);
+    }
+  }
+
+  for (i = 0, ilen = this.selected.length; i < ilen; i++) {
     TD = this.instance.wtTable.getCell(this.selected[i]);
     if (TD) {
       this.onAdd(this.selected[i], TD);
@@ -4643,18 +4787,68 @@ function WalkontableTable(instance) {
   this.wtDom = new WalkontableDom();
   this.wtDom.removeTextNodes(this.TABLE);
 
-  //wtHolder
+  this.hasEmptyCellProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
+  this.hasCellSpacingProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
+
+  if (this.hasCellSpacingProblem) { //IE7
+    this.TABLE.cellSpacing = 0;
+  }
+
+  this.visibilityEdgeRow = this.visibilityEdgeColumn = null;
+
+  //wtSpreader
   var parent = this.TABLE.parentNode;
+  if (!parent || parent.nodeType !== 1 || !this.wtDom.hasClass(parent, 'wtHolder')) {
+    var spreader = document.createElement('DIV');
+    if (this.instance.hasSetting('width') && this.instance.hasSetting('height')) {
+      spreader.style.position = 'absolute';
+      spreader.style.top = '0';
+      spreader.style.left = '0';
+      spreader.style.width = '4000px';
+      spreader.style.height = '4000px';
+    }
+    spreader.className = 'wtSpreader';
+    if (parent) {
+      parent.insertBefore(spreader, this.TABLE); //if TABLE is detached (e.g. in Jasmine test), it has no parentNode so we cannot attach holder to it
+    }
+    spreader.appendChild(this.TABLE);
+  }
+  this.spreader = this.TABLE.parentNode;
+
+  //wtHider
+  parent = this.spreader.parentNode;
+  if (!parent || parent.nodeType !== 1 || !this.wtDom.hasClass(parent, 'wtHolder')) {
+    var hider = document.createElement('DIV');
+    hider.style.position = 'relative';
+    if (this.instance.hasSetting('width') && this.instance.hasSetting('height')) {
+      hider.style.overflow = 'hidden';
+    }
+    if (this.instance.hasSetting('width')) {
+      hider.style.width = this.instance.getSetting('width') - this.instance.getSetting('scrollbarWidth') + 'px';
+    }
+    if (this.instance.hasSetting('height')) {
+      hider.style.height = this.instance.getSetting('height') - this.instance.getSetting('scrollbarHeight') + 'px';
+    }
+    hider.className = 'wtHider';
+    if (parent) {
+      parent.insertBefore(hider, this.spreader); //if TABLE is detached (e.g. in Jasmine test), it has no parentNode so we cannot attach holder to it
+    }
+    hider.appendChild(this.spreader);
+  }
+  this.hider = this.spreader.parentNode;
+
+  //wtHolder
+  parent = this.hider.parentNode;
   if (!parent || parent.nodeType !== 1 || !this.wtDom.hasClass(parent, 'wtHolder')) {
     var holder = document.createElement('DIV');
     holder.style.position = 'relative';
     holder.className = 'wtHolder';
     if (parent) {
-      parent.insertBefore(holder, this.TABLE); //if TABLE is detached (e.g. in Jasmine test), it has no parentNode so we cannot attach holder to it
+      parent.insertBefore(holder, this.hider); //if TABLE is detached (e.g. in Jasmine test), it has no parentNode so we cannot attach holder to it
     }
-    holder.appendChild(this.TABLE);
-    this.parent = holder;
+    holder.appendChild(this.hider);
   }
+  this.parent = this.hider.parentNode;
 
   //bootstrap from settings
   this.TBODY = this.TABLE.getElementsByTagName('TBODY')[0];
@@ -4753,7 +4947,32 @@ WalkontableTable.prototype.adjustAvailableNodes = function () {
   }
 };
 
-WalkontableTable.prototype.draw = function () {
+WalkontableTable.prototype.draw = function (selectionsOnly) {
+  if (!selectionsOnly) {
+    this.tableOffset = this.wtDom.offset(this.TABLE);
+    this.adjustAvailableNodes();
+    this._doDraw(selectionsOnly);
+  }
+
+  //redraw selections and scrollbars
+  if (this.instance.hasSetting('async')) {
+    var that = this;
+    window.cancelRequestAnimFrame(this.selectionsFrame);
+    that.selectionsFrame = window.requestAnimFrame(function () {
+      that.refreshPositions(selectionsOnly);
+    });
+  }
+  else {
+    this.refreshPositions(selectionsOnly);
+  }
+
+  this.instance.drawn = true;
+
+  //this.instance.scrollViewport([this.instance.getSetting('offsetRow'), this.instance.getSetting('offsetColumn')]); //needed by WalkontableScroll -> remove row from the last scroll page should scroll viewport a row up if needed
+  return this;
+};
+
+WalkontableTable.prototype._doDraw = function () {
   var r
     , c
     , offsetRow = this.instance.getSetting('offsetRow')
@@ -4769,8 +4988,6 @@ WalkontableTable.prototype.draw = function () {
     , TH
     , TD
     , cellData;
-  this.adjustAvailableNodes();
-  this.tableOffset = this.wtDom.offset(this.TABLE);
 
   displayRows = Math.min(displayRows, totalRows);
   displayTds = Math.min(displayColumns, totalColumns);
@@ -4788,20 +5005,31 @@ WalkontableTable.prototype.draw = function () {
     }
   }
 
+  var width;
   if (this.instance.hasSetting('columnWidth')) {
     for (c = 0; c < displayTds; c++) {
-      this.COLGROUP.childNodes[c + frozenColumnsCount].style.width = this.instance.getSetting('columnWidth', offsetColumn + c) + 'px';
+      width = this.instance.getSetting('columnWidth', offsetColumn + c);
+      if (width) {
+        this.COLGROUP.childNodes[c + frozenColumnsCount].style.width = this.instance.getSetting('columnWidth', offsetColumn + c) + 'px';
+      }
+      else {
+        this.COLGROUP.childNodes[c + frozenColumnsCount].style.width = '';
+      }
     }
   }
 
   //draw THEAD
   if (frozenColumnsCount && this.instance.hasSetting('columnHeaders')) {
     for (c = 0; c < frozenColumnsCount; c++) {
+      TH = this.THEAD.childNodes[0].childNodes[c];
       if (typeof frozenColumns[c] === "function") {
-        frozenColumns[c](null, this.THEAD.childNodes[0].childNodes[c])
+        frozenColumns[c](null, TH);
       }
       else {
-        this.THEAD.childNodes[0].childNodes[c].innerHTML = '';
+        TH.innerHTML = '';
+      }
+      if (this.hasEmptyCellProblem && TH.innerHTML === '') { //IE7
+        TH.innerHTML = '&nbsp;';
       }
     }
   }
@@ -4813,7 +5041,8 @@ WalkontableTable.prototype.draw = function () {
   }
 
   //draw TBODY
-  for (r = 0; r < displayRows; r++) {
+  this.visibilityEdgeRow = this.visibilityEdgeColumn = null;
+  rows : for (r = 0; r < displayRows; r++) {
     TR = this.TBODY.childNodes[r];
     for (c = 0; c < frozenColumnsCount; c++) { //in future use nextSibling; http://jsperf.com/nextsibling-vs-indexed-childnodes
       TH = TR.childNodes[c];
@@ -4829,21 +5058,94 @@ WalkontableTable.prototype.draw = function () {
     }
     for (c = 0; c < displayTds; c++) { //in future use nextSibling; http://jsperf.com/nextsibling-vs-indexed-childnodes
       TD = TR.childNodes[c + frozenColumnsCount];
-      TD.className = '';
-      this.instance.getSetting('cellRenderer', offsetRow + r, offsetColumn + c, TD);
-    }
-  }
 
-  //redraw selections
-  if (this.instance.selections) {
-    for (r in this.instance.selections) {
-      if (this.instance.selections.hasOwnProperty(r)) {
-        this.instance.selections[r].draw();
+      var visibility = this.isCellVisible(TD);
+      if (this.visibilityEdgeRow === null && this.visibilityEdgeColumn === null && visibility === 1 && c !== 0) {
+        this.visibilityEdgeColumn = offsetColumn + c;
+      }
+      if (this.visibilityEdgeRow === null && visibility === 1 && c === 0) {
+        this.visibilityEdgeRow = offsetRow + r;
+      }
+
+      if (!this.instance.drawn || visibility) {
+        TD.className = '';
+        this.instance.getSetting('cellRenderer', offsetRow + r, offsetColumn + c, TD);
+        if (this.hasEmptyCellProblem && TD.innerHTML === '') { //IE7
+          TD.innerHTML = '&nbsp;';
+        }
+      }
+      else {
+        if (c === 0) {
+          break rows;
+        }
+        else {
+          break; //cols
+        }
       }
     }
   }
 
-  return this;
+  this.refreshSelections();
+};
+
+WalkontableTable.prototype.refreshPositions = function (selectionsOnly) {
+  if (selectionsOnly) { //otherwise it was already rendered by _doDraw
+    this.refreshSelections(selectionsOnly);
+  }
+
+  this.instance.wtScroll.refreshScrollbars();
+};
+
+WalkontableTable.prototype.refreshSelections = function (selectionsOnly) {
+  var r;
+  if (this.instance.selections) {
+    for (r in this.instance.selections) {
+      if (this.instance.selections.hasOwnProperty(r)) {
+        this.instance.selections[r].draw(selectionsOnly);
+      }
+    }
+  }
+};
+
+//0 if no
+//1 if partially
+//2 is fully
+WalkontableTable.prototype.isCellVisible = function (TD) {
+  var offsetRow = this.instance.getSetting('offsetRow')
+    , offsetColumn = this.instance.getSetting('offsetColumn')
+    , displayRows = this.instance.getSetting('displayRows')
+    , displayColumns = this.instance.getSetting('displayColumns')
+    , frozenColumns = this.instance.getSetting('frozenColumns');
+
+  var out;
+
+  var cellOffset = this.wtDom.offset(TD);
+  var tableOffset = this.tableOffset;
+  var innerOffsetTop = cellOffset.top - tableOffset.top;
+  var innerOffsetLeft = cellOffset.left - tableOffset.left;
+  var width = $(TD).outerWidth();
+  var height = $(TD).outerHeight();
+
+  var tableWidth = this.instance.hasSetting('width') ? this.instance.getSetting('width') - this.instance.getSetting('scrollbarWidth') : $(this.TABLE).outerWidth()
+    , tableHeight = this.instance.hasSetting('height') ? this.instance.getSetting('height') - this.instance.getSetting('scrollbarHeight') : $(this.TABLE).outerHeight();
+
+  if (innerOffsetTop > tableHeight) {
+    out = 0;
+  }
+  else if (innerOffsetLeft > tableWidth) {
+    out = 0;
+  }
+  else if (innerOffsetTop + height > tableHeight) {
+    out = 1;
+  }
+  else if (innerOffsetLeft + width > tableWidth) {
+    out = 1;
+  }
+  else {
+    out = 2;
+  }
+
+  return out;
 };
 
 WalkontableTable.prototype.getCell = function (coords) {
@@ -4880,10 +5182,12 @@ function WalkontableWheel(instance) {
     clearTimeout(wheelTimeout);
     wheelTimeout = setTimeout(function () { //timeout is needed because with fast-wheel scrolling mousewheel event comes dozen times per second
       if (deltaY) {
-        that.instance.scrollVertical(-deltaY).draw();
+        //ceil is needed because jquery-mousewheel reports fractional mousewheel deltas on touchpad scroll
+        //see http://stackoverflow.com/questions/5527601/normalizing-mousewheel-speed-across-browsers
+        that.instance.scrollVertical(-Math.ceil(deltaY)).draw();
       }
       else if (deltaX) {
-        that.instance.scrollHorizontal(deltaX).draw();
+        that.instance.scrollHorizontal(Math.ceil(deltaX)).draw();
       }
     }, 0);
     event.preventDefault();
@@ -7451,521 +7755,3 @@ $.contextMenu.defaults = defaults;
 $.contextMenu.types = types;
 
 })(jQuery);
-
-/*!
- * jQuery UI Position 1.9.0-RC1
- * http://jqueryui.com
- *
- * Copyright 2012 jQuery Foundation and other contributors
- * Released under the MIT license.
- * http://jquery.org/license
- *
- * http://docs.jquery.com/UI/Position
- */
-(function( $, undefined ) {
-
-$.ui = $.ui || {};
-
-var cachedScrollbarWidth,
-	max = Math.max,
-	abs = Math.abs,
-	round = Math.round,
-	rhorizontal = /left|center|right/,
-	rvertical = /top|center|bottom/,
-	roffset = /[\+\-]\d+%?/,
-	rposition = /^\w+/,
-	rpercent = /%$/,
-	_position = $.fn.position;
-
-function getOffsets( offsets, width, height ) {
-	return [
-		parseInt( offsets[ 0 ], 10 ) * ( rpercent.test( offsets[ 0 ] ) ? width / 100 : 1 ),
-		parseInt( offsets[ 1 ], 10 ) * ( rpercent.test( offsets[ 1 ] ) ? height / 100 : 1 )
-	];
-}
-function parseCss( element, property ) {
-	return parseInt( $.css( element, property ), 10 ) || 0;
-}
-
-$.position = {
-	scrollbarWidth: function() {
-		if ( cachedScrollbarWidth !== undefined ) {
-			return cachedScrollbarWidth;
-		}
-		var w1, w2,
-			div = $( "<div style='display:block;width:50px;height:50px;overflow:hidden;'><div style='height:100px;width:auto;'></div></div>" ),
-			innerDiv = div.children()[0];
-
-		$( "body" ).append( div );
-		w1 = innerDiv.offsetWidth;
-		div.css( "overflow", "scroll" );
-
-		w2 = innerDiv.offsetWidth;
-
-		if ( w1 === w2 ) {
-			w2 = div[0].clientWidth;
-		}
-
-		div.remove();
-
-		return (cachedScrollbarWidth = w1 - w2);
-	},
-	getScrollInfo: function( within ) {
-		var overflowX = within.isWindow ? "" : within.element.css( "overflow-x" ),
-			overflowY = within.isWindow ? "" : within.element.css( "overflow-y" ),
-			hasOverflowX = overflowX === "scroll" ||
-				( overflowX === "auto" && within.width < within.element[0].scrollWidth ),
-			hasOverflowY = overflowY === "scroll" ||
-				( overflowY === "auto" && within.height < within.element[0].scrollHeight );
-		return {
-			width: hasOverflowX ? $.position.scrollbarWidth() : 0,
-			height: hasOverflowY ? $.position.scrollbarWidth() : 0
-		};
-	},
-	getWithinInfo: function( element ) {
-		var withinElement = $( element || window ),
-			isWindow = $.isWindow( withinElement[0] );
-		return {
-			element: withinElement,
-			isWindow: isWindow,
-			offset: withinElement.offset() || { left: 0, top: 0 },
-			scrollLeft: withinElement.scrollLeft(),
-			scrollTop: withinElement.scrollTop(),
-			width: isWindow ? withinElement.width() : withinElement.outerWidth(),
-			height: isWindow ? withinElement.height() : withinElement.outerHeight()
-		};
-	}
-};
-
-$.fn.position = function( options ) {
-	if ( !options || !options.of ) {
-		return _position.apply( this, arguments );
-	}
-
-	// make a copy, we don't want to modify arguments
-	options = $.extend( {}, options );
-
-	var atOffset, targetWidth, targetHeight, targetOffset, basePosition,
-		target = $( options.of ),
-		within = $.position.getWithinInfo( options.within ),
-		scrollInfo = $.position.getScrollInfo( within ),
-		targetElem = target[0],
-		collision = ( options.collision || "flip" ).split( " " ),
-		offsets = {};
-
-	if ( targetElem.nodeType === 9 ) {
-		targetWidth = target.width();
-		targetHeight = target.height();
-		targetOffset = { top: 0, left: 0 };
-	} else if ( $.isWindow( targetElem ) ) {
-		targetWidth = target.width();
-		targetHeight = target.height();
-		targetOffset = { top: target.scrollTop(), left: target.scrollLeft() };
-	} else if ( targetElem.preventDefault ) {
-		// force left top to allow flipping
-		options.at = "left top";
-		targetWidth = targetHeight = 0;
-		targetOffset = { top: targetElem.pageY, left: targetElem.pageX };
-	} else {
-		targetWidth = target.outerWidth();
-		targetHeight = target.outerHeight();
-		targetOffset = target.offset();
-	}
-	// clone to reuse original targetOffset later
-	basePosition = $.extend( {}, targetOffset );
-
-	// force my and at to have valid horizontal and vertical positions
-	// if a value is missing or invalid, it will be converted to center
-	$.each( [ "my", "at" ], function() {
-		var pos = ( options[ this ] || "" ).split( " " ),
-			horizontalOffset,
-			verticalOffset;
-
-		if ( pos.length === 1) {
-			pos = rhorizontal.test( pos[ 0 ] ) ?
-				pos.concat( [ "center" ] ) :
-				rvertical.test( pos[ 0 ] ) ?
-					[ "center" ].concat( pos ) :
-					[ "center", "center" ];
-		}
-		pos[ 0 ] = rhorizontal.test( pos[ 0 ] ) ? pos[ 0 ] : "center";
-		pos[ 1 ] = rvertical.test( pos[ 1 ] ) ? pos[ 1 ] : "center";
-
-		// calculate offsets
-		horizontalOffset = roffset.exec( pos[ 0 ] );
-		verticalOffset = roffset.exec( pos[ 1 ] );
-		offsets[ this ] = [
-			horizontalOffset ? horizontalOffset[ 0 ] : 0,
-			verticalOffset ? verticalOffset[ 0 ] : 0
-		];
-
-		// reduce to just the positions without the offsets
-		options[ this ] = [
-			rposition.exec( pos[ 0 ] )[ 0 ],
-			rposition.exec( pos[ 1 ] )[ 0 ]
-		];
-	});
-
-	// normalize collision option
-	if ( collision.length === 1 ) {
-		collision[ 1 ] = collision[ 0 ];
-	}
-
-	if ( options.at[ 0 ] === "right" ) {
-		basePosition.left += targetWidth;
-	} else if ( options.at[ 0 ] === "center" ) {
-		basePosition.left += targetWidth / 2;
-	}
-
-	if ( options.at[ 1 ] === "bottom" ) {
-		basePosition.top += targetHeight;
-	} else if ( options.at[ 1 ] === "center" ) {
-		basePosition.top += targetHeight / 2;
-	}
-
-	atOffset = getOffsets( offsets.at, targetWidth, targetHeight );
-	basePosition.left += atOffset[ 0 ];
-	basePosition.top += atOffset[ 1 ];
-
-	return this.each(function() {
-		var collisionPosition, using,
-			elem = $( this ),
-			elemWidth = elem.outerWidth(),
-			elemHeight = elem.outerHeight(),
-			marginLeft = parseCss( this, "marginLeft" ),
-			marginTop = parseCss( this, "marginTop" ),
-			collisionWidth = elemWidth + marginLeft + parseCss( this, "marginRight" ) + scrollInfo.width,
-			collisionHeight = elemHeight + marginTop + parseCss( this, "marginBottom" ) + scrollInfo.height,
-			position = $.extend( {}, basePosition ),
-			myOffset = getOffsets( offsets.my, elem.outerWidth(), elem.outerHeight() );
-
-		if ( options.my[ 0 ] === "right" ) {
-			position.left -= elemWidth;
-		} else if ( options.my[ 0 ] === "center" ) {
-			position.left -= elemWidth / 2;
-		}
-
-		if ( options.my[ 1 ] === "bottom" ) {
-			position.top -= elemHeight;
-		} else if ( options.my[ 1 ] === "center" ) {
-			position.top -= elemHeight / 2;
-		}
-
-		position.left += myOffset[ 0 ];
-		position.top += myOffset[ 1 ];
-
-		// if the browser doesn't support fractions, then round for consistent results
-		if ( !$.support.offsetFractions ) {
-			position.left = round( position.left );
-			position.top = round( position.top );
-		}
-
-		collisionPosition = {
-			marginLeft: marginLeft,
-			marginTop: marginTop
-		};
-
-		$.each( [ "left", "top" ], function( i, dir ) {
-			if ( $.ui.position[ collision[ i ] ] ) {
-				$.ui.position[ collision[ i ] ][ dir ]( position, {
-					targetWidth: targetWidth,
-					targetHeight: targetHeight,
-					elemWidth: elemWidth,
-					elemHeight: elemHeight,
-					collisionPosition: collisionPosition,
-					collisionWidth: collisionWidth,
-					collisionHeight: collisionHeight,
-					offset: [ atOffset[ 0 ] + myOffset[ 0 ], atOffset [ 1 ] + myOffset[ 1 ] ],
-					my: options.my,
-					at: options.at,
-					within: within,
-					elem : elem
-				});
-			}
-		});
-
-		if ( $.fn.bgiframe ) {
-			elem.bgiframe();
-		}
-
-		if ( options.using ) {
-			// adds feedback as second argument to using callback, if present
-			using = function( props ) {
-				var left = targetOffset.left - position.left,
-					right = left + targetWidth - elemWidth,
-					top = targetOffset.top - position.top,
-					bottom = top + targetHeight - elemHeight,
-					feedback = {
-						target: {
-							element: target,
-							left: targetOffset.left,
-							top: targetOffset.top,
-							width: targetWidth,
-							height: targetHeight
-						},
-						element: {
-							element: elem,
-							left: position.left,
-							top: position.top,
-							width: elemWidth,
-							height: elemHeight
-						},
-						horizontal: right < 0 ? "left" : left > 0 ? "right" : "center",
-						vertical: bottom < 0 ? "top" : top > 0 ? "bottom" : "middle"
-					};
-				if ( targetWidth < elemWidth && abs( left + right ) < targetWidth ) {
-					feedback.horizontal = "center";
-				}
-				if ( targetHeight < elemHeight && abs( top + bottom ) < targetHeight ) {
-					feedback.vertical = "middle";
-				}
-				if ( max( abs( left ), abs( right ) ) > max( abs( top ), abs( bottom ) ) ) {
-					feedback.important = "horizontal";
-				} else {
-					feedback.important = "vertical";
-				}
-				options.using.call( this, props, feedback );
-			};
-		}
-
-		elem.offset( $.extend( position, { using: using } ) );
-	});
-};
-
-$.ui.position = {
-	fit: {
-		left: function( position, data ) {
-			var within = data.within,
-				withinOffset = within.isWindow ? within.scrollLeft : within.offset.left,
-				outerWidth = within.width,
-				collisionPosLeft = position.left - data.collisionPosition.marginLeft,
-				overLeft = withinOffset - collisionPosLeft,
-				overRight = collisionPosLeft + data.collisionWidth - outerWidth - withinOffset,
-				newOverRight;
-
-			// element is wider than within
-			if ( data.collisionWidth > outerWidth ) {
-				// element is initially over the left side of within
-				if ( overLeft > 0 && overRight <= 0 ) {
-					newOverRight = position.left + overLeft + data.collisionWidth - outerWidth - withinOffset;
-					position.left += overLeft - newOverRight;
-				// element is initially over right side of within
-				} else if ( overRight > 0 && overLeft <= 0 ) {
-					position.left = withinOffset;
-				// element is initially over both left and right sides of within
-				} else {
-					if ( overLeft > overRight ) {
-						position.left = withinOffset + outerWidth - data.collisionWidth;
-					} else {
-						position.left = withinOffset;
-					}
-				}
-			// too far left -> align with left edge
-			} else if ( overLeft > 0 ) {
-				position.left += overLeft;
-			// too far right -> align with right edge
-			} else if ( overRight > 0 ) {
-				position.left -= overRight;
-			// adjust based on position and margin
-			} else {
-				position.left = max( position.left - collisionPosLeft, position.left );
-			}
-		},
-		top: function( position, data ) {
-			var within = data.within,
-				withinOffset = within.isWindow ? within.scrollTop : within.offset.top,
-				outerHeight = data.within.height,
-				collisionPosTop = position.top - data.collisionPosition.marginTop,
-				overTop = withinOffset - collisionPosTop,
-				overBottom = collisionPosTop + data.collisionHeight - outerHeight - withinOffset,
-				newOverBottom;
-
-			// element is taller than within
-			if ( data.collisionHeight > outerHeight ) {
-				// element is initially over the top of within
-				if ( overTop > 0 && overBottom <= 0 ) {
-					newOverBottom = position.top + overTop + data.collisionHeight - outerHeight - withinOffset;
-					position.top += overTop - newOverBottom;
-				// element is initially over bottom of within
-				} else if ( overBottom > 0 && overTop <= 0 ) {
-					position.top = withinOffset;
-				// element is initially over both top and bottom of within
-				} else {
-					if ( overTop > overBottom ) {
-						position.top = withinOffset + outerHeight - data.collisionHeight;
-					} else {
-						position.top = withinOffset;
-					}
-				}
-			// too far up -> align with top
-			} else if ( overTop > 0 ) {
-				position.top += overTop;
-			// too far down -> align with bottom edge
-			} else if ( overBottom > 0 ) {
-				position.top -= overBottom;
-			// adjust based on position and margin
-			} else {
-				position.top = max( position.top - collisionPosTop, position.top );
-			}
-		}
-	},
-	flip: {
-		left: function( position, data ) {
-			var within = data.within,
-				withinOffset = within.offset.left + within.scrollLeft,
-				outerWidth = within.width,
-				offsetLeft = within.isWindow ? within.scrollLeft : within.offset.left,
-				collisionPosLeft = position.left - data.collisionPosition.marginLeft,
-				overLeft = collisionPosLeft - offsetLeft,
-				overRight = collisionPosLeft + data.collisionWidth - outerWidth - offsetLeft,
-				myOffset = data.my[ 0 ] === "left" ?
-					-data.elemWidth :
-					data.my[ 0 ] === "right" ?
-						data.elemWidth :
-						0,
-				atOffset = data.at[ 0 ] === "left" ?
-					data.targetWidth :
-					data.at[ 0 ] === "right" ?
-						-data.targetWidth :
-						0,
-				offset = -2 * data.offset[ 0 ],
-				newOverRight,
-				newOverLeft;
-
-			if ( overLeft < 0 ) {
-				newOverRight = position.left + myOffset + atOffset + offset + data.collisionWidth - outerWidth - withinOffset;
-				if ( newOverRight < 0 || newOverRight < abs( overLeft ) ) {
-					position.left += myOffset + atOffset + offset;
-				}
-			}
-			else if ( overRight > 0 ) {
-				newOverLeft = position.left - data.collisionPosition.marginLeft + myOffset + atOffset + offset - offsetLeft;
-				if ( newOverLeft > 0 || abs( newOverLeft ) < overRight ) {
-					position.left += myOffset + atOffset + offset;
-				}
-			}
-		},
-		top: function( position, data ) {
-			var within = data.within,
-				withinOffset = within.offset.top + within.scrollTop,
-				outerHeight = within.height,
-				offsetTop = within.isWindow ? within.scrollTop : within.offset.top,
-				collisionPosTop = position.top - data.collisionPosition.marginTop,
-				overTop = collisionPosTop - offsetTop,
-				overBottom = collisionPosTop + data.collisionHeight - outerHeight - offsetTop,
-				top = data.my[ 1 ] === "top",
-				myOffset = top ?
-					-data.elemHeight :
-					data.my[ 1 ] === "bottom" ?
-						data.elemHeight :
-						0,
-				atOffset = data.at[ 1 ] === "top" ?
-					data.targetHeight :
-					data.at[ 1 ] === "bottom" ?
-						-data.targetHeight :
-						0,
-				offset = -2 * data.offset[ 1 ],
-				newOverTop,
-				newOverBottom;
-			if ( overTop < 0 ) {
-				newOverBottom = position.top + myOffset + atOffset + offset + data.collisionHeight - outerHeight - withinOffset;
-				if ( ( position.top + myOffset + atOffset + offset) > overTop && ( newOverBottom < 0 || newOverBottom < abs( overTop ) ) ) {
-					position.top += myOffset + atOffset + offset;
-				}
-			}
-			else if ( overBottom > 0 ) {
-				newOverTop = position.top -  data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
-				if ( ( position.top + myOffset + atOffset + offset) > overBottom && ( newOverTop > 0 || abs( newOverTop ) < overBottom ) ) {
-					position.top += myOffset + atOffset + offset;
-				}
-			}
-		}
-	},
-	flipfit: {
-		left: function() {
-			$.ui.position.flip.left.apply( this, arguments );
-			$.ui.position.fit.left.apply( this, arguments );
-		},
-		top: function() {
-			$.ui.position.flip.top.apply( this, arguments );
-			$.ui.position.fit.top.apply( this, arguments );
-		}
-	}
-};
-
-// fraction support test
-(function () {
-	var testElement, testElementParent, testElementStyle, offsetLeft, i,
-		body = document.getElementsByTagName( "body" )[ 0 ],
-		div = document.createElement( "div" );
-
-	//Create a "fake body" for testing based on method used in jQuery.support
-	testElement = document.createElement( body ? "div" : "body" );
-	testElementStyle = {
-		visibility: "hidden",
-		width: 0,
-		height: 0,
-		border: 0,
-		margin: 0,
-		background: "none"
-	};
-	if ( body ) {
-		$.extend( testElementStyle, {
-			position: "absolute",
-			left: "-1000px",
-			top: "-1000px"
-		});
-	}
-	for ( i in testElementStyle ) {
-		testElement.style[ i ] = testElementStyle[ i ];
-	}
-	testElement.appendChild( div );
-	testElementParent = body || document.documentElement;
-	testElementParent.insertBefore( testElement, testElementParent.firstChild );
-
-	div.style.cssText = "position: absolute; left: 10.7432222px;";
-
-	offsetLeft = $( div ).offset().left;
-	$.support.offsetFractions = offsetLeft > 10 && offsetLeft < 11;
-
-	testElement.innerHTML = "";
-	testElementParent.removeChild( testElement );
-})();
-
-// DEPRECATED
-if ( $.uiBackCompat !== false ) {
-	// offset option
-	(function( $ ) {
-		var _position = $.fn.position;
-		$.fn.position = function( options ) {
-			if ( !options || !options.offset ) {
-				return _position.call( this, options );
-			}
-			var offset = options.offset.split( " " ),
-				at = options.at.split( " " );
-			if ( offset.length === 1 ) {
-				offset[ 1 ] = offset[ 0 ];
-			}
-			if ( /^\d/.test( offset[ 0 ] ) ) {
-				offset[ 0 ] = "+" + offset[ 0 ];
-			}
-			if ( /^\d/.test( offset[ 1 ] ) ) {
-				offset[ 1 ] = "+" + offset[ 1 ];
-			}
-			if ( at.length === 1 ) {
-				if ( /left|center|right/.test( at[ 0 ] ) ) {
-					at[ 1 ] = "center";
-				} else {
-					at[ 1 ] = at[ 0 ];
-					at[ 0 ] = "center";
-				}
-			}
-			return _position.call( this, $.extend( options, {
-				at: at[ 0 ] + offset[ 0 ] + " " + at[ 1 ] + offset[ 1 ],
-				offset: undefined
-			} ) );
-		};
-	}( jQuery ) );
-}
-
-}( jQuery ) );

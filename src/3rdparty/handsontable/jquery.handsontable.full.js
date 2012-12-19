@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Dec 18 2012 01:00:02 GMT+0100 (Central European Standard Time)
+ * Date: Wed Dec 19 2012 01:04:18 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -537,7 +537,7 @@ Handsontable.Core = function (rootElement, settings) {
      * @return {Object|undefined} ending td in pasted area (only if any cell was changed)
      */
     populateFromArray: function (start, input, end, source) {
-      var r, rlen, c, clen, td, setData = [], current = {};
+      var r, rlen, c, clen, setData = [], current = {};
       rlen = input.length;
       if (rlen === 0) {
         return false;
@@ -569,13 +569,6 @@ Handsontable.Core = function (rootElement, settings) {
         }
       }
       self.setDataAtCell(setData, null, null, source || 'populateFromArray');
-    },
-
-    /**
-     * Clears all cells in the grid
-     */
-    clear: function () {
-
     },
 
     /**
@@ -1541,7 +1534,6 @@ Handsontable.Core = function (rootElement, settings) {
     }
 
     grid.keepEmptyRows();
-    grid.clear();
     changes = [];
     rlen = self.countRows(); //recount number of rows in case some row was removed by keepEmptyRows
     clen = self.countCols();
@@ -1888,6 +1880,38 @@ Handsontable.Core = function (rootElement, settings) {
     else if (priv.dataType === 'array') {
       return Math.max((priv.settings.columns && priv.settings.columns.length) || 0, (priv.settings.data && priv.settings.data[0] && priv.settings.data[0].length) || 0);
     }
+  };
+
+  /**
+   * Return index of first visible row
+   * @return {Number}
+   */
+  this.rowOffset = function () {
+    return self.view.wt.getSetting('offsetRow');
+  };
+
+  /**
+   * Return index of first visible column
+   * @return {Number}
+   */
+  this.colOffset = function () {
+    return self.view.wt.getSetting('offsetColumn');
+  };
+
+  /**
+   * Return number of visible rows
+   * @return {Number}
+   */
+  this.countVisibleRows = function () {
+    return self.view.wt.getSetting('viewportRows');
+  };
+
+  /**
+   * Return number of visible columns
+   * @return {Number}
+   */
+  this.countVisibleCols = function () {
+    return self.view.wt.getSetting('viewportColumns');
   };
 
   /**

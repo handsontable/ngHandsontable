@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2-beta3 (Dec 19, 2012)
+
+- virtual rendering fixes and optimizations
+- watch for changes only in visible part of the table
+
 ## 0.2-beta2 (Dec 13, 2012)
 
 - numerous virtual rendering fixes and optimizations

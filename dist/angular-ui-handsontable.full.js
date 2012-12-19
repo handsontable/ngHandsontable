@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.3-dev
+ * angular-ui-handsontable 0.2-beta3
  * 
- * Date: Tue Dec 18 2012 09:40:57 GMT+0100 (Central European Standard Time)
+ * Date: Wed Dec 19 2012 01:07:57 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -72,10 +72,6 @@ angular.module('uiHandsontable', [])
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (!scope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
-
-              $('div.ui-handsontable-container').each(function(){
-                $(this).handsontable('render'); //TEMPORARY HIGH SPEED FIX (compare below)
-              });
             }
           });
 
@@ -83,7 +79,23 @@ angular.module('uiHandsontable', [])
             scope.$emit('datagridSelection', $container, r, p, r2, p2);
           });
 
-          scope.$watch(rhs, function (newVal) {
+          // set up watchers for visible part of the table
+          scope.$watch(function () {
+            //check if visible data has changed
+            var out = ''
+              , instance = $container.data('handsontable')
+              , clen = instance.countCols();
+            for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
+              for (var c = 0; c < clen; c++) {
+                out += instance.getDataAtCell(r, c)
+              }
+            }
+            return out;
+          }, function (newVal, oldVal) {
+            //if data has changed, render the table
+            if (newVal === oldVal) {
+              return;
+            }
             if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.columns.length > 0) {
               $container.handsontable('updateSettings', {
                 data: scope[rhs],
@@ -91,10 +103,9 @@ angular.module('uiHandsontable', [])
               });
             }
             else {
-              $container.handsontable('loadData', scope[rhs]);
+              $container.handsontable('render', scope[rhs]); //never goes here really, fix this
             }
-          //}, true);
-          }, false); //TEMPORARY HIGH SPEED FIX (compare above)
+          }, false);
         }
       }
     };
@@ -276,7 +287,7 @@ angular.module('uiHandsontable', [])
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
             }
             //instance.render();
-            $('.handsontable').each(function(){
+            $('.handsontable').each(function () {
               $(this).handsontable('render');//render all Handsontables in the page
             });
 
@@ -296,7 +307,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Dec 18 2012 01:00:02 GMT+0100 (Central European Standard Time)
+ * Date: Wed Dec 19 2012 01:04:18 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -827,7 +838,7 @@ Handsontable.Core = function (rootElement, settings) {
      * @return {Object|undefined} ending td in pasted area (only if any cell was changed)
      */
     populateFromArray: function (start, input, end, source) {
-      var r, rlen, c, clen, td, setData = [], current = {};
+      var r, rlen, c, clen, setData = [], current = {};
       rlen = input.length;
       if (rlen === 0) {
         return false;
@@ -859,13 +870,6 @@ Handsontable.Core = function (rootElement, settings) {
         }
       }
       self.setDataAtCell(setData, null, null, source || 'populateFromArray');
-    },
-
-    /**
-     * Clears all cells in the grid
-     */
-    clear: function () {
-
     },
 
     /**
@@ -1831,7 +1835,6 @@ Handsontable.Core = function (rootElement, settings) {
     }
 
     grid.keepEmptyRows();
-    grid.clear();
     changes = [];
     rlen = self.countRows(); //recount number of rows in case some row was removed by keepEmptyRows
     clen = self.countCols();
@@ -2178,6 +2181,38 @@ Handsontable.Core = function (rootElement, settings) {
     else if (priv.dataType === 'array') {
       return Math.max((priv.settings.columns && priv.settings.columns.length) || 0, (priv.settings.data && priv.settings.data[0] && priv.settings.data[0].length) || 0);
     }
+  };
+
+  /**
+   * Return index of first visible row
+   * @return {Number}
+   */
+  this.rowOffset = function () {
+    return self.view.wt.getSetting('offsetRow');
+  };
+
+  /**
+   * Return index of first visible column
+   * @return {Number}
+   */
+  this.colOffset = function () {
+    return self.view.wt.getSetting('offsetColumn');
+  };
+
+  /**
+   * Return number of visible rows
+   * @return {Number}
+   */
+  this.countVisibleRows = function () {
+    return self.view.wt.getSetting('viewportRows');
+  };
+
+  /**
+   * Return number of visible columns
+   * @return {Number}
+   */
+  this.countVisibleCols = function () {
+    return self.view.wt.getSetting('viewportColumns');
   };
 
   /**

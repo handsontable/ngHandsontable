@@ -56,10 +56,6 @@ angular.module('uiHandsontable', [])
           $container.on('datachange.handsontable', function (event, changes, source) {
             if (!scope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
-
-              $('div.ui-handsontable-container').each(function(){
-                $(this).handsontable('render'); //TEMPORARY HIGH SPEED FIX (compare below)
-              });
             }
           });
 
@@ -67,7 +63,23 @@ angular.module('uiHandsontable', [])
             scope.$emit('datagridSelection', $container, r, p, r2, p2);
           });
 
-          scope.$watch(rhs, function (newVal) {
+          // set up watchers for visible part of the table
+          scope.$watch(function () {
+            //check if visible data has changed
+            var out = ''
+              , instance = $container.data('handsontable')
+              , clen = instance.countCols();
+            for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
+              for (var c = 0; c < clen; c++) {
+                out += instance.getDataAtCell(r, c)
+              }
+            }
+            return out;
+          }, function (newVal, oldVal) {
+            //if data has changed, render the table
+            if (newVal === oldVal) {
+              return;
+            }
             if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.columns.length > 0) {
               $container.handsontable('updateSettings', {
                 data: scope[rhs],
@@ -75,10 +87,9 @@ angular.module('uiHandsontable', [])
               });
             }
             else {
-              $container.handsontable('loadData', scope[rhs]);
+              $container.handsontable('render', scope[rhs]); //never goes here really, fix this
             }
-          //}, true);
-          }, false); //TEMPORARY HIGH SPEED FIX (compare above)
+          }, false);
         }
       }
     };
@@ -260,7 +271,7 @@ angular.module('uiHandsontable', [])
               childScope.$eval(uiDatagridAutocomplete.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
             }
             //instance.render();
-            $('.handsontable').each(function(){
+            $('.handsontable').each(function () {
               $(this).handsontable('render');//render all Handsontables in the page
             });
 

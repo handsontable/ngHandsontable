@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-beta3
  * 
- * Date: Wed Jan 02 2013 09:03:37 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 02 2013 12:21:42 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -21,15 +21,22 @@ angular.module('uiHandsontable', [])
       compile: function compile(tElement, tAttrs, transclude) {
 
         var defaultSettings = {
+          columns: [],
+          colHeaders: [],
+          colWidths: [],
           outsideClickDeselects: false,
           autoComplete: []
         };
 
         var $container = $('<div class="ui-handsontable-container"></div>');
 
-        var expression = tAttrs.datarows;
-        var match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/),
-          lhs, rhs;
+        var expression = tAttrs.datarows
+          , match
+          , lhs
+          , rhs;
+        if (expression) {
+          match = expression.match(/^\s*(.+)\s+in\s+(.*)\s*$/)
+        }
         if (!match) {
           throw Error("Expected datarows in form of '_item_ in _collection_' but got '" +
             expression + "'.");
@@ -39,9 +46,6 @@ angular.module('uiHandsontable', [])
         tElement.data("uiDatagrid", {
           lhs: lhs,
           rhs: rhs,
-          colHeaders: [],
-          colWidths: [],
-          columns: [],
           settings: angular.extend({}, defaultSettings),
           $container: $container
         });
@@ -54,17 +58,11 @@ angular.module('uiHandsontable', [])
 
           if (typeof scope[rhs] !== 'undefined') {
             uiDatagrid.settings['data'] = scope[rhs];
-            if (uiDatagrid.columns.length > 0) {
-              uiDatagrid.settings['columns'] = uiDatagrid.columns;
-            }
           }
 
-          if (uiDatagrid.colHeaders.length > 0) {
-            uiDatagrid.settings['colHeaders'] = uiDatagrid.colHeaders;
-          }
-
-          if (uiDatagrid.colWidths.length > 0) {
-            uiDatagrid.settings['colWidths'] = uiDatagrid.colWidths;
+          var pattern = new RegExp("^(" + lhs + "\\.)");
+          for (var i = 0, ilen = uiDatagrid.settings.columns.length; i < ilen; i++) {
+            uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
           }
 
           $container.handsontable(uiDatagrid.settings);
@@ -96,10 +94,12 @@ angular.module('uiHandsontable', [])
             if (newVal === oldVal) {
               return;
             }
-            if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.columns.length > 0) {
+            if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.settings.columns.length > 0) {
+
+
               $container.handsontable('updateSettings', {
                 data: scope[rhs],
-                columns: uiDatagrid.columns
+                columns: uiDatagrid.settings.columns
               });
             }
             else {
@@ -135,25 +135,22 @@ angular.module('uiHandsontable', [])
           var i;
           var uiDatagrid = element.inheritedData("uiDatagrid");
 
-          var pattern = new RegExp("^(" + uiDatagrid.lhs + "\\.)")
-            , value = attrs.value.replace(pattern, '')
-            , title = scope.$eval(attrs.title)
+          var title = scope.$eval(attrs.title)
             , width = scope.$eval(attrs.width)
             , type = scope.$eval(attrs.type)
-            , options = attrs.options
-            , tmp;
+            , options = attrs.options;
 
           var childScope = scope.$new();
 
           var column = scope.$eval(options) || {};
-          column.data = value;
+          column.value = attrs.value;
+          column.type = type;
 
-          uiDatagrid.colHeaders.push(title);
-          uiDatagrid.colWidths.push(width);
+          uiDatagrid.settings.colHeaders.push(title);
+          uiDatagrid.settings.colWidths.push(width);
 
           switch (type) {
             case 'autocomplete':
-              column.type = Handsontable.AutocompleteCell;
               var uiDatagridAutocomplete = element.data("uiDatagridAutocomplete");
               for (i in uiDatagridAutocomplete) {
                 if (uiDatagridAutocomplete.hasOwnProperty(i)) {
@@ -163,21 +160,13 @@ angular.module('uiHandsontable', [])
               break;
 
             case 'checkbox':
-              column.type = Handsontable.CheckboxCell;
-              tmp = attrs.checkedtemplate;
-              if (typeof tmp !== 'undefined') {
-                column.checkedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
+              if (typeof attrs.checkedtemplate !== 'undefined') {
+                column.checkedTemplate = scope.$eval(attrs.checkedtemplate); //if undefined then defaults to Boolean true
               }
-              tmp = attrs.uncheckedtemplate;
-              if (typeof tmp !== 'undefined') {
-                column.uncheckedTemplate = scope.$eval(tmp); //if undefined then defaults to Boolean true
+              if (typeof attrs.uncheckedtemplate !== 'undefined') {
+                column.uncheckedTemplate = scope.$eval(attrs.uncheckedtemplate); //if undefined then defaults to Boolean true
               }
               break;
-
-            default:
-              if (typeof type === 'object') {
-                column.type = type;
-              }
           }
 
           if (typeof attrs.readonly !== 'undefined') {
@@ -190,7 +179,7 @@ angular.module('uiHandsontable', [])
             }
           }
 
-          uiDatagrid.columns.push(column);
+          uiDatagrid.settings.columns.push(column);
         }
       }
     };
@@ -307,7 +296,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Wed Jan 02 2013 09:02:17 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 02 2013 12:20:59 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2043,7 +2032,10 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Array|String}
    */
   this.getColHeader = function (col) {
-    if (Object.prototype.toString.call(priv.settings.colHeaders) === '[object Array]' && priv.settings.colHeaders[col] !== void 0) {
+    if (priv.settings.columns && priv.settings.columns[col] && priv.settings.columns[col].title) {
+      return priv.settings.columns[col].title;
+    }
+    else if (Object.prototype.toString.call(priv.settings.colHeaders) === '[object Array]' && priv.settings.colHeaders[col] !== void 0) {
       return priv.settings.colHeaders[col];
     }
     else if (typeof priv.settings.colHeaders === 'function') {
@@ -2062,6 +2054,20 @@ Handsontable.Core = function (rootElement, settings) {
     }
     else {
       return priv.settings.colHeaders;
+    }
+  };
+
+  /**
+   * Return column width
+   * @param {Number} col
+   * @return {Number}
+   */
+  this.getColWidth = function (col) {
+    if (priv.settings.columns && priv.settings.columns[col] && priv.settings.columns[col].width) {
+      return priv.settings.columns[col].width;
+    }
+    else if (Object.prototype.toString.call(priv.settings.colWidths) === '[object Array]' && priv.settings.colWidths[col] !== void 0) {
+      return priv.settings.colWidths[col];
     }
   };
 
@@ -2364,7 +2370,7 @@ Handsontable.TableView = function (instance) {
     height: myHeight,
     frozenColumns: settings.rowHeaders ? [instance.getRowHeader] : null,
     columnHeaders: settings.colHeaders ? instance.getColHeader : null,
-    columnWidth: settings.colWidths ? settings.colWidths : null,
+    columnWidth: instance.getColWidth,
     cellRenderer: function (row, column, TD) {
       that.applyCellTypeMethod('renderer', TD, {row: row, col: column}, instance.getDataAtCell(row, column));
     },
@@ -2449,6 +2455,18 @@ Handsontable.TableView.prototype.applyCellTypeMethod = function (methodName, td,
   var prop = this.instance.colToProp(coords.col)
     , method
     , cellProperties = this.instance.getCellMeta(coords.row, coords.col);
+
+  if (typeof cellProperties.type === 'string') {
+    switch (cellProperties.type) {
+      case 'autocomplete':
+        cellProperties.type = Handsontable.AutocompleteCell;
+        break;
+
+      case 'checkbox':
+        cellProperties.type = Handsontable.CheckboxCell;
+        break;
+    }
+  }
 
   if (cellProperties.type && typeof cellProperties.type[methodName] === "function") {
     method = cellProperties.type[methodName];

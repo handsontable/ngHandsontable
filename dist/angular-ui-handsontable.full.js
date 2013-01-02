@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-beta3
  * 
- * Date: Wed Jan 02 2013 08:34:32 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 02 2013 09:03:37 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -307,7 +307,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Jan 01 2013 11:22:59 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 02 2013 09:02:17 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2258,17 +2258,20 @@ Handsontable.TableView = function (instance) {
   instance.rootElement.addClass('handsontable');
   var $table = $('<table class="htCore"><thead></thead><tbody></tbody></table>');
   instance.rootElement.prepend($table);
-  var overflow = instance.rootElement.css('overflow');
+  var overflow = instance.rootElement[0].style.overflow;
   var myWidth = settings.width;
   var myHeight = settings.height;
+  if ((myWidth || myHeight) && !(overflow === 'scroll' || overflow === 'auto')) {
+    overflow = 'auto';
+  }
   if (overflow === 'scroll' || overflow === 'auto') {
-    instance.rootElement.css('overflow', 'visible');
-    if (settings.width === void 0 && parseInt(instance.rootElement.css('width')) > 0) {
-      myWidth = parseInt(instance.rootElement.css('width'));
+    instance.rootElement[0].style.overflow = 'visible';
+    if (settings.width === void 0 && parseInt(instance.rootElement[0].style.width) > 0) {
+      myWidth = parseInt(instance.rootElement[0].style.width);
       instance.rootElement[0].style.width = '';
     }
-    if (settings.height === void 0 && parseInt(instance.rootElement.css('height')) > 0) {
-      myHeight = parseInt(instance.rootElement.css('height'));
+    if (settings.height === void 0 && parseInt(instance.rootElement[0].style.height) > 0) {
+      myHeight = parseInt(instance.rootElement[0].style.height);
       instance.rootElement[0].style.height = '';
     }
   }
@@ -3891,7 +3894,7 @@ Handsontable.PluginHooks.push('afterGetCellMeta', function (row, col, cellProper
 /**
  * walkontable 0.1
  * 
- * Date: Sun Dec 30 2012 17:02:55 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 02 2013 08:59:16 GMT+0100 (Central European Standard Time)
 */
 
 function WalkontableBorder(instance, settings) {
@@ -4560,13 +4563,17 @@ window.cancelRequestAnimFrame = (function () {
 })();
 function WalkontableScroll(instance) {
   this.instance = instance;
-  this.wtScrollbarV = new WalkontableScrollbar(instance, 'vertical');
-  this.wtScrollbarH = new WalkontableScrollbar(instance, 'horizontal');
+  if (instance.hasSetting('height') || instance.hasSetting('displayRows')) {
+    this.wtScrollbarV = new WalkontableScrollbar(instance, 'vertical');
+  }
+  if (instance.hasSetting('width') || instance.hasSetting('displayColumns')) {
+    this.wtScrollbarH = new WalkontableScrollbar(instance, 'horizontal');
+  }
 }
 
 WalkontableScroll.prototype.refreshScrollbars = function () {
-  this.wtScrollbarV.refresh();
-  this.wtScrollbarH.refresh();
+  this.wtScrollbarV && this.wtScrollbarV.refresh();
+  this.wtScrollbarH && this.wtScrollbarH.refresh();
 };
 
 WalkontableScroll.prototype.scrollVertical = function (delta) {
@@ -5068,7 +5075,7 @@ function WalkontableTable(instance) {
   if (!parent || parent.nodeType !== 1 || !this.wtDom.hasClass(parent, 'wtHolder')) {
     var hider = document.createElement('DIV');
     hider.style.position = 'relative';
-    if (this.instance.hasSetting('width') && this.instance.hasSetting('height')) {
+    if (this.instance.hasSetting('width') || this.instance.hasSetting('height')) {
       hider.style.overflow = 'hidden';
     }
     if (this.instance.hasSetting('width')) {

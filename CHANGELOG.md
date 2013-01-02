@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3 (Jan 2, 2013)
+
+- virtual rendering fixes and optimizations
+- show only relevant scrollbars
+
 ## 0.2-beta3 (Dec 19, 2012)
 
 - virtual rendering fixes and optimizations

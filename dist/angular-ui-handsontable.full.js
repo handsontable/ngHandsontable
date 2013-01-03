@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.2-beta3
  * 
- * Date: Thu Jan 03 2013 09:38:12 GMT+0100 (Central European Standard Time)
+ * Date: Thu Jan 03 2013 10:44:40 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -176,6 +176,10 @@ angular.module('uiHandsontable', [])
         // set up watchers for visible part of the table
         scope.$watch(function () {
           //check if visible data has changed
+          if (scope[rhs] !== $container.handsontable('getData')) {
+            return true;
+          }
+
           var out = ''
             , instance = $container.data('handsontable')
             , clen = instance.countCols();
@@ -187,21 +191,24 @@ angular.module('uiHandsontable', [])
           return out;
         }, function (newVal, oldVal) {
           //if data has changed, render the table
-          if (newVal === oldVal) {
-            return;
+          if (newVal == true) {
+            $container.handsontable('loadData', scope[rhs]);
           }
-          if (scope[rhs] !== $container.handsontable('getData') && uiDatagrid.settings.columns.length > 0) {
-
-
-            $container.handsontable('updateSettings', {
-              data: scope[rhs],
-              columns: uiDatagrid.settings.columns
-            });
-          }
-          else {
-            $container.handsontable('render', scope[rhs]); //never goes here really, fix this
+          else if (newVal !== oldVal) {
+            $container.handsontable('render');
           }
         }, false);
+
+        scope.$watch(function () {
+          //check if configuration has changed
+          var config = scope.$eval(attrs.uiHandsontable || attrs.settings);
+          return config.columns;
+        }, function (newVal, oldVal) {
+          //if data has changed, render the table
+          $container.handsontable('updateSettings', {
+            columns: uiDatagrid.settings.columns
+          });
+        }, true);
       }
     }
   };

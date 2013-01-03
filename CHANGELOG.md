@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.3 (Jan 2, 2013)
+## 0.2.0 (Jan 3, 2013)
 
-- virtual rendering fixes and optimizations
+- virtual rendering fixes and optimizations (upgrade to Handsontable 0.8.0)
 - show only relevant scrollbars
+- dynamic columns defined in split-screen.js
 
 ## 0.2-beta3 (Dec 19, 2012)
 

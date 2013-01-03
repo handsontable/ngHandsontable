@@ -46,14 +46,7 @@
 
 <p>Filter: <input ng-model="query"></p>
 
-<div datarows="item in filteredItems" ui-handsontable="{rowHeaders: true, height: 160, columns: [
-  {value: 'item.id', title: 'ID'},
-  {value: 'item.name.last', title: 'Last Name'},
-  {value: 'item.name.first', title: 'First Name'},
-  {value: 'item.address', title: 'Address', width: 120},
-  {value: 'item.Product.Description', type: 'autocomplete', title: 'Favorite food', width: 120, clickrow: 'item.Product.Description = option.Description', optionList: 'option in item.Product.Options', optionTemplate: '&lt;img ng-src=&quot;\{\{option.Image\}\}&quot; style=&quot;width: 16px; height: 16px; border-width: 0&quot;&gt; \{\{option.Description\}\}'},
-  {value: 'item.isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No'}
-]}">
+<div datarows="item in filteredItems" ui-handsontable="{rowHeaders: true, height: 160, columns: dynamicColumns}">
 </div>
 
 </body>

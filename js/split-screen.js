@@ -44,6 +44,22 @@ function MyCtrl($scope, $filter) {
     );
   }
 
+  $scope.dynamicColumns = [
+    {value: 'item.id', title: 'ID'},
+    {value: 'item.name.last', title: 'Last Name'},
+    {value: 'item.name.first', title: 'First Name'},
+    {value: 'item.address', title: 'Address', width: 120},
+    {value: 'item.Product.Description', type: 'autocomplete', title: 'Favorite food', width: 120, clickrow: 'item.Product.Description = option.Description', optionList: 'option in item.Product.Options', optionTemplate: '<img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}'},
+    {value: 'item.isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No'}
+  ];
+
+  var c = 0;
+  setInterval(function () {
+    $scope.dynamicColumns[0].title = 'ID (' + c + ')';
+    $scope.$apply();
+    c++;
+  }, 1000);
+
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);
   };

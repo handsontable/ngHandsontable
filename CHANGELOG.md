@@ -7,6 +7,7 @@ Features:
 - manual column resize
 - column autosize when double clicked on the manual column resize handle
 - column stretching
+- column sorting
 
 Known issues:
 - last column flickers when scrolling in IE, FF, Opera

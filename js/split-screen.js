@@ -58,7 +58,7 @@ function MyCtrl($scope, $filter) {
     $scope.dynamicColumns[0].title = 'ID (' + c + ')';
     $scope.$apply();
     c++;
-  }, 1000);
+  }, 5000);
 
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);

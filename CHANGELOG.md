@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0-dev (Jan 14, 2013, not final)
+
+Features:
+- highlight currently highlighted row
+- manual column resize
+- column autosize when double clicked on the manual column resize handle
+- column stretching
+
+Known issues:
+- last column flickers when scrolling in IE, FF, Opera
+- first example on split-screen.html uses whole screen witdh if "width" parameter is not provided (width: 640)
+
 ## 0.2.0 (Jan 7, 2013)
 
 - virtual rendering fixes and optimizations (upgrade to Handsontable 0.8.2)

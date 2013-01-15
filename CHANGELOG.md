@@ -8,6 +8,7 @@ Features:
 - column autosize when double clicked on the manual column resize handle
 - column stretching
 - column sorting
+* table now automatically fits the container when window is resized
 
 Known issues:
 - last column flickers when scrolling in IE, FF, Opera

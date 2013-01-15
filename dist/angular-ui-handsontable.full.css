@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.0-dev
  * 
- * Date: Mon Jan 14 2013 12:42:54 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 15 2013 09:59:09 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -12,7 +12,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Mon Jan 14 2013 12:41:28 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 15 2013 00:54:01 GMT+0100 (Central European Standard Time)
  */
 
 .handsontable {
@@ -134,6 +134,7 @@
   width: 5px;
   height: 25px;
   z-index: 999;
+  cursor: col-resize;
 }
 
 .handsontable th .manualColumnResizer:hover,

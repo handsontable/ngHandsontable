@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.3.0-dev (Jan 14, 2013, not final)
+## 0.3.1 (Jan 21, 2013)
+
+Bugfixes:
+- `onChange` callback is called before any other events when clicked outside of the grid
+- column stretching does not flicker when scrolling in IE, FF, Opera
+
+## 0.3.0 (Jan 14, 2013)
 
 Features:
 - highlight currently highlighted row

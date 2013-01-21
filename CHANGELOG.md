@@ -5,6 +5,7 @@
 Bugfixes:
 - `onChange` callback is called before any other events when clicked outside of the grid
 - column stretching does not flicker when scrolling in IE, FF, Opera
+- clicking outside of table finishes editing of the cell
 
 ## 0.3.0 (Jan 14, 2013)
 

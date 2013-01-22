@@ -96,8 +96,6 @@ function MyCtrl($scope, $filter) {
   $scope.currentSelection = "None";
 
   $scope.$on('datagridSelection', function (scope, $container, r, p, r2, p2) {
-    return;
-
     var ht = $container.data('handsontable');
     var str = "row '" + r + "' col '" + ht.propToCol(p) + "' (prop '" + p + "')";
     if (r !== r2 && p !== p2) {

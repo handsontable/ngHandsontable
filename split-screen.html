@@ -28,7 +28,9 @@
 
 <p>Selection: {{currentSelection}}</p>
 
-<ui-handsontable minSpareRows="1" columnsorting="true" rowheaders="true" HeIgHT="myHeight" datarows="item in items">
+<p>Selection: <input ng-model="MySelectedIndex"></p>
+
+<ui-handsontable minSpareRows="1" selectedIndex="MySelectedIndex" columnsorting="true" rowheaders="true" HeIgHT="myHeight" datarows="item in items">
   <datacolumn width="50" value="item.id" title="'ID'"></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>

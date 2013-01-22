@@ -28,6 +28,7 @@ function MyCtrl($scope, $filter) {
   var lastNames = ["Tired", "Johnson", "Moore", "Rocket", "Goodman", "Farewell", "Manson", "Bentley", "Kowalski", "Schmidt", "Tucker", "Fancy"];
   var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
 
+  $scope.MySelectedIndex = null;
   $scope.items = [];
   for (var i = 0; i < 10000; i++) {
     $scope.items.push(
@@ -58,9 +59,11 @@ function MyCtrl($scope, $filter) {
   setInterval(function () {
     $scope.dynamicColumns[0].title = 'ID (' + c + ')';
     //$scope.myHeight += 2;
-    $scope.$apply();
+    if (!$scope.$$phase) { //if digest is not in progress
+      $scope.$apply();
+    }
     c++;
-  }, 2000);
+  }, 5000);
 
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);
@@ -93,13 +96,17 @@ function MyCtrl($scope, $filter) {
   $scope.currentSelection = "None";
 
   $scope.$on('datagridSelection', function (scope, $container, r, p, r2, p2) {
+    return;
+
     var ht = $container.data('handsontable');
     var str = "row '" + r + "' col '" + ht.propToCol(p) + "' (prop '" + p + "')";
     if (r !== r2 && p !== p2) {
       str = "From " + str + " to row '" + r2 + "' col '" + ht.propToCol(p2) + "' (prop '" + p2 + "')";
     }
-    $scope.$apply(function () {
-      $scope.currentSelection = str;
-    });
+    if (!$scope.$$phase) { //if digest is not in progress
+      $scope.$apply(function () {
+        $scope.currentSelection = str;
+      });
+    }
   });
 }

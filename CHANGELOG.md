@@ -5,6 +5,7 @@
 Features:
 - new syntax supported. Handsontable attributes should now be passed at directive attributes (eg. `minSpareRows="1"`)
 - in addition to the above, the attributes may be dynamic variables that will be observed for changes (eg. `columns="myColumns"`)
+- new attribute `selectedIndex` allows to bind a scope variable to get/set selected row index
 
 Bugfixes:
 - `onChange` callback is called before any other events when clicked outside of the grid

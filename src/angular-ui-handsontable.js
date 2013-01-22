@@ -2,7 +2,9 @@ angular.module('uiHandsontable', [])
   .directive('uiHandsontable', ['$compile', function ($compile) {
   var htOptions = ['data', 'width', 'height', 'rowHeaders', 'colHeaders', 'colWidths', 'columns', 'cells', 'dataSchema', 'contextMenu', 'onSelection', 'onSelectionByProp', 'onBeforeChange', 'onChange', 'onCopyLimit', 'startRows', 'startCols', 'minRows', 'minCols', 'maxRows', 'maxCols', 'minSpareRows', 'minSpareCols', 'multiSelect', 'fillHandle', 'undo', 'outsideClickDeselects', 'enterBeginsEditing', 'enterMoves', 'tabMoves', 'autoWrapRow', 'autoWrapCol', 'copyRowsLimit', 'copyColsLimit', 'currentRowClassName', 'currentColClassName', 'asyncRendering', 'stretchH', 'columnSorting'];
 
-  var scopeDef = {};
+  var scopeDef = {
+    selectedIndex: '=selectedindex'
+  };
   for (var i = 0, ilen = htOptions.length; i < ilen; i++) {
     scopeDef[htOptions[i]] = '=' + htOptions[i].toLowerCase();
   }
@@ -240,7 +242,7 @@ angular.module('uiHandsontable', [])
     var directiveDefinitionObject = {
       restrict: 'E',
       priority: 500,
-      compile: function compile(tElement, tAttrs, transclude) {
+      compile: function compile(tElement, tAttrs) {
 
         var keys = [];
         for (var i in tAttrs) {
@@ -323,6 +325,57 @@ angular.module('uiHandsontable', [])
           uiDatagridColumn.optionList = attrs.datarows;
           uiDatagridColumn.clickrow = attrs.clickrow;
           uiDatagridColumn.linker = linker;
+        }
+      }
+    };
+    return directiveDefinitionObject;
+  })
+  .directive('selectedindex', function () {
+    var directiveDefinitionObject = {
+      restrict: 'A',
+      priority: 491,
+      compile: function compile() {
+
+        return function postLink(scope, element) {
+          var uiDatagrid = element.data("uiDatagrid")
+            , $container = uiDatagrid.$container;
+
+          var isSelected
+          , lastSelectionRow
+          , lastSelectionCol;
+
+          $container.on('selection.handsontable', function (event, r, c, r2, c2) {
+            isSelected = true;
+            lastSelectionRow = r;
+            lastSelectionCol = c;
+
+            if (!scope.$$phase && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) { //if digest is not in progress
+              scope.$apply(function () {
+                scope.selectedIndex = r;
+              });
+            }
+          });
+
+          $container.on('deselect.handsontable', function (event) {
+            isSelected = false;
+            lastSelectionRow = null;
+
+            if (!scope.$$phase && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex !== null) { //if digest is not in progress
+              scope.$apply(function () {
+                scope.selectedIndex = null;
+              });
+            }
+          });
+
+          // set up watcher for selectedIndex
+          scope.$watch('selectedIndex', function (newVal, oldVal) {
+            //if selectedIndex has changed, change table selection
+            var row = newVal * 1; //convert to numeric
+            if (typeof newVal !== 'undefined' && newVal !== null && row !== lastSelectionRow) {
+              var col = lastSelectionCol || 0;
+              $container.handsontable('selectCell', row, col, row, col, true);
+            }
+          }, false);
         }
       }
     };

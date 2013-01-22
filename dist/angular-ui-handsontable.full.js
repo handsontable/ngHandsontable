@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.1
  * 
- * Date: Tue Jan 22 2013 15:52:51 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 22 2013 17:11:41 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -417,7 +417,7 @@ angular.module('uiHandsontable', [])
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Mon Jan 21 2013 23:33:31 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 22 2013 17:09:24 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -4443,7 +4443,7 @@ Handsontable.PluginHooks.push('afterGetColWidth', htManualColumnResize.getColWid
 /**
  * walkontable 0.1
  * 
- * Date: Mon Jan 21 2013 14:38:34 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 22 2013 17:06:04 GMT+0100 (Central European Standard Time)
 */
 
 function WalkontableBorder(instance, settings) {
@@ -5320,7 +5320,8 @@ WalkontableScrollbar.prototype.prepare = function () {
     scroll = this.instance.getSetting('scrollH');
   }
 
-  if ((ratio === 1 && scroll === 'auto') || scroll === 'none') {
+  if (((ratio === 1 || isNaN(ratio)) && scroll === 'auto') || scroll === 'none') {
+    //isNaN is needed because ratio equals NaN when totalRows/totalColumns equals 0
     this.visible = false;
   }
   else {
@@ -5962,7 +5963,7 @@ WalkontableTable.prototype.refreshStretching = function () {
     , frozenColumns = this.instance.getSetting('frozenColumns')
     , frozenColumnsCount = frozenColumns ? frozenColumns.length : 0;
 
-  if (!this.instance.hasSetting('columnWidth') || !this.instance.getSetting('totalRows')) {
+  if (!this.instance.hasSetting('columnWidth')) {
     return;
   }
 
@@ -5975,10 +5976,22 @@ WalkontableTable.prototype.refreshStretching = function () {
     }
   }
 
-  var TD = this.instance.wtTable.TBODY.firstChild.firstChild;
-  if (TD.nodeName === 'TH') {
+  var TD;
+  if (this.instance.wtTable.TBODY.firstChild && this.instance.wtTable.TBODY.firstChild.firstChild) {
+    TD = this.instance.wtTable.TBODY.firstChild.firstChild;
+  }
+  else if (this.instance.wtTable.THEAD.firstChild && this.instance.wtTable.THEAD.firstChild.firstChild) {
+    TD = this.instance.wtTable.THEAD.firstChild.firstChild;
+  }
+
+  if (frozenColumnsCount) {
     TD = TD.nextSibling;
   }
+
+  if (!TD) {
+    return;
+  }
+
   var cellOffset = this.instance.wtDom.offset(TD)
     , tableOffset = this.instance.wtTable.tableOffset
     , rowHeaderWidth = cellOffset.left - tableOffset.left

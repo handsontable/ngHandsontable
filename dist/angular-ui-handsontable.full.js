@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.1
  * 
- * Date: Tue Jan 22 2013 12:14:35 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 22 2013 15:52:51 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -197,17 +197,25 @@ angular.module('uiHandsontable', [])
         });
 
         // set up watcher for visible part of the table
+        var lastTotalRows = 0;
         scope.$watch(function () {
           //check if visible data has changed
           if (scope.$parent[rhs] !== $container.handsontable('getData')) {
             return true;
           }
 
+          var instance = $container.data('handsontable')
+            , totalRows = instance.countRows();
+
+          if (lastTotalRows !== totalRows) {
+            lastTotalRows = totalRows; //needed to render newly added rows
+            return lastTotalRows;
+          }
+
           var out = ''
-            , instance = $container.data('handsontable')
-            , clen = instance.countCols();
+            , totalCols = instance.countCols()
           for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
-            for (var c = 0; c < clen; c++) {
+            for (var c = 0; c < totalCols; c++) {
               out += instance.getDataAtCell(r, c)
             }
           }

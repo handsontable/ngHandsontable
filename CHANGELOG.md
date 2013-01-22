@@ -2,6 +2,7 @@
 
 Bugfixes:
 - fix "Non-assignable model expression" error when `selectedIndex` attribute was a primitive number, not a object property reference
+- when starting with 0 rows, then adding a new row, table was not rerendered
 
 ## 0.3.1 (Jan 21, 2013)
 

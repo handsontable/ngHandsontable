@@ -181,17 +181,25 @@ angular.module('uiHandsontable', [])
         });
 
         // set up watcher for visible part of the table
+        var lastTotalRows = 0;
         scope.$watch(function () {
           //check if visible data has changed
           if (scope.$parent[rhs] !== $container.handsontable('getData')) {
             return true;
           }
 
+          var instance = $container.data('handsontable')
+            , totalRows = instance.countRows();
+
+          if (lastTotalRows !== totalRows) {
+            lastTotalRows = totalRows; //needed to render newly added rows
+            return lastTotalRows;
+          }
+
           var out = ''
-            , instance = $container.data('handsontable')
-            , clen = instance.countCols();
+            , totalCols = instance.countCols()
           for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
-            for (var c = 0; c < clen; c++) {
+            for (var c = 0; c < totalCols; c++) {
               out += instance.getDataAtCell(r, c)
             }
           }

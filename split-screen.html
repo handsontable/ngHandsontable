@@ -28,7 +28,7 @@
 
 <p>Selection: {{currentSelection}}</p>
 
-<ui-handsontable settings="{minSpareRows: 1, columnSorting: true, rowHeaders: true, height: 160}" datarows="item in items">
+<ui-handsontable minSpareRows="1" columnsorting="true" rowheaders="true" HeIgHT="myHeight" datarows="item in items">
   <datacolumn width="50" value="item.id" title="'ID'"></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -44,9 +44,9 @@
 
 <h2>Instance 2</h2>
 
-<p>Filter: <input ng-model="query"></p>
+<p>Filter: <input ng-model="query"> | <button ng-click="addColumn()">Dynamically add column</button></p>
 
-<div datarows="item in filteredItems" ui-handsontable="{rowHeaders: true, height: 160, width: 640, columns: dynamicColumns}">
+<div ui-handsontable="{rowHeaders: false}" datarows="item in filteredItems" columns="dynamicColumns" height="160" width="640">
 </div>
 
 </body>

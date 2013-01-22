@@ -22,7 +22,7 @@ Include the library files (see [dist/](https://github.com/warpech/angular-ui-han
 Template:
 
 ```html
-<div ui-handsontable="{minSpareRows: 1}" datarows="item in items">
+<div minSpareRows="1" datarows="item in items">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -68,6 +68,8 @@ Please note that in the above example, the `item.Product.Description` column has
 Whereas `item.isActive` column has autocomplete options defined directly in the parental scope.
   
 ## Directives and attributes specification
+
+All **Handsontable** attributes listed [here](https://github.com/warpech/jquery-handsontable) should be supported (namely: width, height, rowHeaders, colHeaders, colWidths, columns, cells, dataSchema, contextMenu, onSelection, onSelectionByProp, onBeforeChange, onChange, onCopyLimit, startRows, startCols, minRows, minCols, maxRows, maxCols, minSpareRows, minSpareCols, multiSelect, fillHandle, undo, outsideClickDeselects, enterBeginsEditing, enterMoves, tabMoves, autoWrapRow, autoWrapCol, copyRowsLimit, copyColsLimit, currentRowClassName, currentColClassName, asyncRendering, stretchH, columnSorting)
   
  Directive                       | Attribute&nbsp;&nbsp;&nbsp; | Description
  --------------------------------|-----------------------------|-------------

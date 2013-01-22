@@ -47,21 +47,27 @@ function MyCtrl($scope, $filter) {
   $scope.dynamicColumns = [
     {value: 'item.id', title: 'ID'},
     {value: 'item.name.last', title: 'Last Name'},
-    {value: 'item.name.first', title: 'First Name'},
+    //{value: 'item.name.first', title: 'First Name'}, //this will be added dynamically after button is pressed
     {value: 'item.address', title: 'Address', width: 120},
     {value: 'item.Product.Description', type: 'autocomplete', title: 'Favorite food', width: 120, clickrow: 'item.Product.Description = option.Description', optionList: 'option in item.Product.Options', optionTemplate: '<img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}'},
     {value: 'item.isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No'}
   ];
 
   var c = 0;
+  $scope.myHeight = 160;
   setInterval(function () {
     $scope.dynamicColumns[0].title = 'ID (' + c + ')';
+    //$scope.myHeight += 2;
     $scope.$apply();
     c++;
-  }, 5000);
+  }, 2000);
 
   $scope.dumpItems = function () {
     console.log("dump items", $scope.items);
+  };
+
+  $scope.addColumn = function () {
+    $scope.dynamicColumns.splice(2, 0, {value: 'item.name.first', title: 'First Name'});
   };
 
   $scope.grayedOut = {

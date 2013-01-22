@@ -2,6 +2,10 @@
 
 ## 0.3.1 (Jan 21, 2013)
 
+Features:
+- new syntax supported. Handsontable attributes should now be passed at directive attributes (eg. `minSpareRows="1"`)
+- in addition to the above, the attributes may be dynamic variables that will be observed for changes (eg. `columns="myColumns"`)
+
 Bugfixes:
 - `onChange` callback is called before any other events when clicked outside of the grid
 - column stretching does not flicker when scrolling in IE, FF, Opera

@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.1
  * 
- * Date: Tue Jan 22 2013 03:17:32 GMT+0100 (Central European Standard Time)
+ * Date: Tue Jan 22 2013 12:14:35 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -357,15 +357,17 @@ angular.module('uiHandsontable', [])
             , $container = uiDatagrid.$container;
 
           var isSelected
-          , lastSelectionRow
-          , lastSelectionCol;
+            , lastSelectionRow
+            , lastSelectionCol;
 
           $container.on('selection.handsontable', function (event, r, c, r2, c2) {
             isSelected = true;
             lastSelectionRow = r;
             lastSelectionCol = c;
 
-            if (!scope.$$phase && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) { //if digest is not in progress
+            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
+              //make sure digest is not in progress
+              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
               scope.$apply(function () {
                 scope.selectedIndex = r;
               });
@@ -376,7 +378,9 @@ angular.module('uiHandsontable', [])
             isSelected = false;
             lastSelectionRow = null;
 
-            if (!scope.$$phase && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex !== null) { //if digest is not in progress
+            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != null) {
+              //make sure digest is not in progress
+              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
               scope.$apply(function () {
                 scope.selectedIndex = null;
               });

@@ -1,5 +1,8 @@
 # Changelog
 
+Bugfixes:
+- fix "Non-assignable model expression" error when `selectedIndex` attribute was a primitive number, not a object property reference
+
 ## 0.3.1 (Jan 21, 2013)
 
 Features:

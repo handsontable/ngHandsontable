@@ -1,18 +1,18 @@
 /**
  * angular-ui-handsontable 0.3.1
  * 
- * Date: Tue Jan 22 2013 17:11:41 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 23 2013 03:21:46 GMT+0100 (Central European Standard Time)
 */
 
 /**
- * Handsontable 0.8.2
+ * Handsontable 0.8.3
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Jan 22 2013 17:09:24 GMT+0100 (Central European Standard Time)
+ * Date: Wed Jan 23 2013 03:09:58 GMT+0100 (Central European Standard Time)
  */
 
 .handsontable {
@@ -125,6 +125,22 @@
 }
 
 /* plugins */
+
+.handsontable .manualColumnMover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: transparent;
+  width: 5px;
+  height: 25px;
+  z-index: 999;
+  cursor: move;
+}
+
+.handsontable th .manualColumnMover:hover,
+.handsontable th .manualColumnMover.active {
+  background-color: #88F;
+}
 
 .handsontable .manualColumnResizer {
   position: absolute;

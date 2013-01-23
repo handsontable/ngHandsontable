@@ -1,6 +1,7 @@
-# Changelog
+## 0.3.2 (Jan 23, 2013)
 
 Bugfixes:
+- upgrade Handsontable to 0.8.3
 - fix "Non-assignable model expression" error when `selectedIndex` attribute was a primitive number, not a object property reference
 - when starting with 0 rows, then adding a new row, table was not rerendered
 - column stretching did not work with 0 rows

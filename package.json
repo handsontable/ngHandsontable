@@ -8,6 +8,11 @@
   "author": "Marcin Warpechowski <marcin@nextgen.pl>",
   "version": "0.3.2",
   "devDependencies": {
-    "grunt-css": "~0.3.0"
+    "grunt": "~0.4.0",
+    "grunt-css": "~0.5.4",
+    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-concat": "~0.1.0",
+    "grunt-contrib-watch": "~0.2.0"
   }
 }

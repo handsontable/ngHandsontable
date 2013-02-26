@@ -19,19 +19,21 @@
  * See https://github.com/cowboy/grunt for more information about Grunt
  */
 module.exports = function (grunt) {
+  var myBanner = '/**\n' +
+    ' * <%= pkg.name %> <%= pkg.version %>\n' +
+    ' * \n' +
+    ' * Date: <%= (new Date()).toString() %>\n' +
+    '*/\n\n';
+
+
   grunt.initConfig({
-    pkg: '<json:package.json>',
-    meta: {
-      banner: '/**\n' +
-        ' * <%= pkg.name %> <%= pkg.version %>\n' +
-        ' * \n' +
-        ' * Date: <%= (new Date()).toString() %>\n' +
-        '*/'
-    },
+    pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        banner: myBanner
+      },
       full_js: {
         src: [
-          '<banner>',
           'src/ie-shim.js',
           'src/angular-ui-handsontable.js',
           'src/3rdparty/handsontable/jquery.handsontable.full.js'
@@ -40,26 +42,35 @@ module.exports = function (grunt) {
       },
       full_css: {
         src: [
-          '<banner>',
           'src/3rdparty/handsontable/jquery.handsontable.full.css'
         ],
         dest: 'dist/angular-ui-handsontable.full.css'
       }
     },
-    min: {
-      "dist/angular-ui-handsontable.full.min.js": [ "<banner>", "dist/angular-ui-handsontable.full.js" ]
+    uglify: {
+      options: {
+        banner: myBanner
+      },
+      "dist/angular-ui-handsontable.full.min.js": ["dist/angular-ui-handsontable.full.js" ]
     },
     cssmin: {
-      "dist/angular-ui-handsontable.full.min.css": [ "<banner>", "dist/angular-ui-handsontable.full.css" ]
+      options: {
+        banner: myBanner
+      },
+      "dist/angular-ui-handsontable.full.min.css": ["dist/angular-ui-handsontable.full.css" ]
     },
     watch: {
       files: ['src/*', 'src/3rdparty/handsontable/*'],
-      tasks: 'concat min cssmin'
+      tasks: ['concat', 'uglify', 'cssmin']
     }
   });
 
   // Default task.
-  grunt.registerTask('default', 'concat min cssmin');
+  grunt.registerTask('default', ['concat', 'uglify', 'cssmin']);
 
   grunt.loadNpmTasks('grunt-css');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 };

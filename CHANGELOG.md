@@ -1,3 +1,7 @@
+## HEAD (Feb 26, 2012)
+
+- upgrade build system to Grunt 0.4.0 (read instructions how to upgrade here: http://gruntjs.com/upgrading-from-0.3-to-0.4)
+
 ## 0.3.2 (Jan 23, 2013)
 
 Bugfixes:

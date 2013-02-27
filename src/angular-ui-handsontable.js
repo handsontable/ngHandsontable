@@ -51,10 +51,6 @@ angular.module('uiHandsontable', [])
           var htInstance = uiDatagrid.$container.data('handsontable');
           var row = htInstance.getSelected()[0];
           childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-          if (!column.saveOnBlur) {
-            childScope.$eval(column.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-            childScope.$apply();
-          }
           deinterval = setInterval(function () {
             childScope.item = htInstance.getData()[row];
             if (childScope.item) {
@@ -93,25 +89,11 @@ angular.module('uiHandsontable', [])
           return el;
         };
 
-        column.select = function () {
+        column.onSelect = function (row, col, prop, value, index) {
+          //index is the selection index in the menu
           var htInstance = uiDatagrid.$container.data('handsontable');
-          if (this.$menu.find('.active').length) {
-            var index = this.$menu.find('.active').index();
-            childScope[lhs] = lastItems[index];
-            htInstance.destroyEditor();
-            childScope.$eval(column.clickrow);
-          }
-          else if (!column.strict) {
-            htInstance.destroyEditor();
-            childScope.$eval(column.value + ' = "' + $.trim(this.query).replace(/"/g, '\"') + '"'); //assign current textarea value
-          }
-          //htInstance.render();
-          $('.handsontable').each(function () {
-            $(this).handsontable('render');//render all Handsontables in the page
-          });
-
-          lastQuery = void 0;
-          return this.hide();
+          childScope[lhs] = lastItems[index];
+          childScope.$eval(column.clickrow);
         };
       };
 

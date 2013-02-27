@@ -39,6 +39,7 @@ function MyCtrl($scope, $filter) {
           last: lastNames[Math.floor(Math.random() * lastNames.length)]
         },
         address: Math.floor(Math.random() * 100000) + ' ' + address[Math.floor(Math.random() * address.length)],
+        price: Math.floor(Math.random() * 100000) / 100,
         isActive: 'Yes',
         Product: $.extend({}, products[Math.floor(Math.random() * products.length)])
       }
@@ -55,7 +56,7 @@ function MyCtrl($scope, $filter) {
   ];
 
   var c = 0;
-  $scope.myHeight = 160;
+  $scope.myHeight = 320;
   setInterval(function () {
     $scope.dynamicColumns[0].title = 'ID (' + c + ')';
     //$scope.myHeight += 2;

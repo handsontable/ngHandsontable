@@ -1,18 +1,18 @@
 /**
  * angular-ui-handsontable 0.3.2
  * 
- * Date: Tue Feb 26 2013 20:51:09 GMT+0100 (Central European Standard Time)
+ * Date: Wed Feb 27 2013 20:00:20 GMT+0100 (Central European Standard Time)
 */
 
 /**
- * Handsontable 0.8.3
+ * Handsontable 0.8.6
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Wed Jan 23 2013 03:09:58 GMT+0100 (Central European Standard Time)
+ * Date: Wed Feb 27 2013 19:09:10 GMT+0100 (Central European Standard Time)
  */
 
 .handsontable {
@@ -42,6 +42,7 @@
   border-width: 0;
   table-layout: fixed;
   width: 0;
+  outline-width: 0;
 }
 
 .handsontable col {
@@ -198,19 +199,12 @@ textarea.handsontableInput {
   resize: none;
 }
 
-.handsontableInputHolder.htHidden textarea.handsontableInput {
-  border-color: #5292F7;
-  background: #5292F7;
-  color: #5292F7;
-}
-
 .handsontableInputHolder {
   position: absolute;
   top: 0;
   left: 0;
   width: 1px;
   height: 1px;
-  overflow: hidden;
 }
 
 /*
@@ -234,6 +228,13 @@ AutocompleteRenderer down arrow
 
 .handsontable td .htAutocompleteArrow:hover {
   color: #777;
+}
+
+/*
+NumericRenderer
+*/
+.handsontable .htNumeric {
+  text-align: right;
 }
 
 /* typeahead rules. Needed only if you are using the autocomplete feature */

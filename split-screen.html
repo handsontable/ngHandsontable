@@ -40,6 +40,7 @@
       <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>
+  <datacolumn type="'numeric'" width="50" value="item.price" format="'$ 0,0.00'" title="'Price'"></datacolumn>
   <datacolumn width="65" type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"
               uncheckedTemplate="'No'"></datacolumn>
 </ui-handsontable>
@@ -48,7 +49,7 @@
 
 <p>Filter: <input ng-model="query"> | <button ng-click="addColumn()">Dynamically add column</button></p>
 
-<div ui-handsontable="{rowHeaders: false}" datarows="item in filteredItems" columns="dynamicColumns" height="160" width="640">
+<div ui-handsontable="{rowHeaders: false}" datarows="item in filteredItems" columns="dynamicColumns" height="320" width="640">
 </div>
 
 </body>

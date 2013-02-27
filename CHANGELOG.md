@@ -1,4 +1,4 @@
-## HEAD (Feb 26, 2012)
+## 0.3.3 (Feb 28, 2012)
 
 Features:
 - new numeric cell type

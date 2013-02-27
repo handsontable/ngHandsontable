@@ -1,6 +1,11 @@
 ## HEAD (Feb 26, 2012)
 
-- upgrade Handsontable to 0.8.6, including numeric cell type
+Features:
+- new numeric cell type
+- make autocomplete selection much faster
+
+Other:
+- upgrade Handsontable to 0.8.6
 - upgrade jQuery to 1.9.1
 - upgrade build system to Grunt 0.4.0 (read instructions how to upgrade here: http://gruntjs.com/upgrading-from-0.3-to-0.4)
 

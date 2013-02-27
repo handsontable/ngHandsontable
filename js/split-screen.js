@@ -12,7 +12,11 @@ function MyCtrl($scope, $filter) {
       "Description": "Big Mac",
       "Options": [
         {"Description": "Big Mac", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-        {"Description": "Big Mac & Co", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
+        {"Description": "Big Mac & Co", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+        {"Description": "McRoyal", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+        {"Description": "Hamburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+        {"Description": "Cheeseburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+        {"Description": "Double Cheeseburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
       ]
     },
     {

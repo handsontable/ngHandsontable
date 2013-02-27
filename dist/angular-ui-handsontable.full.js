@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.2
  * 
- * Date: Wed Feb 27 2013 20:00:20 GMT+0100 (Central European Standard Time)
+ * Date: Thu Feb 28 2013 00:52:59 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -48,45 +48,18 @@ angular.module('uiHandsontable', [])
 
         var lhs = match[1]
           , rhs = match[2]
-          , deregister
-          , deinterval
           , childScope = scope.$new()
           , lastItems
-          , lastQuery;
+          , lastOptionScope;
 
         column.source = function (query, process) {
-          if ($.trim(query) === lastQuery) {
-            return;
-          }
-          lastQuery = $.trim(query);
-
-          if (deregister) {
-            deregister();
-            clearInterval(deinterval);
-          }
           var htInstance = uiDatagrid.$container.data('handsontable');
           var row = htInstance.getSelected()[0];
           childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-          if (!column.saveOnBlur) {
-            //childScope.$eval(column.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
-            //childScope.$apply();
-          }
-          deinterval = setInterval(function () {
-            childScope.item = htInstance.getData()[row];
-            if (childScope.item) {
-              childScope.$apply();
-            }
-            else {
-              deregister();
-              clearInterval(deinterval);
-            }
-          }, 100);
-          deregister = childScope.$watch(rhs, function (newVal) {
-            lastItems = newVal;
-            if (process) {
-              process(newVal);
-            }
-          }, true);
+          lastItems = childScope.$eval(rhs);
+          childScope.$apply();
+          process(lastItems);
+          lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
         };
 
         column.sorter = function (items) {
@@ -97,10 +70,11 @@ angular.module('uiHandsontable', [])
           var el;
           var optionScope = childScope.$new();
           optionScope[lhs] = item;
-          if (column.linker) {
-            column.linker(optionScope, function (elem) {
+          optionScope.$apply();
+          lastOptionScope = optionScope;
+          if (column.transclude) {
+            column.transclude(optionScope, function (elem) {
               el = elem[0];
-              el.style.display = 'block';
             });
           }
           else {
@@ -110,10 +84,11 @@ angular.module('uiHandsontable', [])
         };
 
         column.onSelect = function (row, col, prop, value, index) {
-          var htInstance = uiDatagrid.$container.data('handsontable');
           //index is the selection index in the menu
+          //var htInstance = uiDatagrid.$container.data('handsontable');
           childScope[lhs] = lastItems[index];
           childScope.$eval(column.clickrow);
+          childScope.$apply();
         };
       };
 
@@ -199,7 +174,7 @@ angular.module('uiHandsontable', [])
           }
 
           var out = ''
-            , totalCols = instance.countCols()
+            , totalCols = instance.countCols();
           for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
             for (var c = 0; c < totalCols; c++) {
               out += instance.getDataAtCell(r, c)
@@ -328,13 +303,13 @@ angular.module('uiHandsontable', [])
       restrict: 'E',
       transclude: 'element',
       priority: 510,
-      compile: function compile(element, attr, linker) {
+      compile: function compile(tElement, tAttrs, transclude) {
 
         return function postLink(scope, element, attrs) {
           var uiDatagridColumn = element.inheritedData("uiDatagridColumn");
           uiDatagridColumn.optionList = attrs.datarows;
           uiDatagridColumn.clickrow = attrs.clickrow;
-          uiDatagridColumn.linker = linker;
+          uiDatagridColumn.transclude = transclude;
         }
       }
     };

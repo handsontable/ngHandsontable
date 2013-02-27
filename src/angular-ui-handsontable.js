@@ -32,41 +32,18 @@ angular.module('uiHandsontable', [])
 
         var lhs = match[1]
           , rhs = match[2]
-          , deregister
-          , deinterval
           , childScope = scope.$new()
           , lastItems
-          , lastQuery;
+          , lastOptionScope;
 
         column.source = function (query, process) {
-          if ($.trim(query) === lastQuery) {
-            return;
-          }
-          lastQuery = $.trim(query);
-
-          if (deregister) {
-            deregister();
-            clearInterval(deinterval);
-          }
           var htInstance = uiDatagrid.$container.data('handsontable');
           var row = htInstance.getSelected()[0];
           childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-          deinterval = setInterval(function () {
-            childScope.item = htInstance.getData()[row];
-            if (childScope.item) {
-              childScope.$apply();
-            }
-            else {
-              deregister();
-              clearInterval(deinterval);
-            }
-          }, 100);
-          deregister = childScope.$watch(rhs, function (newVal) {
-            lastItems = newVal;
-            if (process) {
-              process(newVal);
-            }
-          }, true);
+          lastItems = childScope.$eval(rhs);
+          childScope.$apply();
+          process(lastItems);
+          lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
         };
 
         column.sorter = function (items) {
@@ -77,10 +54,11 @@ angular.module('uiHandsontable', [])
           var el;
           var optionScope = childScope.$new();
           optionScope[lhs] = item;
-          if (column.linker) {
-            column.linker(optionScope, function (elem) {
+          optionScope.$apply();
+          lastOptionScope = optionScope;
+          if (column.transclude) {
+            column.transclude(optionScope, function (elem) {
               el = elem[0];
-              el.style.display = 'block';
             });
           }
           else {
@@ -91,9 +69,10 @@ angular.module('uiHandsontable', [])
 
         column.onSelect = function (row, col, prop, value, index) {
           //index is the selection index in the menu
-          var htInstance = uiDatagrid.$container.data('handsontable');
+          //var htInstance = uiDatagrid.$container.data('handsontable');
           childScope[lhs] = lastItems[index];
           childScope.$eval(column.clickrow);
+          childScope.$apply();
         };
       };
 
@@ -179,7 +158,7 @@ angular.module('uiHandsontable', [])
           }
 
           var out = ''
-            , totalCols = instance.countCols()
+            , totalCols = instance.countCols();
           for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
             for (var c = 0; c < totalCols; c++) {
               out += instance.getDataAtCell(r, c)
@@ -308,13 +287,13 @@ angular.module('uiHandsontable', [])
       restrict: 'E',
       transclude: 'element',
       priority: 510,
-      compile: function compile(element, attr, linker) {
+      compile: function compile(tElement, tAttrs, transclude) {
 
         return function postLink(scope, element, attrs) {
           var uiDatagridColumn = element.inheritedData("uiDatagridColumn");
           uiDatagridColumn.optionList = attrs.datarows;
           uiDatagridColumn.clickrow = attrs.clickrow;
-          uiDatagridColumn.linker = linker;
+          uiDatagridColumn.transclude = transclude;
         }
       }
     };

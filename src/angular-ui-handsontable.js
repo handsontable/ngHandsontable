@@ -34,16 +34,49 @@ angular.module('uiHandsontable', [])
           , rhs = match[2]
           , childScope = scope.$new()
           , lastItems
-          , lastOptionScope;
+          , lastOptionScope
+          , deregister;
+
+        $container.on('blur', 'textarea', function () {
+          //need to deregister when focus is moved to another cell, typically when autocomplete editor is destroyed
+          //another way to do this would be to call deregister on (yet nonexistent) event destroyeditor.handsontable
+          if (deregister) {
+            deregister();
+          }
+        });
 
         column.source = function (query, process) {
-          var htInstance = uiDatagrid.$container.data('handsontable');
-          var row = htInstance.getSelected()[0];
-          childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-          lastItems = childScope.$eval(rhs);
-          childScope.$apply();
+          if (deregister) {
+            deregister();
+          }
+
+          var getItems = function () {
+            var htInstance = uiDatagrid.$container.data('handsontable');
+            var row = htInstance.getSelected()[0];
+            childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
+            return childScope.$eval(rhs);
+          };
+
+          lastItems = getItems();
+          if (!childScope.$$phase) {
+            childScope.$apply();
+          }
           process(lastItems);
           lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
+
+          deregister = scope.$parent.$watch(getItems, function (newVal, oldVal) {
+            if (newVal === oldVal) {
+              return;
+            }
+            setTimeout(function () {
+              column.source(query, process);
+            }, 0);
+          }/*, true*/);
+
+          if (!column.saveOnBlur) {
+            childScope.$eval(column.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
+            childScope.$apply();
+          }
         };
 
         column.sorter = function (items) {
@@ -54,7 +87,6 @@ angular.module('uiHandsontable', [])
           var el;
           var optionScope = childScope.$new();
           optionScope[lhs] = item;
-          optionScope.$apply();
           lastOptionScope = optionScope;
           if (column.transclude) {
             column.transclude(optionScope, function (elem) {
@@ -69,7 +101,6 @@ angular.module('uiHandsontable', [])
 
         column.onSelect = function (row, col, prop, value, index) {
           //index is the selection index in the menu
-          //var htInstance = uiDatagrid.$container.data('handsontable');
           childScope[lhs] = lastItems[index];
           childScope.$eval(column.clickrow);
           childScope.$apply();
@@ -105,12 +136,10 @@ angular.module('uiHandsontable', [])
         uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.uiHandsontable || attrs.settings));
 
         for (i in htOptions) {
-          if (typeof scope[htOptions[i]] !== 'undefined') {
+          if (htOptions.hasOwnProperty(i) && typeof scope[htOptions[i]] !== 'undefined') {
             uiDatagrid.settings[htOptions[i]] = scope[htOptions[i]];
           }
         }
-
-        //console.log('uiDatagrid.settings', uiDatagrid.settings);
 
         $(element).append($container);
 
@@ -131,7 +160,7 @@ angular.module('uiHandsontable', [])
 
         $container.handsontable(uiDatagrid.settings);
 
-        $container.on('datachange.handsontable', function (event, changes, source) {
+        $container.on('datachange.handsontable', function () {
           if (!scope.$$phase) { //if digest is not in progress
             scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
           }
@@ -180,7 +209,6 @@ angular.module('uiHandsontable', [])
           (function (key) {
             scope.$watch(key, function (newVal, oldVal) {
               //if configuration has changed, call updateSettings
-              //console.log(key, 'changed value to ', newVal);
               if (newVal === oldVal) {
                 return;
               }
@@ -318,9 +346,9 @@ angular.module('uiHandsontable', [])
             lastSelectionRow = r;
             lastSelectionCol = c;
 
-            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
+            if (!scope.$$phase && /*typeof scope.selectedIndex === 'object' && */typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
               //make sure digest is not in progress
-              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
+              //typeof scope.selectedIndex === 'object' was used to make sure selectedIndex is observable (to avoid "Non-assignable model expression" error), but it seems unnecessary now
               scope.$apply(function () {
                 scope.selectedIndex = r;
               });
@@ -331,9 +359,9 @@ angular.module('uiHandsontable', [])
             isSelected = false;
             lastSelectionRow = null;
 
-            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != null) {
+            if (!scope.$$phase && /*typeof scope.selectedIndex === 'object' && */typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != null) {
               //make sure digest is not in progress
-              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
+              //typeof scope.selectedIndex === 'object' was used to make sure selectedIndex is observable (to avoid "Non-assignable model expression" error), but it seems unnecessary now
               scope.$apply(function () {
                 scope.selectedIndex = null;
               });

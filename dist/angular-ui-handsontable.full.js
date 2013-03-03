@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.3
  * 
- * Date: Thu Feb 28 2013 00:54:12 GMT+0100 (Central European Standard Time)
+ * Date: Mon Mar 04 2013 00:52:58 GMT+0100 (Central European Standard Time)
 */
 
 /**
@@ -50,16 +50,49 @@ angular.module('uiHandsontable', [])
           , rhs = match[2]
           , childScope = scope.$new()
           , lastItems
-          , lastOptionScope;
+          , lastOptionScope
+          , deregister;
+
+        $container.on('blur', 'textarea', function () {
+          //need to deregister when focus is moved to another cell, typically when autocomplete editor is destroyed
+          //another way to do this would be to call deregister on (yet nonexistent) event destroyeditor.handsontable
+          if (deregister) {
+            deregister();
+          }
+        });
 
         column.source = function (query, process) {
-          var htInstance = uiDatagrid.$container.data('handsontable');
-          var row = htInstance.getSelected()[0];
-          childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-          lastItems = childScope.$eval(rhs);
-          childScope.$apply();
+          if (deregister) {
+            deregister();
+          }
+
+          var getItems = function () {
+            var htInstance = uiDatagrid.$container.data('handsontable');
+            var row = htInstance.getSelected()[0];
+            childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
+            return childScope.$eval(rhs);
+          };
+
+          lastItems = getItems();
+          if (!childScope.$$phase) {
+            childScope.$apply();
+          }
           process(lastItems);
           lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
+
+          deregister = scope.$parent.$watch(getItems, function (newVal, oldVal) {
+            if (newVal === oldVal) {
+              return;
+            }
+            setTimeout(function () {
+              column.source(query, process);
+            }, 0);
+          }/*, true*/);
+
+          if (!column.saveOnBlur) {
+            childScope.$eval(column.value + ' = "' + $.trim(query).replace(/"/g, '\"') + '"'); //refresh value after each key stroke
+            childScope.$apply();
+          }
         };
 
         column.sorter = function (items) {
@@ -70,7 +103,6 @@ angular.module('uiHandsontable', [])
           var el;
           var optionScope = childScope.$new();
           optionScope[lhs] = item;
-          optionScope.$apply();
           lastOptionScope = optionScope;
           if (column.transclude) {
             column.transclude(optionScope, function (elem) {
@@ -85,7 +117,6 @@ angular.module('uiHandsontable', [])
 
         column.onSelect = function (row, col, prop, value, index) {
           //index is the selection index in the menu
-          //var htInstance = uiDatagrid.$container.data('handsontable');
           childScope[lhs] = lastItems[index];
           childScope.$eval(column.clickrow);
           childScope.$apply();
@@ -121,12 +152,10 @@ angular.module('uiHandsontable', [])
         uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.uiHandsontable || attrs.settings));
 
         for (i in htOptions) {
-          if (typeof scope[htOptions[i]] !== 'undefined') {
+          if (htOptions.hasOwnProperty(i) && typeof scope[htOptions[i]] !== 'undefined') {
             uiDatagrid.settings[htOptions[i]] = scope[htOptions[i]];
           }
         }
-
-        //console.log('uiDatagrid.settings', uiDatagrid.settings);
 
         $(element).append($container);
 
@@ -147,7 +176,7 @@ angular.module('uiHandsontable', [])
 
         $container.handsontable(uiDatagrid.settings);
 
-        $container.on('datachange.handsontable', function (event, changes, source) {
+        $container.on('datachange.handsontable', function () {
           if (!scope.$$phase) { //if digest is not in progress
             scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
           }
@@ -196,7 +225,6 @@ angular.module('uiHandsontable', [])
           (function (key) {
             scope.$watch(key, function (newVal, oldVal) {
               //if configuration has changed, call updateSettings
-              //console.log(key, 'changed value to ', newVal);
               if (newVal === oldVal) {
                 return;
               }
@@ -334,9 +362,9 @@ angular.module('uiHandsontable', [])
             lastSelectionRow = r;
             lastSelectionCol = c;
 
-            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
+            if (!scope.$$phase && /*typeof scope.selectedIndex === 'object' && */typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
               //make sure digest is not in progress
-              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
+              //typeof scope.selectedIndex === 'object' was used to make sure selectedIndex is observable (to avoid "Non-assignable model expression" error), but it seems unnecessary now
               scope.$apply(function () {
                 scope.selectedIndex = r;
               });
@@ -347,9 +375,9 @@ angular.module('uiHandsontable', [])
             isSelected = false;
             lastSelectionRow = null;
 
-            if (!scope.$$phase && typeof scope.selectedIndex === 'object' && typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != null) {
+            if (!scope.$$phase && /*typeof scope.selectedIndex === 'object' && */typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != null) {
               //make sure digest is not in progress
-              //make sure selectgedIndex is observable to avoid "Non-assignable model expression" error
+              //typeof scope.selectedIndex === 'object' was used to make sure selectedIndex is observable (to avoid "Non-assignable model expression" error), but it seems unnecessary now
               scope.$apply(function () {
                 scope.selectedIndex = null;
               });
@@ -371,14 +399,14 @@ angular.module('uiHandsontable', [])
     return directiveDefinitionObject;
   });
 /**
- * Handsontable 0.8.6
+ * Handsontable 0.8.8
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Wed Feb 27 2013 19:09:10 GMT+0100 (Central European Standard Time)
+ * Date: Mon Mar 04 2013 00:45:03 GMT+0100 (Central European Standard Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -1574,24 +1602,18 @@ Handsontable.Core = function (rootElement, settings) {
      * Prepare text input to be displayed at given grid cell
      */
     prepare: function () {
-      editproxy.focus();
       if (priv.settings.asyncRendering) {
         clearTimeout(window.prepareFrame);
         window.prepareFrame = setTimeout(function () {
-          priv.editorDestroyer = self.view.applyCellTypeMethod('editor', self.view.getCellAtCoords(priv.selStart.coords()), priv.selStart.row(), priv.selStart.col());
+          var TD = self.view.getCellAtCoords(priv.selStart.coords());
+          TD.focus();
+          priv.editorDestroyer = self.view.applyCellTypeMethod('editor', TD, priv.selStart.row(), priv.selStart.col());
         }, 0);
       }
       else {
-        priv.editorDestroyer = self.view.applyCellTypeMethod('editor', self.view.getCellAtCoords(priv.selStart.coords()), priv.selStart.row(), priv.selStart.col());
-      }
-    },
-
-    /**
-     * Sets focus to event listener
-     */
-    focus: function () {
-      if (selection.isSelected()) {
-        self.$table[0].focus();
+        var TD = self.view.getCellAtCoords(priv.selStart.coords());
+        TD.focus();
+        priv.editorDestroyer = self.view.applyCellTypeMethod('editor', TD, priv.selStart.row(), priv.selStart.col());
       }
     }
   };
@@ -1645,7 +1667,7 @@ Handsontable.Core = function (rootElement, settings) {
       };
 
       for (var i = changes.length - 1; i >= 0; i--) {
-        var cellProperties = self.getCellMeta(changes[i][0], changes[i][1]);
+        var cellProperties = self.getCellMeta(changes[i][0], datamap.propToCol(changes[i][1]));
         if (cellProperties.strict && cellProperties.source) {
           var items = $.isFunction(cellProperties.source) ? cellProperties.source(changes[i][3], process(i)) : cellProperties.source;
           if (items) {
@@ -1661,7 +1683,7 @@ Handsontable.Core = function (rootElement, settings) {
           changes.splice(i, 1);
         }
 
-        var cellProperties = self.getCellMeta(changes[i][0], changes[i][1]);
+        var cellProperties = self.getCellMeta(changes[i][0], datamap.propToCol(changes[i][1]));
         if (cellProperties.dataType === 'number' && typeof changes[i][3] === 'string') {
           if (changes[i][3].length > 0 && /^[0-9\s]*[.]*[0-9]*$/.test(changes[i][3])) {
             changes[i][3] = numeral().unformat(changes[i][3] || '0'); //numeral cannot unformat empty string
@@ -1830,8 +1852,7 @@ Handsontable.Core = function (rootElement, settings) {
    * @public
    * @param {Array} data
    */
-  this.loadData = function (data, isInitial) {
-    var rlen;
+  this.loadData = function (data) {
     priv.isPopulated = false;
     priv.settings.data = data;
     if ($.isPlainObject(priv.settings.dataSchema) || $.isPlainObject(data[0])) {
@@ -1847,16 +1868,6 @@ Handsontable.Core = function (rootElement, settings) {
       priv.duckDataSchema = {};
     }
     datamap.createMap();
-
-    if (isInitial) {
-      rlen = self.countRows();
-      if (priv.settings.startRows) {
-        while (priv.settings.startRows > rlen) {
-          datamap.createRow();
-          rlen++;
-        }
-      }
-    }
 
     grid.keepEmptyRows();
     Handsontable.PluginHooks.run(self, 'afterLoadData');
@@ -1927,22 +1938,20 @@ Handsontable.Core = function (rootElement, settings) {
       }
     }
 
-    if (priv.settings.data === void 0) {
-      if (settings.data === void 0) {
-        settings.data = [];
-        var row;
-        for (var r = 0, rlen = priv.settings.startRows; r < rlen; r++) {
-          row = [];
-          for (var c = 0, clen = priv.settings.startCols; c < clen; c++) {
-            row.push(null);
-          }
-          settings.data.push(row);
+    if (settings.data === void 0 && priv.settings.data === void 0) {
+      var data = [];
+      var row;
+      for (var r = 0, rlen = priv.settings.startRows; r < rlen; r++) {
+        row = [];
+        for (var c = 0, clen = priv.settings.startCols; c < clen; c++) {
+          row.push(null);
         }
+        data.push(row);
       }
+      self.loadData(data); //data source created just now
     }
-
-    if (settings.data !== void 0) {
-      self.loadData(settings.data, true);
+    else if (settings.data !== void 0) {
+      self.loadData(settings.data); //data source given as option
     }
     else if (settings.columns !== void 0) {
       datamap.createMap();
@@ -2099,8 +2108,11 @@ Handsontable.Core = function (rootElement, settings) {
    * @return {Object}
    */
   this.getCellMeta = function (row, col) {
-    var cellProperties = {}
-      , prop = datamap.colToProp(col);
+    var cellProperties = $.extend(true, cellProperties, Handsontable.TextCell)
+      , prop = datamap.colToProp(col)
+      , i
+      , type;
+
     if (priv.settings.columns) {
       cellProperties = $.extend(true, cellProperties, priv.settings.columns[col] || {});
     }
@@ -2110,17 +2122,18 @@ Handsontable.Core = function (rootElement, settings) {
     Handsontable.PluginHooks.run(self, 'beforeGetCellMeta', row, col, cellProperties);
 
     if (typeof cellProperties.type === 'string' && Handsontable.cellTypes[cellProperties.type]) {
-      cellProperties = $.extend(true, cellProperties, Handsontable.cellTypes[cellProperties.type]);
+      type = Handsontable.cellTypes[cellProperties.type];
     }
     else if (typeof cellProperties.type === 'object') {
-      for (var i in cellProperties.type) {
-        if (cellProperties.type.hasOwnProperty(i)) {
-          cellProperties[i] = cellProperties.type[i];
+      type = cellProperties.type;
+    }
+
+    if (type) {
+      for (i in type) {
+        if (type.hasOwnProperty(i)) {
+          cellProperties[i] = type[i];
         }
       }
-    }
-    else {
-      cellProperties = $.extend(true, cellProperties, Handsontable.TextCell);
     }
 
     cellProperties.isWritable = !cellProperties.readOnly;
@@ -2334,7 +2347,7 @@ Handsontable.Core = function (rootElement, settings) {
   /**
    * Handsontable version
    */
-  this.version = '0.8.6'; //inserted by grunt from package.json
+  this.version = '0.8.8'; //inserted by grunt from package.json
 };
 
 var settings = {
@@ -2418,10 +2431,7 @@ Handsontable.TableView = function (instance) {
   var $table = $('<table class="htCore"><thead></thead><tbody></tbody></table>');
 
   instance.$table = $table;
-  $table.attr('tabindex', 10000); //http://www.barryvan.com.au/2009/01/onfocus-and-onblur-for-divs-in-fx/; 32767 is max tabindex for IE7,8
-
   instance.rootElement.prepend($table);
-  $table[0].focus(); //otherwise TextEditor tests do not pass in IE8
 
   this.overflow = instance.rootElement.css('overflow');
   if ((settings.width || settings.height) && !(this.overflow === 'scroll' || this.overflow === 'auto')) {
@@ -2608,6 +2618,7 @@ Handsontable.TableView = function (instance) {
       else {
         instance.selection.setRangeStart(coordsObj);
       }
+      TD.focus();
       event.preventDefault();
       clearTextSelection();
     },
@@ -2660,6 +2671,8 @@ Handsontable.TableView = function (instance) {
       event.stopPropagation();
     }
   });
+
+  $table[0].focus(); //otherwise TextEditor tests do not pass in IE8
 };
 
 Handsontable.TableView.prototype.isCellEdited = function () {
@@ -3103,11 +3116,8 @@ HandsontableTextEditorClass.prototype.bindEvents = function () {
         event.preventDefault(); //don't add newline to field
         break;
 
-      case 8: /* backspace */
-      case 46: /* delete */
-      case 36: /* home */
-      case 35: /* end */
-        event.stopPropagation();
+      default:
+        event.stopPropagation(); //backspace, delete, home, end, CTRL+A, CTRL+C, CTRL+V, CTRL+X should only work locally when cell is edited (not in table context)
         break;
     }
   });
@@ -3206,7 +3216,8 @@ HandsontableTextEditorClass.prototype.refreshDimensions = function () {
   }
 
   ///start prepare textarea position
-  var $td = $(this.instance.getCell(this.row, this.col)); //because old td may have been scrolled out with scrollViewport
+  this.TD = this.instance.getCell(this.row, this.col);
+  var $td = $(this.TD); //because old td may have been scrolled out with scrollViewport
   var currentOffset = $td.offset();
   var containerOffset = this.instance.rootElement.offset();
   var scrollTop = this.instance.rootElement.scrollTop();
@@ -3284,8 +3295,8 @@ HandsontableTextEditorClass.prototype.finishEditing = function (isCancelled, ctr
   }
 
   this.instance.$table.off(".editor");
-  if (document.activeElement === this.TEXTAREA) {
-    this.instance.$table[0].focus(); //don't refocus the table if user focused some cell outside of HT on purpose
+  if (document.activeElement === this.TEXTAREA[0]) {
+    this.TD.focus(); //don't refocus the table if user focused some cell outside of HT on purpose
   }
   this.instance.view.wt.update('onCellDblClick', null);
 
@@ -3307,6 +3318,7 @@ Handsontable.TextEditor = function (instance, td, row, col, prop, value, cellPro
     instance.textEditor = new HandsontableTextEditorClass(instance);
   }
 
+  instance.textEditor.TD = td;
   instance.textEditor.isCellEdited = false;
   instance.textEditor.originalValue = value;
 
@@ -3475,6 +3487,7 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, value,
     instance.autocompleteEditor = new HandsontableAutocompleteEditorClass(instance);
   }
 
+  instance.autocompleteEditor.TD = td;
   instance.autocompleteEditor.isCellEdited = false;
   instance.autocompleteEditor.originalValue = value;
 
@@ -4686,7 +4699,7 @@ Handsontable.PluginHooks.push('afterGetColWidth', htManualColumnResize.getColWid
 /**
  * walkontable 0.2.0
  * 
- * Date: Wed Feb 27 2013 12:41:20 GMT+0100 (Central European Standard Time)
+ * Date: Thu Feb 28 2013 17:54:27 GMT+0100 (Central European Standard Time)
 */
 
 function WalkontableBorder(instance, settings) {
@@ -6130,6 +6143,7 @@ function WalkontableTable(instance) {
   if (this.hasCellSpacingProblem) { //IE7
     this.TABLE.cellSpacing = 0;
   }
+  this.TABLE.setAttribute('tabindex', 10000); //http://www.barryvan.com.au/2009/01/onfocus-and-onblur-for-divs-in-fx/; 32767 is max tabindex for IE7,8
 
   this.visibilityStartRow = this.visibilityStartColumn = this.visibilityEdgeRow = this.visibilityEdgeColumn = null;
 
@@ -6382,7 +6396,9 @@ WalkontableTable.prototype.adjustAvailableNodes = function () {
   for (var r = 0, rlen = TRs.length; r < rlen; r++) {
     trChildrenLength = TRs[r].childNodes.length;
     while (trChildrenLength < displayTds + frozenColumnsCount) {
-      TRs[r].appendChild(document.createElement('TD'));
+      var TD = document.createElement('TD');
+      TD.setAttribute('tabindex', 10000); //http://www.barryvan.com.au/2009/01/onfocus-and-onblur-for-divs-in-fx/; 32767 is max tabindex for IE7,8
+      TRs[r].appendChild(TD);
       trChildrenLength++;
     }
     while (trChildrenLength > displayTds + frozenColumnsCount) {
@@ -7397,48 +7413,34 @@ function CopyPaste(listenerElement) {
   }
 
   this._bindEvent(listenerElement, 'keydown', function (event) {
+    var isCtrlDown = false;
+    if (event.metaKey) { //mac
+      isCtrlDown = true;
+    }
+    else if (event.ctrlKey && navigator.userAgent.indexOf('Mac') === -1) { //pc
+      isCtrlDown = true;
+    }
+
     /* 67 = c
      * 86 = v
      * 88 = x
      */
-    if ((event.ctrlKey || event.metaKey) && (event.keyCode === 67 || event.keyCode === 86 || event.keyCode === 88)) {
-      ctrlWasDown = true;
+    if (isCtrlDown && (event.keyCode === 67 || event.keyCode === 86 || event.keyCode === 88)) {
       that.selectNodeText(that.elTextarea);
 
       if (event.keyCode === 88) { //works in all browsers, incl. Opera < 12.12
-        that.triggerCut(event);
+        setTimeout(function(){
+          that.triggerCut(event);
+        }, 0);
       }
       else if (event.keyCode === 86) {
-        that.triggerPaste(event);
+        setTimeout(function(){
+          that.triggerPaste(event);
+        }, 0);
       }
-
-      /*if (event.stopPropagation) {
-       event.stopPropagation();
-       }
-       // Support: IE
-       event.cancelBubble = true;*/
     }
   });
-
-  this._bindEvent(listenerElement, 'keyup', function (event) {
-    if (ctrlWasDown) {
-      ctrlWasDown = false;
-    }
-  });
-
-  /*
-   //does not work in Opera < 12.12
-   this._bindEvent(this.elTextarea, 'cut', function (event) {
-   that.triggerCut(event);
-   });
-
-   this._bindEvent(this.elTextarea, 'paste', function (event) {
-   that.triggerPaste(event);
-   });
-   */
 }
-
-var lastActive, ctrlWasDown;
 
 //http://jsperf.com/textara-selection
 //http://stackoverflow.com/questions/1502385/how-can-i-make-this-code-work-in-ie

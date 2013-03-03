@@ -1,3 +1,11 @@
+## HEAD
+
+Bugfix:
+- fix problems with autocomplete cell type and Angular Patch integration
+
+Other:
+- upgrade Handsontable to 0.8.8
+
 ## 0.3.3 (Feb 28, 2012)
 
 Features:

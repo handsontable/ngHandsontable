@@ -5,6 +5,7 @@ Bugfix:
 
 Other:
 - upgrade Handsontable to 0.8.8
+- upgrade AngularJS to 1.0.5
 
 ## 0.3.3 (Feb 28, 2012)
 

@@ -1,4 +1,4 @@
-## HEAD
+## 0.3.4 (Mar 4, 2012)
 
 Bugfix:
 - fix problems with autocomplete cell type and Angular Patch integration

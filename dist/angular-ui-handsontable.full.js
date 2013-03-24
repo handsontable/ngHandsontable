@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.3.4
+ * angular-ui-handsontable 0.3.5
  * 
- * Date: Sun Mar 24 2013 17:46:45 GMT+0100 (Central European Standard Time)
+ * Date: Sun Mar 24 2013 17:47:35 GMT+0100 (Central European Standard Time)
 */
 
 /**

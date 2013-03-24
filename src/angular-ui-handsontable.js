@@ -143,8 +143,9 @@ angular.module('uiHandsontable', [])
 
         $(element).append($container);
 
-        if (typeof scope.$parent[rhs] !== 'undefined') {
-          uiDatagrid.settings['data'] = scope.$parent[rhs];
+        var data = scope.$parent.$eval(rhs);
+        if (typeof data !== 'undefined') {
+          uiDatagrid.settings['data'] = data;
         }
 
         if (uiDatagrid.settings.columns) {
@@ -174,7 +175,7 @@ angular.module('uiHandsontable', [])
         var lastTotalRows = 0;
         scope.$watch(function () {
           //check if visible data has changed
-          if (scope.$parent[rhs] !== $container.handsontable('getData')) {
+          if (scope.$parent.$eval(rhs) !== $container.handsontable('getData')) {
             return true;
           }
 
@@ -197,7 +198,7 @@ angular.module('uiHandsontable', [])
         }, function (newVal, oldVal) {
           //if data has changed, render the table
           if (newVal == true) {
-            $container.handsontable('loadData', scope.$parent[rhs]);
+            $container.handsontable('loadData', scope.$parent.$eval(rhs));
           }
           else if (newVal !== oldVal) {
             $container.handsontable('render');
@@ -371,7 +372,7 @@ angular.module('uiHandsontable', [])
           // set up watcher for selectedIndex
           scope.$watch('selectedIndex', function (newVal, oldVal) {
             //if selectedIndex has changed, change table selection
-            var row = newVal * 1; //convert to numeric
+            var row = parseInt(newVal, 10);
             if (typeof newVal !== 'undefined' && newVal !== null && row !== lastSelectionRow) {
               var col = lastSelectionCol || 0;
               $container.handsontable('selectCell', row, col, row, col, true);

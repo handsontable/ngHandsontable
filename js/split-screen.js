@@ -33,9 +33,10 @@ function MyCtrl($scope, $filter) {
   var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
 
   $scope.MySelectedIndex = null;
-  $scope.items = [];
+  $scope.db = {};
+  $scope.db.items = [];
   for (var i = 0; i < 10000; i++) {
-    $scope.items.push(
+    $scope.db.items.push(
       {
         id: i + 1,
         name: {
@@ -50,7 +51,7 @@ function MyCtrl($scope, $filter) {
     );
   }
 
-  $scope.dynamicColumns = [
+  $scope.db.dynamicColumns = [
     {value: 'item.id', title: 'ID'},
     {value: 'item.name.last', title: 'Last Name'},
     //{value: 'item.name.first', title: 'First Name'}, //this will be added dynamically after button is pressed
@@ -62,7 +63,7 @@ function MyCtrl($scope, $filter) {
   var c = 0;
   $scope.myHeight = 320;
   setInterval(function () {
-    $scope.dynamicColumns[0].title = 'ID (' + c + ')';
+    $scope.db.dynamicColumns[0].title = 'ID (' + c + ')';
     //$scope.myHeight += 2;
     if (!$scope.$$phase) { //if digest is not in progress
       $scope.$apply();
@@ -71,11 +72,11 @@ function MyCtrl($scope, $filter) {
   }, 5000);
 
   $scope.dumpItems = function () {
-    console.log("dump items", $scope.items);
+    console.log("dump items", $scope.db.items);
   };
 
   $scope.addColumn = function () {
-    $scope.dynamicColumns.splice(2, 0, {value: 'item.name.first', title: 'First Name'});
+    $scope.db.dynamicColumns.splice(2, 0, {value: 'item.name.first', title: 'First Name'});
   };
 
   $scope.grayedOut = {
@@ -90,9 +91,9 @@ function MyCtrl($scope, $filter) {
    */
 
   $scope.$watch('query', function (newVal, oldVal) {
-    $scope.filteredItems = $filter('filter')($scope.items, $scope.query);
+    $scope.filteredItems = $filter('filter')($scope.db.items, $scope.query);
   });
-  $scope.filteredItems = $scope.items;
+  $scope.filteredItems = $scope.db.items;
 
   /**
    * Selection

@@ -1,3 +1,8 @@
+## HEAD
+
+Bugfix:
+- `datarows` crashed when trying to use deep object structure as the data source (`datarows="row in sql.Rows"`)
+
 ## 0.3.4 (Mar 4, 2012)
 
 Bugfix:

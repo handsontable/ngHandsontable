@@ -1,4 +1,4 @@
-## HEAD
+## 0.3.6 (Mar 26, 2012)
 
 Feature:
 - split-screen.html demo now uses all available space in window

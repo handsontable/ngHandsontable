@@ -30,7 +30,7 @@
 
 <p>Selection: <input ng-model="MySelectedIndex"></p>
 
-<ui-handsontable minSpareRows="1" stretchH="'last'" manualColumnMove="true" manualColumnResize="true" columnSorting="true" selectedIndex="MySelectedIndex" rowheaders="true" HeIgHT="myHeight" datarows="item in db.items">
+<ui-handsontable id="example1" minSpareRows="1" stretchH="'last'" manualColumnMove="true" manualColumnResize="true" columnSorting="true" selectedIndex="MySelectedIndex" rowheaders="true" HeIgHT="calcHeight" width="calcWidth" datarows="item in db.items">
   <datacolumn width="50" value="item.id" title="'ID'"></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>

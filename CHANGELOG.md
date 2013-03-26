@@ -1,3 +1,11 @@
+## HEAD
+
+Feature:
+- split-screen.html demo now uses all available space in window
+
+Other:
+- upgrade Handsontable to 0.8.16
+
 ## 0.3.5 (Mar 24, 2012)
 
 Bugfix:

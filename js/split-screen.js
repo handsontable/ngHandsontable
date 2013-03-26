@@ -7,6 +7,35 @@ angular.module('uiApp', ['ui', 'uiHandsontable']);
  * Below controller declaration is used in ui.html and split-screen.html
  */
 function MyCtrl($scope, $filter) {
+
+  var $window = $(window);
+  var winHeight = $window.height();
+  var winWidth = $window.width();
+  $window.resize(function () {
+    winHeight = $window.height();
+    winWidth = $window.width();
+  });
+
+  $scope.calcHeight = function() {
+    var border = 12;
+    var topOffset = $("#example1").offset().top;
+    var height = winHeight - topOffset - 2 * border;
+    if(height < 50) {
+      return 50;
+    }
+    return height;
+  };
+
+  $scope.calcWidth = function() {
+    var border = 12;
+    var leftOffset = $("#example1").offset().left;
+    var width = winWidth - leftOffset - 2 * border;
+    if(width < 50) {
+      return 50;
+    }
+    return width;
+  };
+
   var products = [
     {
       "Description": "Big Mac",

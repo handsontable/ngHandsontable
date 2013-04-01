@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.6
  * 
- * Date: Tue Mar 26 2013 02:41:07 GMT+0100 (Central European Standard Time)
+ * Date: Mon Apr 01 2013 12:35:46 GMT-0700 (PDT)
 */
 
 /**
@@ -177,10 +177,11 @@ angular.module('uiHandsontable', [])
 
         $container.handsontable(uiDatagrid.settings);
 
-        $container.on('datachange.handsontable', function () {
+        $container.on('datachange.handsontable', function (event, changes, source) {
           if (!scope.$$phase) { //if digest is not in progress
             scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
           }
+          scope.$emit('datagridChange', $container, changes, source);
         });
 
         $container.on('selectionbyprop.handsontable', function (event, r, p, r2, p2) {

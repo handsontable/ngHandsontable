@@ -1,44 +1,46 @@
-/**
- * Creates Handsontable settings object if needed
- * @param $element
- * @returns {Object}
- */
-
-function getHandsontableSettings($element) {
-  var uiDatagrid = $element.data('uiDatagrid');
-  if (!uiDatagrid) {
-    uiDatagrid = {
-      settings: {
-        columns: [],
-        colHeaders: true,
-        outsideClickDeselects: true,
-        autoComplete: []
-      },
-      $container: $('<div class="ui-handsontable-container"></div>')
-    };
-    $element.data('uiDatagrid', uiDatagrid);
-  }
-  return uiDatagrid;
-}
-
-/**
- * Creates Handsontable settings object if needed
- * @param $element
- * @returns {Object}
- */
-
-function getDatacolumnSettings($element) {
-  var uiDatagridDatacolumn = $element.data('uiDatagridDatacolumn');
-  if (!uiDatagridDatacolumn) {
-    uiDatagridDatacolumn = {
-    };
-    $element.data('uiDatagridDatacolumn', uiDatagridDatacolumn);
-  }
-  return uiDatagridDatacolumn;
-}
-
 angular.module('uiHandsontable', [])
-  .directive('uiHandsontable', ['$compile', function ($compile) {
+/**
+ * Creates Handsontable settings object if needed
+ * @param $element
+ * @returns {Object}
+ */
+  .factory('getHandsontableSettings', function () {
+    return function getHandsontableSettings($element) {
+      var uiDatagrid = $element.data('uiDatagrid');
+      if (!uiDatagrid) {
+        uiDatagrid = {
+          settings: {
+            columns: [],
+            colHeaders: true,
+            outsideClickDeselects: true,
+            autoComplete: []
+          },
+          $container: $('<div class="ui-handsontable-container"></div>')
+        };
+        $element.data('uiDatagrid', uiDatagrid);
+      }
+      return uiDatagrid;
+    }
+  })
+
+/**
+ * Creates Datacolumn settings object if needed
+ * @param $element
+ * @returns {Object}
+ */
+  .factory('getDatacolumnSettings', function () {
+    return function getDatacolumnSettings($element) {
+      var uiDatagridDatacolumn = $element.data('uiDatagridDatacolumn');
+      if (!uiDatagridDatacolumn) {
+        uiDatagridDatacolumn = {
+        };
+        $element.data('uiDatagridDatacolumn', uiDatagridDatacolumn);
+      }
+      return uiDatagridDatacolumn;
+    }
+  })
+
+  .directive('uiHandsontable', function ($compile, getHandsontableSettings) {
     var htOptions = ['data', 'width', 'height', 'rowHeaders', 'colHeaders', 'colWidths', 'columns', 'cells', 'dataSchema', 'contextMenu', 'onSelection', 'onSelectionByProp', 'onBeforeChange', 'onChange', 'onCopyLimit', 'startRows', 'startCols', 'minRows', 'minCols', 'maxRows', 'maxCols', 'minSpareRows', 'minSpareCols', 'multiSelect', 'fillHandle', 'undo', 'outsideClickDeselects', 'enterBeginsEditing', 'enterMoves', 'tabMoves', 'autoWrapRow', 'autoWrapCol', 'copyRowsLimit', 'copyColsLimit', 'currentRowClassName', 'currentColClassName', 'asyncRendering', 'stretchH', 'columnSorting', 'manualColumnMove', 'manualColumnResize'];
 
     var scopeDef = {
@@ -262,8 +264,9 @@ angular.module('uiHandsontable', [])
       }
     };
     return directiveDefinitionObject;
-  }])
-  .directive('datacolumn', function () {
+  })
+
+  .directive('datacolumn', function (getHandsontableSettings, getDatacolumnSettings) {
     var directiveDefinitionObject = {
       restrict: 'E',
       priority: 500,
@@ -334,7 +337,8 @@ angular.module('uiHandsontable', [])
     };
     return directiveDefinitionObject;
   })
-  .directive('optionlist', function () {
+
+  .directive('optionlist', function (getDatacolumnSettings) {
     var directiveDefinitionObject = {
       restrict: 'E',
       transclude: 'element',
@@ -351,7 +355,8 @@ angular.module('uiHandsontable', [])
     };
     return directiveDefinitionObject;
   })
-  .directive('selectedindex', function () {
+
+  .directive('selectedindex', function (getHandsontableSettings) {
     var directiveDefinitionObject = {
       restrict: 'A',
       priority: 491,

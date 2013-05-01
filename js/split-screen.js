@@ -2,6 +2,7 @@
  * Below module declaration is used in ui.html
  */
 angular.module('uiApp', ['ui', 'uiHandsontable']);
+angular.module('uiAppWithTabs', ['uiHandsontable', 'ui.bootstrap']);
 
 /**
  * Below controller declaration is used in ui.html and split-screen.html
@@ -16,21 +17,21 @@ function MyCtrl($scope, $filter) {
     winWidth = $window.width();
   });
 
-  $scope.calcHeight = function() {
+  $scope.calcHeight = function () {
     var border = 12;
     var topOffset = $("#example1").offset().top;
     var height = winHeight - topOffset - 2 * border;
-    if(height < 50) {
+    if (height < 50) {
       return 50;
     }
     return height;
   };
 
-  $scope.calcWidth = function() {
+  $scope.calcWidth = function () {
     var border = 12;
     var leftOffset = $("#example1").offset().left;
     var width = winWidth - leftOffset - 2 * border;
-    if(width < 50) {
+    if (width < 50) {
       return 50;
     }
     return width;

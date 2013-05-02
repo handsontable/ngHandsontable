@@ -60,7 +60,7 @@ module.exports = function (grunt) {
       "dist/angular-ui-handsontable.full.min.css": ["dist/angular-ui-handsontable.full.css" ]
     },
     watch: {
-      files: ['src/*', 'src/3rdparty/handsontable/*'],
+      files: ['src/**/*'],
       tasks: ['concat', 'uglify', 'cssmin']
     }
   });

@@ -4,6 +4,9 @@ Bugfix:
 - `ui-handsontable` did not work when placed inside [UI Bootstrap](http://angular-ui.github.io/bootstrap/) `<tabs>` directive
 - added tabs.html demo that uses UI Bootstrap
 
+Other:
+- upgrade Handsontable to 0.8.22
+
 ## 0.3.6 (Mar 26, 2012)
 
 Feature:

@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.7
  * 
- * Date: Fri May 03 2013 01:55:59 GMT+0200 (Central European Daylight Time)
+ * Date: Fri May 03 2013 11:18:40 GMT+0200 (Central European Daylight Time)
 */
 
 /**
@@ -56,7 +56,7 @@ angular.module('uiHandsontable', [])
     }
   })
 
-  .directive('uiHandsontable', function ($compile, getHandsontableSettings) {
+  .directive('uiHandsontable', function ($compile, $rootScope, getHandsontableSettings) {
     var htOptions = ['data', 'width', 'height', 'rowHeaders', 'colHeaders', 'colWidths', 'columns', 'cells', 'dataSchema', 'contextMenu', 'onSelection', 'onSelectionByProp', 'onBeforeChange', 'onChange', 'onCopyLimit', 'startRows', 'startCols', 'minRows', 'minCols', 'maxRows', 'maxCols', 'minSpareRows', 'minSpareCols', 'multiSelect', 'fillHandle', 'undo', 'outsideClickDeselects', 'enterBeginsEditing', 'enterMoves', 'tabMoves', 'autoWrapRow', 'autoWrapCol', 'copyRowsLimit', 'copyColsLimit', 'currentRowClassName', 'currentColClassName', 'asyncRendering', 'stretchH', 'columnSorting', 'manualColumnMove', 'manualColumnResize'];
 
     var scopeDef = {

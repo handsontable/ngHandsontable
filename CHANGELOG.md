@@ -1,3 +1,8 @@
+## HEAD
+
+Bugfix:
+- fix "$digest already in progress" issue
+
 ## 0.3.7 (May 5, 2012)
 
 Bugfix:

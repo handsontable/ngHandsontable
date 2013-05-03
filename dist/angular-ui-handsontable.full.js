@@ -1,7 +1,7 @@
 /**
  * angular-ui-handsontable 0.3.7
  * 
- * Date: Fri May 03 2013 11:18:40 GMT+0200 (Central European Daylight Time)
+ * Date: Fri May 03 2013 12:39:38 GMT+0200 (Central European Daylight Time)
 */
 
 /**
@@ -207,7 +207,7 @@ angular.module('uiHandsontable', [])
           uiDatagrid.$container.handsontable(uiDatagrid.settings);
 
           uiDatagrid.$container.on('datachange.handsontable', function () {
-            if (!scope.$$phase) { //if digest is not in progress
+            if (!$rootScope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
           });

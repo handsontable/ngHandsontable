@@ -191,7 +191,7 @@ angular.module('uiHandsontable', [])
           uiDatagrid.$container.handsontable(uiDatagrid.settings);
 
           uiDatagrid.$container.on('datachange.handsontable', function () {
-            if (!scope.$$phase) { //if digest is not in progress
+            if (!$rootScope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
           });

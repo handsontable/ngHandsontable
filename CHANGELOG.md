@@ -7,7 +7,7 @@ Bugfix:
 Other:
 - upgrade Handsontable to 0.9-beta1 (dev branch)
 
-## 0.3.7 (May 5, 2012)
+## 0.3.7 (May 3, 2012)
 
 Bugfix:
 - `ui-handsontable` did not work when placed inside [UI Bootstrap](http://angular-ui.github.io/bootstrap/) `<tabs>` directive

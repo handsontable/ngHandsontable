@@ -1,4 +1,4 @@
-## HEAD
+## 0.3.8 (May 12, 2012)
 
 Bugfix:
 - fix "$digest already in progress" issue when using UI Bootstrap <tabs>

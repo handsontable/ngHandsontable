@@ -1,7 +1,11 @@
 ## HEAD
 
 Bugfix:
-- fix "$digest already in progress" issue
+- fix "$digest already in progress" issue when using UI Bootstrap <tabs>
+- fix "firstChild not found" issue when using UI Bootstrap <tabs>
+
+Other:
+- upgrade Handsontable to 0.9-beta1 (dev branch)
 
 ## 0.3.7 (May 5, 2012)
 

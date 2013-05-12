@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue May 07 2013 15:24:58 GMT+0200 (Central European Daylight Time)
+ * Date: Sun May 12 2013 21:19:07 GMT+0200 (Central European Daylight Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -5846,26 +5846,9 @@ function Walkontable(settings) {
   this.drawInterrupted = false;
 }
 
-Walkontable.prototype.isVisible = function () {
-  var next = this.wtTable.TABLE;
-  while (next !== document.documentElement) {
-    if (next === null) {
-      return false;
-    }
-    else if (next.style.display === 'none') {
-      return false;
-    }
-    else if (this.wtTable.TABLE.parentNode.clientWidth === 0) {
-      return false; //this is the technique used by jQuery is(':visible')
-    }
-    next = next.parentNode;
-  }
-  return true;
-};
-
 Walkontable.prototype.draw = function (selectionsOnly) {
   this.drawInterrupted = false;
-  if (!selectionsOnly && !this.isVisible()) {
+  if (!selectionsOnly && !this.wtDom.isVisible(this.wtTable.TABLE)) {
     this.drawInterrupted = true; //draw interrupted because TABLE is not visible
     return;
   }
@@ -6082,6 +6065,50 @@ WalkontableDom.prototype.avoidInnerHTML = function (element, content) {
 
     element.appendChild(document.createTextNode(content));
   }
+};
+
+/**
+ * Returns true if element is attached to the DOM and visible, false otherwise
+ * @param elem
+ * @returns {boolean}
+ */
+WalkontableDom.prototype.isVisible = function (elem) {
+  //fast method
+  try {//try/catch performance is not a problem here: http://jsperf.com/try-catch-performance-overhead/7
+    if (!elem.offsetParent) {
+      return false; //fixes problem with UI Bootstrap <tabs> directive
+    }
+  }
+  catch (e) {
+    return false; //IE7-8 throws "Unspecified error" when offsetParent is not found - we catch it here
+  }
+
+  if (elem.offsetWidth > 0 || (elem.parentNode && elem.parentNode.offsetWidth > 0)) {
+    return true;
+  }
+
+  //slow method
+  var next = elem;
+  while (next !== document.documentElement) { //until <html> reached
+    if (next === null) { //parent detached from DOM
+      return false;
+    }
+    else if (next.nodeType === 11) { //IE7 reports this after detaching element from DOM
+      return false;
+    }
+    else if (next.style.display === 'none') {
+      return false;
+    }
+    /*else if (next !== elem && next.offsetWidth === 0) {
+     //this is the technique used by jQuery is(':visible')
+     //but in IE7, clientWidth & offsetWidth sometimes returns 0 when it shouldn't
+     return false;
+
+     compare with jQuery :visible selector (search jquery.js for `reliableHiddenOffsets`)
+     }*/
+    next = next.parentNode;
+  }
+  return true;
 };
 
 /**
@@ -6319,14 +6346,11 @@ WalkontableScroll.prototype.scrollVertical = function (delta) {
 
   if (total > 0) {
     if (maxSize !== Infinity) {
-      var TD = instance.wtTable.TBODY.firstChild.firstChild;
-      if (TD.nodeName === 'TH') {
-        TD = TD.nextSibling;
-      }
-      var cellOffset = instance.wtDom.offset(TD);
-      var tableOffset = instance.wtTable.tableOffset;
+      var cellOffset = instance.wtDom.offset(instance.wtTable.TBODY)
+        , tableOffset = instance.wtTable.tableOffset
+        , columnHeaderHeight = cellOffset.top - tableOffset.top; //in future may be merged with `containerHeightFn` in WalkontableTable.prototype.refreshStretching
 
-      maxSize -= cellOffset.top - tableOffset.top; //column header height
+      maxSize -= columnHeaderHeight;
       maxSize -= instance.getSetting('scrollbarHeight');
     }
 
@@ -6473,6 +6497,8 @@ WalkontableScrollbar.prototype.init = function () {
 
   //reference to instance
   this.$table = $(this.instance.wtTable.TABLE);
+  this.$thead = this.$table.find('thead');
+  this.$tbody = this.$table.find('tbody');
 
   //create elements
   this.slider = document.createElement('DIV');
@@ -6595,7 +6621,7 @@ WalkontableScrollbar.prototype.refresh = function () {
     , handleSize
     , handlePosition
     , visibleCount = this.visibleCount
-    , tableOuterWidth = this.$table.outerWidth()
+    , tableOuterWidth = this.$table.outerWidth() || this.$tbody.outerWidth() || this.$thead.outerWidth() //IE8 reports 0 as <table> offsetWidth
     , tableOuterHeight = this.$table.outerHeight()
     , tableWidth = this.instance.hasSetting('width') ? this.instance.getSetting('width') : tableOuterWidth
     , tableHeight = this.instance.hasSetting('height') ? this.instance.getSetting('height') : tableOuterHeight;
@@ -6708,6 +6734,77 @@ WalkontableHorizontalScrollbar.prototype.readSettings = function () {
   this.handlePosition = parseInt(this.handleStyle.left, 10);
   this.sliderSize = parseInt(this.sliderStyle.width, 10);
   this.fixedCount = this.instance.getSetting('fixedColumnsLeft');
+};
+function WalkontableScrollbarNative() {
+}
+
+WalkontableScrollbarNative.prototype.init = function () {
+  this.fixedContainer = this.instance.wtTable.TABLE.parentNode.parentNode;
+
+  //tableView.js
+  $window.on('scroll.' + instance.guid, function () {
+    instance.forceFullRender = true;
+    that.render();
+  });
+};
+
+WalkontableScrollbarNative.prototype.onScroll = function () {
+};
+
+WalkontableScrollbarNative.prototype.prepare = function () {
+};
+
+WalkontableScrollbarNative.prototype.refresh = function () {
+  this.tableParentOffset = this.instance.wtDom.offset(this.fixedContainer);
+
+  this.windowSize = $(window).height();
+  this.availableSize = null;
+  var scrollDelta;
+
+  var newOffset = 0;
+  if ($(window).scrollTop() > this.tableParentOffset.top) {
+    scrollDelta = $(window).scrollTop() - this.tableParentOffset.top;
+    newOffset = parseInt(scrollDelta / 20, 10);
+    this.availableSize = this.windowSize;
+
+    this.spreader.style.position = 'fixed';
+    this.spreader.style.top = '0';
+    this.spreader.style.left = this.tableParentOffset.left;
+
+    newOffset = Math.min(newOffset, totalRows)
+  }
+  else {
+    this.availableSize = this.windowSize - (this.tableParentOffset.top - $(window).scrollTop());
+    this.spreader.style.position = 'static';
+  }
+  this.instance.update('offsetRow', newOffset);
+  this.spreader.parentNode.style.paddingTop = newOffset * 20 + 'px';
+
+  this.rowFilter.readSettings(this.instance);
+  this.columnFilter.readSettings(this.instance);
+
+  this.tableOffset = this.wtDom.offset(this.TABLE);
+  this.tableParentOffset = this.wtDom.offset(this.TABLE.parentNode);
+
+
+
+
+
+  this.spreader.parentNode.style.paddingBottom = $(this.spreader).height() + (totalRows - newOffset - r) * 20 + 'px';
+
+};
+
+///
+
+var WalkontableVerticalScrollbarNative = function (instance) {
+  this.instance = instance;
+  this.type = 'vertical';
+  this.init();
+};
+
+WalkontableVerticalScrollbarNative.prototype = new WalkontableScrollbarNative();
+
+WalkontableVerticalScrollbarNative.prototype.readSettings = function () {
 };
 function WalkontableSelection(instance, settings) {
   this.instance = instance;

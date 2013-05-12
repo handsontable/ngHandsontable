@@ -188,17 +188,17 @@ angular.module('uiHandsontable', [])
             }
           }
 
-          uiDatagrid.$container.handsontable(uiDatagrid.settings);
-
-          uiDatagrid.$container.on('datachange.handsontable', function () {
+          uiDatagrid.settings.afterChange = function () {
             if (!$rootScope.$$phase) { //if digest is not in progress
               scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
             }
-          });
+          };
 
-          uiDatagrid.$container.on('selectionbyprop.handsontable', function (event, r, p, r2, p2) {
+          uiDatagrid.settings.onSelectionByProp = function (r, p, r2, p2) {
             scope.$emit('datagridSelection', uiDatagrid.$container, r, p, r2, p2);
-          });
+          };
+
+          uiDatagrid.$container.handsontable(uiDatagrid.settings);
 
           // set up watcher for visible part of the table
           var lastTotalRows = 0;
@@ -369,7 +369,7 @@ angular.module('uiHandsontable', [])
             , lastSelectionRow
             , lastSelectionCol;
 
-          $container.on('selection.handsontable', function (event, r, c, r2, c2) {
+          getHandsontableSettings(element).settings.onSelection = function (r, c, r2, c2) {
             isSelected = true;
             lastSelectionRow = r;
             lastSelectionCol = c;
@@ -377,11 +377,12 @@ angular.module('uiHandsontable', [])
             if (!scope.$$phase && /*typeof scope.selectedIndex === 'object' && */typeof scope.selectedIndex !== 'undefined' && scope.selectedIndex != r) {
               //make sure digest is not in progress
               //typeof scope.selectedIndex === 'object' was used to make sure selectedIndex is observable (to avoid "Non-assignable model expression" error), but it seems unnecessary now
+
               scope.$apply(function () {
                 scope.selectedIndex = r;
               });
             }
-          });
+          }
 
           $container.on('deselect.handsontable', function (event) {
             isSelected = false;

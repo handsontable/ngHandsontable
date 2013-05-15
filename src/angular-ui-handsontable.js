@@ -194,7 +194,7 @@ angular.module('uiHandsontable', [])
             }
           };
 
-          uiDatagrid.settings.onSelectionByProp = function (r, p, r2, p2) {
+          uiDatagrid.settings.afterSelectionByProp = function (r, p, r2, p2) {
             scope.$emit('datagridSelection', uiDatagrid.$container, r, p, r2, p2);
           };
 
@@ -384,7 +384,7 @@ angular.module('uiHandsontable', [])
             }
           }
 
-          $container.on('deselect.handsontable', function (event) {
+          getHandsontableSettings(element).settings.afterDeselect = function (event) {
             isSelected = false;
             lastSelectionRow = null;
 
@@ -395,7 +395,7 @@ angular.module('uiHandsontable', [])
                 scope.selectedIndex = null;
               });
             }
-          });
+          };
 
           // set up watcher for selectedIndex
           scope.$watch('selectedIndex', function (newVal, oldVal) {

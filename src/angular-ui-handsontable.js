@@ -369,7 +369,7 @@ angular.module('uiHandsontable', [])
             , lastSelectionRow
             , lastSelectionCol;
 
-          getHandsontableSettings(element).settings.onSelection = function (r, c, r2, c2) {
+          getHandsontableSettings(element).settings.afterSelection = function (r, c, r2, c2) {
             isSelected = true;
             lastSelectionRow = r;
             lastSelectionCol = c;

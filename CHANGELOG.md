@@ -1,3 +1,11 @@
+## 0.3.9 (May 15, 2012)
+
+Bugfix:
+- fix "Cannot read property 'offsetLeft' of undefined at WalkontableDom.offset" issue when using UI Bootstrap <tabs>
+
+Other:
+- upgrade Handsontable to 0.9-beta2
+
 ## 0.3.8 (May 12, 2012)
 
 Bugfix:

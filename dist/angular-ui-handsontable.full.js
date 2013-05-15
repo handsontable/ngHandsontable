@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.3.8
+ * angular-ui-handsontable 0.3.9
  * 
- * Date: Wed May 15 2013 03:00:39 GMT+0200 (Central European Daylight Time)
+ * Date: Wed May 15 2013 03:06:48 GMT+0200 (Central European Daylight Time)
 */
 
 /**
@@ -385,7 +385,7 @@ angular.module('uiHandsontable', [])
             , lastSelectionRow
             , lastSelectionCol;
 
-          getHandsontableSettings(element).settings.onSelection = function (r, c, r2, c2) {
+          getHandsontableSettings(element).settings.afterSelection = function (r, c, r2, c2) {
             isSelected = true;
             lastSelectionRow = r;
             lastSelectionCol = c;

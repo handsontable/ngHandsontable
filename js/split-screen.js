@@ -64,9 +64,9 @@ function MyCtrl($scope, $filter) {
 
   $scope.MySelectedIndex = null;
   $scope.db = {};
-  $scope.db.items = [];
+  var items = [];
   for (var i = 0; i < 10000; i++) {
-    $scope.db.items.push(
+    items.push(
       {
         id: i + 1,
         name: {
@@ -80,6 +80,7 @@ function MyCtrl($scope, $filter) {
       }
     );
   }
+  $scope.db.items = items;
 
   $scope.db.dynamicColumns = [
     {value: 'item.id', title: 'ID'},

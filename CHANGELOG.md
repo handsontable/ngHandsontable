@@ -1,4 +1,4 @@
-## Head
+## 0.3.10 (Jun 12, 2012)
 
 Other:
 - define Handsontable as Bower dependency

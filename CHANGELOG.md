@@ -1,3 +1,9 @@
+## Head
+
+Other:
+- define Handsontable as Bower dependency
+- upgrade Handsontable to 0.9.4
+
 ## 0.3.9 (May 15, 2012)
 
 Bugfix:

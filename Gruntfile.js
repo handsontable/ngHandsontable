@@ -36,13 +36,13 @@ module.exports = function (grunt) {
         src: [
           'src/ie-shim.js',
           'src/angular-ui-handsontable.js',
-          'src/3rdparty/handsontable/jquery.handsontable.full.js'
+          'components/handsontable/dist/jquery.handsontable.full.js'
         ],
         dest: 'dist/angular-ui-handsontable.full.js'
       },
       full_css: {
         src: [
-          'src/3rdparty/handsontable/jquery.handsontable.full.css'
+          'components/handsontable/dist/jquery.handsontable.full.css'
         ],
         dest: 'dist/angular-ui-handsontable.full.css'
       }

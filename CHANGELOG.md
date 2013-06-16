@@ -1,3 +1,8 @@
+## 0.3.11 (Jun 17, 2012)
+
+Other:
+- upgrade Handsontable to 0.9.5
+
 ## 0.3.10 (Jun 12, 2012)
 
 Other:

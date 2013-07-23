@@ -1,15 +1,20 @@
-## 0.3.11 (Jun 17, 2012)
+## 0.3.12 (Jul 23, 2013)
+
+Other:
+- upgrade Handsontable to 0.9.10 (see [changelog](https://github.com/warpech/jquery-handsontable/blob/master/CHANGELOG.md))
+
+## 0.3.11 (Jun 17, 2013)
 
 Other:
 - upgrade Handsontable to 0.9.5
 
-## 0.3.10 (Jun 12, 2012)
+## 0.3.10 (Jun 12, 2013)
 
 Other:
 - define Handsontable as Bower dependency
 - upgrade Handsontable to 0.9.4
 
-## 0.3.9 (May 15, 2012)
+## 0.3.9 (May 15, 2013)
 
 Bugfix:
 - fix "Cannot read property 'offsetLeft' of undefined at WalkontableDom.offset" issue when using UI Bootstrap <tabs>
@@ -17,7 +22,7 @@ Bugfix:
 Other:
 - upgrade Handsontable to 0.9-beta2
 
-## 0.3.8 (May 12, 2012)
+## 0.3.8 (May 12, 2013)
 
 Bugfix:
 - fix "$digest already in progress" issue when using UI Bootstrap <tabs>
@@ -26,7 +31,7 @@ Bugfix:
 Other:
 - upgrade Handsontable to 0.9-beta1 (dev branch)
 
-## 0.3.7 (May 3, 2012)
+## 0.3.7 (May 3, 2013)
 
 Bugfix:
 - `ui-handsontable` did not work when placed inside [UI Bootstrap](http://angular-ui.github.io/bootstrap/) `<tabs>` directive
@@ -35,7 +40,7 @@ Bugfix:
 Other:
 - upgrade Handsontable to 0.8.23
 
-## 0.3.6 (Mar 26, 2012)
+## 0.3.6 (Mar 26, 2013)
 
 Feature:
 - split-screen.html demo now uses all available space in window
@@ -43,12 +48,12 @@ Feature:
 Other:
 - upgrade Handsontable to 0.8.16
 
-## 0.3.5 (Mar 24, 2012)
+## 0.3.5 (Mar 24, 2013)
 
 Bugfix:
 - `datarows` crashed when trying to use deep object structure as the data source (`datarows="row in sql.Rows"`)
 
-## 0.3.4 (Mar 4, 2012)
+## 0.3.4 (Mar 4, 2013)
 
 Bugfix:
 - fix problems with autocomplete cell type and Angular Patch integration
@@ -57,7 +62,7 @@ Other:
 - upgrade Handsontable to 0.8.8
 - upgrade AngularJS to 1.0.5
 
-## 0.3.3 (Feb 28, 2012)
+## 0.3.3 (Feb 28, 2013)
 
 Features:
 - new numeric cell type

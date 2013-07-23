@@ -19,9 +19,37 @@
  *
  * See http://gruntjs.com/getting-started for more information about Grunt
  */
+var browsers = [
+  {
+    browserName: 'firefox',
+    platform: 'Windows 7'
+  },
+  {
+    browserName: 'chrome',
+    platform: 'Windows 7'
+  },
+  {
+    browserName: 'internet explorer',
+    version: '8',
+    platform: 'Windows 7'
+  },
+  {
+    browserName: 'internet explorer',
+    version: '9',
+    platform: 'Windows 7'
+  },
+  {
+    browserName: 'internet explorer',
+    version: '10',
+    platform: 'Windows 8'
+  }
+];
+
 module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    gitinfo: {
+    },
     meta: {
       src: [
         'tmp/core.js',
@@ -44,6 +72,7 @@ module.exports = function (grunt) {
         'src/editors/handsontableEditor.js',
 
         'src/validators/numericValidator.js',
+        'src/validators/autocompleteValidator.js',
 
         'src/cellTypes.js',
 
@@ -55,6 +84,7 @@ module.exports = function (grunt) {
         'src/plugins/manualColumnMove.js',
         'src/plugins/manualColumnResize.js',
         'src/plugins/observeChanges.js',
+        'src/plugins/persistentState.js',
 
         'src/3rdparty/jquery.autoresize.js',
         'src/3rdparty/sheetclip.js',
@@ -70,6 +100,9 @@ module.exports = function (grunt) {
         'lib/jQuery-contextMenu/jquery.contextMenu.js'
         // seems to have no effect when turned off on contextmenu.html
         //'lib/jQuery-contextMenu/jquery.ui.position.js'
+      ],
+      shims : [
+        'lib/shims/array.filter.js'
       ]
     },
 
@@ -77,6 +110,7 @@ module.exports = function (grunt) {
       dist: {
         files: {
           'dist/jquery.handsontable.js': [
+            '<%= meta.shims %>',
             'tmp/intro.js',
             '<%= meta.src %>',
             '<%= meta.walkontable %>',
@@ -119,6 +153,9 @@ module.exports = function (grunt) {
     },
 
     watch: {
+      options: {
+        livereload: true //works with Chrome LiveReload extension. See: https://github.com/gruntjs/grunt-contrib-watch
+      },
       files: [
         'src/**/*.js',
         'src/**/*.css',
@@ -169,17 +206,19 @@ module.exports = function (grunt) {
           'test/jasmine/spec/SpecHelper.js',
           'demo/js/backbone/lodash.underscore.js',
           'demo/js/backbone/backbone.js',
-          'demo/js/backbone/backbone-relational/backbone-relational.js'
+          'demo/js/backbone/backbone-relational/backbone-relational.js',
+          'extensions/jquery.handsontable.removeRow.js'
         ],
         options: {
           specs: [
-            'test/jasmine/spec/*Spec.js',
-            'test/jasmine/spec/*/*Spec.js'
+           'test/jasmine/spec/*Spec.js',
+           'test/jasmine/spec/*/*Spec.js'
           ],
           styles: [
             'test/jasmine/css/SpecRunner.css',
             'dist/jquery.handsontable.css',
-            'lib/jQuery-contextMenu/jquery.contextMenu.css'
+            'lib/jQuery-contextMenu/jquery.contextMenu.css',
+            'extensions/jquery.handsontable.removeRow.css'
           ]
         }
       },
@@ -207,15 +246,53 @@ module.exports = function (grunt) {
           base: '.',
           keepalive: true
         }
+      },
+      sauce: {
+        options: {
+          port: 9999,
+          base: '.',
+          keepalive: false
+        }
+      }
+    },
+    'saucelabs-jasmine': {
+      handsontable: {
+        options: {
+          urls: ['http://localhost:9999/test/jasmine/SpecRunner.html'],
+          testTimeout: (1000 * 60 * 5),
+          tunnelTimeout: 120,
+          testInterval: 5,
+          testReadyTimeout: 5,
+//          build: process.env.TRAVIS_JOB_ID,
+          build: '<%= pkg.version %>-<%= gitinfo.local.branch.current.name %>',
+          concurrency: 3,
+          browsers: browsers,
+          testname: "Development test (Handsontable)"
+        }
+      },
+      walkontable: {
+        options: {
+          urls: ['http://localhost:9999/src/3rdparty/walkontable/test/jasmine/SpecRunner.html'],
+          testTimeout: (1000 * 60 * 5),
+          tunnelTimeout: 120,
+          testInterval: 5,
+          testReadyTimeout: 5,
+//          build: process.env.TRAVIS_JOB_ID,
+          build: '<%= pkg.version %>-<%= gitinfo.local.branch.current.name %>',
+          concurrency: 3,
+          browsers: browsers,
+          testname: "Development test (Walkontable)"
+        }
       }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', ['replace:dist', 'concat', 'replace:wc', 'clean']);
+  grunt.registerTask('default', ['gitinfo', 'replace:dist', 'concat', 'replace:wc', 'clean']);
   grunt.registerTask('test', ['default', 'jasmine']);
   grunt.registerTask('test:handsontable', ['default', 'jasmine:handsontable']);
   grunt.registerTask('test:walkontable', ['default', 'jasmine:walkontable']);
+  grunt.registerTask('sauce', ['default', 'connect:sauce', 'saucelabs-jasmine:walkontable', 'saucelabs-jasmine:handsontable']);
 
   grunt.loadNpmTasks('grunt-replace');
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -223,4 +300,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-saucelabs');
+  grunt.loadNpmTasks('grunt-gitinfo');
 };

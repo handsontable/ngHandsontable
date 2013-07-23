@@ -12,13 +12,6 @@ function WalkontableTable(instance) {
   this.wtDom = this.instance.wtDom;
   this.wtDom.removeTextNodes(this.TABLE);
 
-  this.hasEmptyCellProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
-  this.hasCellSpacingProblem = ($.browser.msie && (parseInt($.browser.version, 10) <= 7));
-
-  if (this.hasCellSpacingProblem) { //IE7
-    this.TABLE.cellSpacing = 0;
-  }
-
   //wtSpreader
   var parent = this.TABLE.parentNode;
   if (!parent || parent.nodeType !== 1 || !this.wtDom.hasClass(parent, 'wtHolder')) {
@@ -102,6 +95,13 @@ WalkontableTable.prototype.refreshHiderDimensions = function () {
   var spreaderStyle = this.spreader.style;
 
   if (height !== Infinity || width !== Infinity) {
+    if (height === Infinity) {
+      height = this.instance.wtViewport.getWorkspaceActualHeight();
+    }
+    if (width === Infinity) {
+      width = this.instance.wtViewport.getWorkspaceActualWidth();
+    }
+
     this.hiderStyle.overflow = 'hidden';
 
     spreaderStyle.position = 'absolute';
@@ -116,14 +116,11 @@ WalkontableTable.prototype.refreshHiderDimensions = function () {
       spreaderStyle.width = '4000px';
     }
 
-    if (height === Infinity) {
-      height = this.instance.wtViewport.getWorkspaceActualHeight();
+    if (height < 0) { //this happens with WalkontableScrollbarNative and causes "Invalid argument" error in IE8
+      height = 0;
     }
-    this.hiderStyle.height = height + 'px';
 
-    if (width === Infinity) {
-      width = this.instance.wtViewport.getWorkspaceActualWidth();
-    }
+    this.hiderStyle.height = height + 'px';
     this.hiderStyle.width = width + 'px';
   }
   else {
@@ -211,8 +208,14 @@ WalkontableTable.prototype.adjustAvailableNodes = function () {
   }
 
   //adjust THEAD
+  TR = this.THEAD.firstChild;
   if (columnHeaders.length) {
-    TR = this.THEAD.firstChild;
+    if (!TR) {
+      TR = document.createElement('TR');
+      this.THEAD.appendChild(TR);
+    }
+
+    this.theadChildrenLength = TR.childNodes.length;
     while (this.theadChildrenLength < displayTds + displayThs) {
       TR.appendChild(document.createElement('TH'));
       this.theadChildrenLength++;
@@ -221,6 +224,9 @@ WalkontableTable.prototype.adjustAvailableNodes = function () {
       TR.removeChild(TR.lastChild);
       this.theadChildrenLength--;
     }
+  }
+  else if (TR) {
+    this.wtDom.empty(TR);
   }
 
   //draw COLGROUP
@@ -240,9 +246,6 @@ WalkontableTable.prototype.adjustAvailableNodes = function () {
       TD = TR.firstChild; //actually it is TH but let's reuse single variable
       for (c = 0; c < displayThs; c++) {
         rowHeaders[c](-displayThs + c, TD);
-        if (this.hasEmptyCellProblem) { //IE7
-          TD.innerHTML = '&nbsp;';
-        }
         TD = TD.nextSibling;
       }
     }
@@ -299,8 +302,14 @@ WalkontableTable.prototype._doDraw = function () {
     , displayThs = rowHeaders.length
     , TR
     , TD
+    , TH
     , adjusted = false
-    , workspaceWidth;
+    , workspaceWidth
+    , mustBeInViewport;
+
+  if (this.verticalRenderReverse) {
+    mustBeInViewport = offsetRow;
+  }
 
   this.instance.wtViewport.resetSettings();
 
@@ -343,10 +352,19 @@ WalkontableTable.prototype._doDraw = function () {
       }
 
       //TH
-      TD = TR.firstChild;
+      TH = TR.firstChild;
       for (c = 0; c < displayThs; c++) {
-        rowHeaders[c](source_r, TD); //actually TH
-        TD = TD.nextSibling; //http://jsperf.com/nextsibling-vs-indexed-childnodes
+
+        //If the number of row headers increased we need to replace TD with TH
+        if (TH.nodeName == 'TD') {
+          TD = TH;
+          TH = document.createElement('TH');
+          TR.insertBefore(TH, TD);
+          TR.removeChild(TD);
+        }
+
+        rowHeaders[c](source_r, TH); //actually TH
+        TH = TH.nextSibling; //http://jsperf.com/nextsibling-vs-indexed-childnodes
       }
 
       if (first) {
@@ -379,12 +397,18 @@ WalkontableTable.prototype._doDraw = function () {
         else {
           TD = TD.nextSibling; //http://jsperf.com/nextsibling-vs-indexed-childnodes
         }
+
+        //If the number of headers has been reduced, we need to replace excess TH with TD
+        if (TD.nodeName == 'TH') {
+          TH = TD;
+          TD = document.createElement('TD');
+          TR.insertBefore(TD, TH);
+          TR.removeChild(TH);
+        }
+
         TD.className = '';
         TD.removeAttribute('style');
         this.instance.getSetting('cellRenderer', source_r, source_c, TD);
-        if (this.hasEmptyCellProblem && TD.innerHTML === '') { //IE7
-          TD.innerHTML = '&nbsp;';
-        }
       }
 
       offsetRow = this.instance.getSetting('offsetRow'); //refresh the value
@@ -392,21 +416,28 @@ WalkontableTable.prototype._doDraw = function () {
       //after last column is rendered, check if last cell is fully displayed
       if (this.verticalRenderReverse && noPartial) {
         if (-this.wtDom.outerHeight(TR.firstChild) < this.rowStrategy.remainingSize) {
-            this.TBODY.removeChild(TR);
+          this.TBODY.removeChild(TR);
           this.instance.update('offsetRow', offsetRow + 1);
-            this.tbodyChildrenLength--;
-            this.rowFilter.readSettings(this.instance);
-            break;
+          this.tbodyChildrenLength--;
+          this.rowFilter.readSettings(this.instance);
+          break;
 
         }
         else {
-          this.rowStrategy.add(r, TD);
+          this.rowStrategy.add(r, TD, this.verticalRenderReverse);
         }
       }
       else {
-        this.rowStrategy.add(r, TD);
+        this.rowStrategy.add(r, TD, this.verticalRenderReverse);
 
         if (this.rowStrategy.isLastIncomplete()) {
+          if (this.verticalRenderReverse && !this.isRowInViewport(mustBeInViewport)) {
+            //we failed because one of the cells was by far too large. Recover by rendering from top
+            this.verticalRenderReverse = false;
+            this.instance.update('offsetRow', mustBeInViewport);
+            this.draw();
+            return;
+          }
           break;
         }
       }
@@ -503,37 +534,6 @@ WalkontableTable.prototype.refreshSelections = function (selectionsOnly) {
   }
 };
 
-/* this function is not used currently (was used in _doDraw)
- WalkontableTable.prototype.isCellVisible = function (r, c) {
- var out = 0;
-
- if (this.isRowInViewport(r)) {
- if (this.getLastVisibleRow() === c && this.rowStrategy.remainingSize > 0) {
- out |= FLAG_PARTIALLY_VISIBLE_VERTICAL;
- }
- else {
- out |= FLAG_VISIBLE_VERTICAL;
- }
- }
- else {
- out |= FLAG_NOT_VISIBLE_VERTICAL;
- }
-
- if (this.isColumnInViewport(c)) {
- if (this.getLastVisibleColumn() === c && this.columnStrategy.remainingSize > 0) {
- out |= FLAG_PARTIALLY_VISIBLE_HORIZONTAL;
- }
- else {
- out |= FLAG_VISIBLE_HORIZONTAL;
- }
- }
- else {
- out |= FLAG_NOT_VISIBLE_HORIZONTAL;
- }
-
- return out;
- };*/
-
 /**
  * getCell
  * @param {Array} coords
@@ -566,7 +566,7 @@ WalkontableTable.prototype.getCell = function (coords) {
 
 WalkontableTable.prototype.getCoords = function (TD) {
   return [
-    this.rowFilter.visibleToSource(this.wtDom.prevSiblings(TD.parentNode).length),
+    this.rowFilter.visibleToSource(this.wtDom.index(TD.parentNode)),
     this.columnFilter.visibleRowHeadedColumnToSourceColumn(TD.cellIndex)
   ];
 };

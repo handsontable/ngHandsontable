@@ -16,10 +16,7 @@ function HandsontableAutoColumnSize() {
       renderer: null,
       rendererTd: null,
       container: null,
-      containerStyle: null,
-      $container: null,
-      $noRenderer: null,
-      $renderer: null
+      containerStyle: null
     };
   };
 
@@ -57,10 +54,6 @@ function HandsontableAutoColumnSize() {
       tmp.container.appendChild(tmp.tbody);
       tmp.container.appendChild(tmp.noRenderer);
       tmp.container.appendChild(tmp.renderer);
-
-      tmp.$container = $(tmp.container);
-      tmp.$noRenderer = $(tmp.noRenderer);
-      tmp.$renderer = $(tmp.renderer);
 
       instance.rootElement[0].parentNode.appendChild(tmp.container);
     }
@@ -111,7 +104,7 @@ function HandsontableAutoColumnSize() {
 
     tmp.containerStyle.display = 'block';
 
-    var width = tmp.$container.outerWidth();
+    var width = instance.view.wt.wtDom.outerWidth(tmp.container);
 
     var cellProperties = instance.getCellMeta(0, col);
     if (cellProperties.renderer) {
@@ -121,7 +114,12 @@ function HandsontableAutoColumnSize() {
       var renderer = Handsontable.helper.getCellMethod('renderer', cellProperties.renderer);
       renderer(instance, tmp.rendererTd, 0, col, instance.colToProp(col), str, cellProperties);
 
-      width += tmp.$renderer.width() - tmp.$noRenderer.width(); //add renderer overhead to the calculated width
+      width += instance.view.wt.wtDom.outerWidth(tmp.renderer) - instance.view.wt.wtDom.outerWidth(tmp.noRenderer); //add renderer overhead to the calculated width
+    }
+
+    var maxWidth = instance.view.wt.wtViewport.getViewportWidth() - 2; //2 is some overhead for cell border
+    if (width > maxWidth) {
+      width = maxWidth;
     }
 
     tmp.containerStyle.display = 'none';
@@ -145,9 +143,17 @@ function HandsontableAutoColumnSize() {
       response.width = this.autoColumnWidths[col];
     }
   };
+
+  this.afterDestroy = function () {
+    instance = this;
+    if (instance.autoColumnSizeTmp.container) {
+      instance.autoColumnSizeTmp.container.parentNode.removeChild(instance.autoColumnSizeTmp.container);
+    }
+  };
 }
 var htAutoColumnSize = new HandsontableAutoColumnSize();
 
 Handsontable.PluginHooks.add('beforeInit', htAutoColumnSize.beforeInit);
 Handsontable.PluginHooks.add('beforeRender', htAutoColumnSize.determineColumnsWidth);
 Handsontable.PluginHooks.add('afterGetColWidth', htAutoColumnSize.getColWidth);
+Handsontable.PluginHooks.add('afterDestroy', htAutoColumnSize.afterDestroy);

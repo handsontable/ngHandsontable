@@ -15,181 +15,178 @@ describe('Core_selection', function () {
   it('should call onSelection callback', function () {
     var output = null;
 
-    runs(function () {
-      handsontable({
-        onSelection: function (r, c) {
-          output = [r, c];
-        }
-      });
-      selectCell(1, 2);
+    handsontable({
+      onSelection: function (r, c) {
+        output = [r, c];
+      }
     });
+    selectCell(1, 2);
 
-    waitsFor(function () {
-      return (output != null)
-    }, "onSelection callback called", 100);
-
-    runs(function () {
-      expect(output[0]).toEqual(1);
-      expect(output[1]).toEqual(2);
-    });
+    expect(output[0]).toEqual(1);
+    expect(output[1]).toEqual(2);
   });
 
   it('should trigger selection event', function () {
     var output = null;
 
-    runs(function () {
-      handsontable();
-      Handsontable.PluginHooks.add('onSelection', function (r, c) {
-        output = [r, c];
-      });
-      selectCell(1, 2);
+    handsontable();
+    Handsontable.PluginHooks.add('onSelection', function (r, c) {
+      output = [r, c];
     });
+    selectCell(1, 2);
 
-    waitsFor(function () {
-      return (output != null)
-    }, "selection event triggered", 100);
-
-    runs(function () {
-      expect(output[0]).toEqual(1);
-      expect(output[1]).toEqual(2);
-    });
+    expect(output[0]).toEqual(1);
+    expect(output[1]).toEqual(2);
   });
 
   it('this.rootElement should point to handsontable rootElement (onSelection)', function () {
     var output = null;
 
-    runs(function () {
-      handsontable({
-        onSelection: function () {
-          output = this.rootElement[0];
-        }
-      });
-      selectCell(0, 0);
+    handsontable({
+      onSelection: function () {
+        output = this.rootElement[0];
+      }
     });
+    selectCell(0, 0);
 
-    waitsFor(function () {
-      return (output != null)
-    }, "onSelection callback called", 100);
-
-    runs(function () {
-      expect(output).toEqual(this.$container[0]);
-    });
+    expect(output).toEqual(this.$container[0]);
   });
 
   it('this.rootElement should point to handsontable rootElement (onSelectionByProp)', function () {
     var output = null;
 
-    runs(function () {
       handsontable({
         onSelectionByProp: function () {
           output = this.rootElement[0];
         }
       });
       selectCell(0, 0);
-    });
 
-    waitsFor(function () {
-      return (output != null)
-    }, "onSelectionByProp callback called", 100);
-
-    runs(function () {
       expect(output).toEqual(this.$container[0]);
-    });
   });
 
   it('should focus external textarea when clicked during editing', function () {
     var textarea = $('<input type="text">').prependTo($('body'));
 
-    runs(function () {
-      handsontable();
-      selectCell(0, 0);
-    });
+    handsontable();
+    selectCell(0, 0);
 
-    waits(10);
+    keyDown('enter');
+    $("html").triggerHandler('mouseup');
+    textarea.focus();
 
-    runs(function () {
-      keyDown('enter');
-      $("html").triggerHandler('mouseup');
-      textarea.focus();
-    });
-
-    waits(10);
-
-    runs(function () {
-      expect(document.activeElement).toBe(textarea[0]);
-      textarea.remove();
-    });
+    expect(document.activeElement).toBe(textarea[0]);
+    textarea.remove();
   });
 
   it('should deselect currently selected cell', function () {
+    handsontable();
+    selectCell(0, 0);
 
-    runs(function () {
-      handsontable();
-      selectCell(0, 0);
-    });
+    $("html").triggerHandler('mousedown');
 
-    waits(10);
-
-    runs(function () {
-      $("html").triggerHandler('mousedown');
-    });
-
-    waits(10);
-
-    runs(function () {
-      expect(getSelected()).toBeUndefined();
-    });
-
+    expect(getSelected()).toBeUndefined();
   });
 
   it('should not deselect currently selected cell', function () {
-
-    runs(function () {
-      handsontable({
-        outsideClickDeselects: false
-      });
-      selectCell(0, 0);
+    handsontable({
+      outsideClickDeselects: false
     });
+    selectCell(0, 0);
 
-    waits(10);
+    $("html").triggerHandler('mousedown');
 
-    runs(function () {
-      $("html").triggerHandler('mousedown');
-    });
-
-    waits(10);
-
-    runs(function () {
-      expect(getSelected()).toEqual([0, 0, 0, 0]);
-    });
-
+    expect(getSelected()).toEqual([0, 0, 0, 0]);
   });
 
   it('should allow to focus on external input and hold current selection informations', function () {
     var textarea = $('<input id="test_textarea" type="text">').prependTo($('body'));
 
-    runs(function () {
-      handsontable({
-        outsideClickDeselects: false
-      });
-      selectCell(0, 0);
+    handsontable({
+      outsideClickDeselects: false
+    });
+    selectCell(0, 0);
+
+    textarea.trigger('mousedown');
+    textarea.focus();
+
+    expect(document.activeElement.id).toEqual('test_textarea');
+    expect(getSelected()).toEqual([0, 0, 0, 0]);
+    textarea.remove();
+  });
+
+  it('should allow to type in external input while holding current selection information', function () {
+    var textarea = $('<textarea id="test_textarea"></textarea>').prependTo($('body'));
+    var keyPressed, activeElementName;
+    handsontable({
+      outsideClickDeselects: false
+    });
+    selectCell(0, 0);
+
+    textarea.focus();
+    textarea.trigger('mousedown');
+    textarea.trigger('mouseup');
+    activeElementName = document.activeElement;
+
+    $(activeElementName).on('keydown', function(event){
+       keyPressed = event.keyCode;
     });
 
-    waits(10);
+    var LETTER_a_KEY = 97;
+    var event = $.Event('keydown');
+    event.keyCode = LETTER_a_KEY;
 
-    runs(function () {
-      textarea.trigger('mousedown');
-      textarea.focus();
+    $(document.activeElement).trigger(event);
+
+    expect(Handsontable.activeGuid).toBeNull();
+
+    //textarea should receive the event and be an active element
+    expect(keyPressed).toEqual(LETTER_a_KEY);
+    expect(activeElementName).toBe(document.getElementById('test_textarea'));
+
+    //should preserve selection, close editor and save changes
+    expect(getSelected()).toEqual([0, 0, 0, 0]);
+    expect(getDataAtCell(0, 0)).toBeNull();
+
+    textarea.remove();
+  });
+
+  it('should allow to type in external input after opening cell editor', function () {
+    var textarea = $('<textarea id="test_textarea"></textarea>').prependTo($('body'));
+    var keyPressed, activeElementName;
+    handsontable({
+      outsideClickDeselects: false
+    });
+    selectCell(0, 0);
+    keyDown('enter');
+    document.activeElement.value = 'Foo';
+
+    textarea.focus();
+    textarea.trigger('mousedown');
+    textarea.trigger('mouseup');
+    activeElementName = document.activeElement;
+
+    $(activeElementName).on('keydown', function(event){
+      keyPressed = event.keyCode;
     });
 
-    waits(10);
+    var LETTER_a_KEY = 97;
+    var event = $.Event('keydown');
+    event.keyCode = LETTER_a_KEY;
 
-    runs(function () {
-      expect(document.activeElement.id).toEqual('test_textarea');
-      expect(getSelected()).toEqual([0, 0, 0, 0]);
-      textarea.remove();
-    });
+    $(document.activeElement).trigger(event);
 
+    expect(Handsontable.activeGuid).toBeNull();
+
+    //textarea should receive the event and be an active element
+    expect(keyPressed).toEqual(LETTER_a_KEY);
+    expect(activeElementName).toBe(document.getElementById('test_textarea'));
+
+    //should preserve selection, close editor and save changes
+    expect(getSelected()).toEqual([0, 0, 0, 0]);
+    expect(getDataAtCell(0, 0)).toEqual('Foo');
+
+    textarea.remove();
   });
 
   it('should fix start range if provided is out of bounds (to the left)', function () {

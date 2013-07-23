@@ -55,5 +55,98 @@ describe('Core_updateSettings', function () {
 
   });
 
+  it('should update readOnly global setting', function(){
+    handsontable({
+      readOnly: true,
+      data : [['foo', 'bar']],
+      columns : [
+        { },
+        { }
+      ]
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(true);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(true);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(true);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(true);
+
+    updateSettings({
+      readOnly: false
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(false);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(false);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(false);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(false);
+  });
+
+  it('should update readOnly columns setting', function(){
+    handsontable({
+      data : [['foo', true]],
+      columns : [
+        { type : 'text',
+          readOnly: true
+        },
+        { type : 'checkbox' }
+      ]
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(true);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(true);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(false);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(false);
+
+    updateSettings({
+      columns: [
+        { type : 'text',
+          readOnly: false
+        },
+        { type : 'checkbox' }
+      ]
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(false);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(false);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(false);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(false);
+  });
+
+  it('should update readOnly columns setting and override global setting', function(){
+    handsontable({
+      readOnly: true,
+      data : [['foo', true]],
+      columns : [
+        { type : 'text'
+        },
+        { type : 'checkbox' }
+      ]
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(true);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(true);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(true);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(false);
+
+    updateSettings({
+      columns: [
+        { type : 'text',
+          readOnly: false
+        },
+        { type : 'checkbox' }
+      ]
+    });
+
+    expect(getCellMeta(0, 0).readOnly).toBe(false);
+    expect($(getCell(0, 0)).hasClass('htDimmed')).toBe(false);
+
+    expect(getCellMeta(0, 1).readOnly).toBe(true);
+    expect($(getCell(0, 1)).hasClass('htDimmed')).toBe(false);
+  });
+
 
 });

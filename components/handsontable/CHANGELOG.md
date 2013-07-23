@@ -1,3 +1,91 @@
+## [0.9.10](https://github.com/warpech/jquery-handsontable/tree/v0.9.10) (Jul 23, 2013)
+
+Features:
+- New option: `persistentState` ([docs](https://github.com/warpech/jquery-handsontable/wiki/Options)). Settings of manualColumnMove, manualColumnResize and columnSorting can be restored on page load using localStorage. See [Column resize](http://handsontable.com/demo/column_resize.html) and [Sorting](http://handsontable.com/demo/sorting.html) demos
+
+Bugfixes (sorting):
+- issues with create/update/delete operations on a sorted table ([#793](https://github.com/warpech/jquery-handsontable/issues/793), [#542](https://github.com/warpech/jquery-handsontable/issues/542), [#746](https://github.com/warpech/jquery-handsontable/issues/746))
+- added proper sorting for `date` column type ([#720](https://github.com/warpech/jquery-handsontable/issues/720))
+- sorting tables with spare rows that contain not empty cells  ([#857](https://github.com/warpech/jquery-handsontable/issues/857))
+
+Bugfixes (validation):
+- cell editors now work better with async cell validators
+- validator should add class name `htInvalid` to a cell without removing other classes
+
+Bugfixes (big cells):
+- remove maximum column width 200px limit ([#422](https://github.com/warpech/jquery-handsontable/issues/422))
+- refactor manualColumnResize plugin, now it works ok also with columns wider than viewport
+- refactor scrollViewport to correctly scroll to cells wider than viewport (should just cut the part that is not visible)
+- refactor scrollViewport to correctly scroll to cells higher than viewport (should just cut the part that is not visible)
+- cell editor could not handle long values correctly ([#393](https://github.com/warpech/jquery-handsontable/issues/393), [#441](https://github.com/warpech/jquery-handsontable/issues/441), [#804](https://github.com/warpech/jquery-handsontable/issues/804))
+- scrollbar handle size does not depend on row height anymore, which solves problem of jumpy scrollbar behavior for rows of variable height [SC#527](https://github.com/Starcounter/Starcounter/issues/527)
+- it should not be allowed to select fragments of Handsontable chrome (even if `fragmentSelection` set to true)
+- fix cell selection positioning for tables with `<caption>`
+
+Bugfixes (other):
+- removing rows from table with fixed rows ([#805](https://github.com/warpech/jquery-handsontable/issues/805))
+- issues with selecting inputs/textareas/selects outside of HOT ([#408](https://github.com/warpech/jquery-handsontable/issues/408))
+- fixed API methods `addHook`, `addHookOnce`, `removeHook`, `runHooks`, `runHooksAndReturn` to manipulate local hooks
+- fixed calling `beforeChange` and `afterChange` hooks multiple times while editing a single value in a column with synchronous validator ([#864](https://github.com/warpech/jquery-handsontable/issues/864))
+
+Performance:
+- replace jQuery `find` with `querySelector` where possible
+- replace jQuery `index` with `wtDom.index` where possible - up to 8x faster
+- replace jQuery `:visible` with `wtDom.isVisible` where possible
+
+Other:
+- updated Grunt packages
+- added livereload to `grunt watch` - works with Chrome LiveReload extension. See: https://github.com/gruntjs/grunt-contrib-watch
+- remove the deprecated `isWritable` cell property from code and demo; add it temporarily to `src/plugins/legacy.js` so it does not break your code (to be removed in 1.0 or sooner)
+- now all tests pass in IE8-10, FF, Ch, also with `grunt sauce`
+
+## [0.9.9](https://github.com/warpech/jquery-handsontable/tree/v0.9.9) (Jun 30, 2013)
+
+Bugfix:
+- version 0.9.8 contained a fatal typo in cut (CTRL+X) callback
+
+## [0.9.8](https://github.com/warpech/jquery-handsontable/tree/v0.9.8) (Jun 30, 2013)
+
+Bugfix:
+- copy/cut/paste did not work since last version ([#846](https://github.com/warpech/jquery-handsontable/issues/846))
+
+## [0.9.7](https://github.com/warpech/jquery-handsontable/tree/v0.9.7) (Jun 30, 2013)
+
+Features:
+- new option `fragmentSelection`, which unblocks free text selection within cells ([demo](http://handsontable.com/demo/options.html), [docs](https://github.com/warpech/jquery-handsontable/wiki/Options))
+
+Bugfixes:
+- `updateSettings` method did not take effect when updating `readOnly`, `columns`, `colHeaders`, `fixedColumnsLeft`, `fixedRowsTop` ([#824](https://github.com/warpech/jquery-handsontable/issues/824), [#715](https://github.com/warpech/jquery-handsontable/issues/715), [#524](https://github.com/warpech/jquery-handsontable/issues/524))
+- numeric cell type did not respect the `readOnly` setting
+- `demo/php.html` is now fixed (runs only when PHP is installed, does not work on handsontable.com)
+- mousewheel not working in IE8 ([#817](https://github.com/warpech/jquery-handsontable/issues/817))
+- HTML in cells and headers was escaped when it shouldn't be ([#845](https://github.com/warpech/jquery-handsontable/issues/845), [#815](https://github.com/warpech/jquery-handsontable/issues/815), [#821](https://github.com/warpech/jquery-handsontable/issues/821))
+- fixed issues with asynchronous validators
+
+Other:
+- all Handsontable event listeners now listen on document body. This was needed to make `fragmentSelection` feature
+- created the [Handsontable Google Group](https://groups.google.com/forum/#!forum/handsontable). Please use it for general questions - and keep GitHub Issues for bugfixes and feature requests
+
+Tests:
+- initial integration with Sauce Labs (`grunt sauce`). More info about testing coming soon in wiki
+- dropped support for IE7, which now has [below 1%](http://gs.statcounter.com/#browser_version_partially_combined-ww-monthly-201306-201306-bar) of the global market share. IE8 is safe for now
+
+## [0.9.6](https://github.com/warpech/jquery-handsontable/tree/v0.9.6) (Jun 18, 2013)
+
+Bugfixes:
+- `isEmptyRow` produced error `this.countCols is not a function` ([#632](https://github.com/warpech/jquery-handsontable/issues/632))
+- delete row extension does not show the button when grid is inside a `<table>` ([#764](https://github.com/warpech/jquery-handsontable/issues/764))
+- drag-down not working if Handsontable is inside a table ([#355](https://github.com/warpech/jquery-handsontable/issues/355), [#361](https://github.com/warpech/jquery-handsontable/issues/361), [#538](https://github.com/warpech/jquery-handsontable/issues/538), [#438](https://github.com/warpech/jquery-handsontable/issues/438), [#671](https://github.com/warpech/jquery-handsontable/issues/671), [#704](https://github.com/warpech/jquery-handsontable/issues/704)) - this makes me realize how many people still use tables to create a layout
+- numeric cell renderer did not add class name `htDimmed` to a read only cell
+
+Performance:
+- avoid jQuery and expensive DOM operations in several places
+
+Other:
+- add more test cases
+- upgrade jQuery contextMenu plugin to v1.6.5
+- upgrade jquery-mousewheel plugin to v3.1.3
+
 ## [0.9.5](https://github.com/warpech/jquery-handsontable/tree/v0.9.5) (Jun 15, 2013)
 
 Feature:

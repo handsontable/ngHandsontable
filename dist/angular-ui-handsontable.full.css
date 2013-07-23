@@ -1,18 +1,18 @@
 /**
  * angular-ui-handsontable 0.3.11
  * 
- * Date: Mon Jun 17 2013 00:27:03 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Jul 23 2013 17:13:48 GMT+0200 (Central European Daylight Time)
 */
 
 /**
- * Handsontable 0.9.5
+ * Handsontable 0.9.10
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Sat Jun 15 2013 14:04:49 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Jul 23 2013 15:18:14 GMT+0200 (Central European Daylight Time)
  */
 
 .handsontable {
@@ -38,6 +38,7 @@
 .handsontable table {
   border-collapse: separate; /*it must be separate, otherwise there are offset miscalculations in WebKit: http://stackoverflow.com/questions/2655987/border-collapse-differences-in-ff-and-webkit*/
   position: relative;
+  /*this actually only changes appearance of user selection - does not make text unselectable
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
@@ -76,6 +77,7 @@
   vertical-align: top;
   overflow: hidden;
   outline-width: 0;
+  white-space: pre-line; /* preserve new line character in cell */
 }
 
 .handsontable td.htInvalid {
@@ -166,18 +168,33 @@
 
 .handsontable .manualColumnResizer {
   position: absolute;
-  right: -1px;
   top: 0;
-  background-color: transparent;
-  width: 5px;
-  height: 25px;
-  z-index: 999;
   cursor: col-resize;
 }
 
-.handsontable th .manualColumnResizer:hover,
-.handsontable .manualColumnResizerLine .manualColumnResizer {
+.handsontable .manualColumnResizerHandle {
+  background-color: transparent;
+  width: 5px;
+  height: 25px;
+}
+
+.handsontable .manualColumnResizer:hover .manualColumnResizerHandle,
+.handsontable .manualColumnResizer.active .manualColumnResizerHandle {
   background-color: #AAB;
+}
+
+.handsontable .manualColumnResizerLine {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #AAB;
+  display: none;
+  width: 0;
+  border-right: 1px dashed #777;
+}
+
+.handsontable .manualColumnResizer.active .manualColumnResizerLine {
+  display: block;
 }
 
 .handsontable .columnSorting:hover {
@@ -376,7 +393,7 @@ ul.context-menu-list li {
 /*!
  * jQuery contextMenu - Plugin for simple contextMenu handling
  *
- * Version: 1.5.25
+ * Version: 1.6.5
  *
  * Authors: Rodney Rehm, Addy Osmani (patches for FF)
  * Web: http://medialize.github.com/jQuery-contextMenu/

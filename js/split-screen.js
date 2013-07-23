@@ -1,7 +1,7 @@
 /**
  * Below module declaration is used in ui.html
  */
-angular.module('uiApp', ['ui', 'uiHandsontable']);
+angular.module('uiApp', ['ui.select2', 'uiHandsontable']);
 angular.module('uiAppWithTabs', ['uiHandsontable', 'ui.bootstrap']);
 
 /**

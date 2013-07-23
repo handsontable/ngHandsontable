@@ -42,13 +42,13 @@
 
 <p>Address of the first person:</p>
 
-<input type="text" ng-model="items[0].address" style="width: 300px">
+<input type="text" ng-model="db.items[0].address" style="width: 300px">
 
 <p>Select favorite food of first person:</p>
 
-<select ui-select2 ng-model="items[0].Product.Description" data-placeholder="-- Select One --" style="width: 150px">
+<select ui-select2 ng-model="db.items[0].Product.Description" data-placeholder="-- Select One --" style="width: 150px">
   <option></option>
-  <option ng-repeat="option in items[0].Product.Options" value="{{option.Description}}">{{option.Description}}</option>
+  <option ng-repeat="option in db.items[0].Product.Options" value="{{option.Description}}">{{option.Description}}</option>
 </select>
 
 </body>

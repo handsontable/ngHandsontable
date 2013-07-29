@@ -36,13 +36,13 @@ module.exports = function (grunt) {
         src: [
           'src/ie-shim.js',
           'src/angular-ui-handsontable.js',
-          'components/handsontable/dist/jquery.handsontable.full.js'
+          'bower_components/handsontable/dist/jquery.handsontable.full.js'
         ],
         dest: 'dist/angular-ui-handsontable.full.js'
       },
       full_css: {
         src: [
-          'components/handsontable/dist/jquery.handsontable.full.css'
+          'bower_components/handsontable/dist/jquery.handsontable.full.css'
         ],
         dest: 'dist/angular-ui-handsontable.full.css'
       }
@@ -60,7 +60,7 @@ module.exports = function (grunt) {
       "dist/angular-ui-handsontable.full.min.css": ["dist/angular-ui-handsontable.full.css" ]
     },
     watch: {
-      files: ['src/**/*'],
+      files: ['src/**/*', 'bower_components/**/*'],
       tasks: ['concat', 'uglify', 'cssmin']
     }
   });

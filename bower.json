@@ -1,6 +1,6 @@
 {
   "name": "ng-datagrid",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "devDependencies": {
     "handsontable": "~0.9.11"
   },

@@ -41,7 +41,7 @@ angular.module('uiHandsontable', [])
   })
 
   .directive('uiHandsontable', function ($compile, $rootScope, getHandsontableSettings) {
-    var htOptions = ['data', 'width', 'height', 'rowHeaders', 'colHeaders', 'colWidths', 'columns', 'cells', 'dataSchema', 'contextMenu', 'onSelection', 'onSelectionByProp', 'onBeforeChange', 'onChange', 'onCopyLimit', 'startRows', 'startCols', 'minRows', 'minCols', 'maxRows', 'maxCols', 'minSpareRows', 'minSpareCols', 'multiSelect', 'fillHandle', 'undo', 'outsideClickDeselects', 'enterBeginsEditing', 'enterMoves', 'tabMoves', 'autoWrapRow', 'autoWrapCol', 'copyRowsLimit', 'copyColsLimit', 'currentRowClassName', 'currentColClassName', 'asyncRendering', 'stretchH', 'columnSorting', 'manualColumnMove', 'manualColumnResize'];
+    var htOptions = ["data", "width", "height", "startRows", "startCols", "minRows", "minCols", "maxRows", "maxCols", "minSpareRows", "minSpareCols", "multiSelect", "fillHandle", "fixedRowsTop", "fixedColumnsLeft", "undo", "outsideClickDeselects", "enterBeginsEditing", "enterMoves", "tabMoves", "autoWrapRow", "autoWrapCol", "copyRowsLimit", "copyColsLimit", "pasteMode", "currentRowClassName", "currentColClassName", "stretchH", "isEmptyRow", "isEmptyCol", "observeDOMVisibility", "allowInvalid", "invalidCellClassName", "fragmentSelection", "readOnly"];
 
     var scopeDef = {
       selectedIndex: '=selectedindex'

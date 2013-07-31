@@ -1,3 +1,7 @@
+## 0.3.15 (Jul 31, 2013)
+
+Fix a bug introduced in 0.3.14 (some of the options were not correct).
+
 ## 0.3.14 (Jul 31, 2013)
 
 Allow all Handsontable options introduced in few recent versions, e.g. `fragmentSelection` (see [Options](https://github.com/warpech/jquery-handsontable/wiki/Options))

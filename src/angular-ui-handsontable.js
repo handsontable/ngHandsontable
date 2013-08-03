@@ -178,9 +178,16 @@ angular.module('uiHandsontable', [])
           }
 
           if (uiDatagrid.settings.columns) {
-            var pattern = new RegExp("^(" + lhs + "\\.)");
+            var pattern = new RegExp("^(" + lhs + "\\.)"),
+              pattern2 = new RegExp("^" + lhs + "\\[(\\d+)\\]"),
+              match;
             for (i = 0, ilen = uiDatagrid.settings.columns.length; i < ilen; i++) {
-              uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
+              if(pattern2.test(uiDatagrid.settings.columns[i].value)){
+                match = uiDatagrid.settings.columns[i].value.match(pattern2);
+                uiDatagrid.settings.columns[i].data = parseInt(match[1]);
+              }else{
+                uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
+              }
 
               if (uiDatagrid.settings.columns[i].type === 'autocomplete') {
                 parseAutocomplete(scope, uiDatagrid.settings.columns[i], uiDatagrid);
@@ -244,9 +251,16 @@ angular.module('uiHandsontable', [])
                 }
 
                 if (key === 'columns') {
-                  var pattern = new RegExp("^(" + lhs + "\\.)");
+                  var pattern = new RegExp("^(" + lhs + "\\.)"),
+                    pattern2 = new RegExp("^" + lhs + "\\[(\\d+)\\]"),
+                    match;
                   for (var i = 0, ilen = newVal.length; i < ilen; i++) {
-                    newVal[i].data = newVal[i].value.replace(pattern, '');
+                    if(pattern2.test(newVal[i].value)){
+                      match = newVal[i].value;
+                      newVal[i].data = parseInt(match[1]); 
+                    }else{
+                      newVal[i].data = newVal[i].value.replace(pattern, '');
+                    }
 
                     if (newVal[i].type === 'autocomplete') {
                       parseAutocomplete(scope, newVal[i], uiDatagrid);

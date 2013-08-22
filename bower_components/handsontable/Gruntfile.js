@@ -88,7 +88,8 @@ module.exports = function (grunt) {
 
         'src/3rdparty/jquery.autoresize.js',
         'src/3rdparty/sheetclip.js',
-        'src/3rdparty/copypaste.js'
+        'src/3rdparty/copypaste.js',
+        'src/3rdparty/json-patch-duplex.js'
       ],
       walkontable: [
         'src/3rdparty/walkontable/src/*.js',
@@ -110,10 +111,10 @@ module.exports = function (grunt) {
       dist: {
         files: {
           'dist/jquery.handsontable.js': [
-            '<%= meta.shims %>',
             'tmp/intro.js',
             '<%= meta.src %>',
             '<%= meta.walkontable %>',
+            '<%= meta.shims %>',
             'src/outro.js'
           ]
         }
@@ -202,6 +203,7 @@ module.exports = function (grunt) {
           'demo/js/backbone/lodash.underscore.js',
           'demo/js/backbone/backbone.js',
           'demo/js/backbone/backbone-relational/backbone-relational.js',
+          'lib/jquery-ui/js/jquery-ui.custom.js',
           'extensions/jquery.handsontable.removeRow.js'
         ],
         options: {
@@ -213,6 +215,7 @@ module.exports = function (grunt) {
             'test/jasmine/css/SpecRunner.css',
             'dist/jquery.handsontable.css',
             'lib/jQuery-contextMenu/jquery.contextMenu.css',
+            'lib/jquery-ui/css/ui-bootstrap/jquery-ui.custom.css',
             'extensions/jquery.handsontable.removeRow.css'
           ],
           vendor: [

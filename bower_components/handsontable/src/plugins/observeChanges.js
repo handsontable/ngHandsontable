@@ -1,283 +1,185 @@
-function HandsontableObserveChanges() {
-  // begin shim code
-  // fragments from https://github.com/Starcounter-Jack/JSON-Patch/blob/master/src/json-patch-duplex.js
-  //
-  // json-patch.js 0.3
-  // (c) 2013 Joachim Wester
-  // MIT license
-  var observeOps = {
-    'new': function (patches, path) {
-      var patch = {
-        op: "add",
-        path: path + "/" + this.name,
-        value: this.object[this.name]
-      };
-      patches.push(patch);
-    },
-    deleted: function (patches, path) {
-      var patch = {
-        op: "remove",
-        path: path + "/" + this.name
-      };
-      patches.push(patch);
-    },
-    updated: function (patches, path) {
-      var patch = {
-        op: "replace",
-        path: path + "/" + this.name,
-        value: this.object[this.name]
-      };
-      patches.push(patch);
-    }
-  };
+(function HandsontableObserveChanges() {
 
-  function markPaths(observer, node) {
-    for (var key in node) {
-      if (node.hasOwnProperty(key)) {
-        var kid = node[key];
-        if (kid instanceof Object) {
-          Object.unobserve(kid, observer);
-          kid.____Path = node.____Path + "/" + key;
-          markPaths(observer, kid);
-        }
-      }
+  Handsontable.PluginHooks.add('afterLoadData', init);
+  Handsontable.PluginHooks.add('afterUpdateSettings', init);
+
+  function init() {
+    var instance = this;
+    var pluginEnabled = instance.getSettings().observeChanges;
+
+    if (!instance.observer && pluginEnabled) {
+      createObserver.call(instance);
+      bindEvents.call(instance);
+
+    } else if (!pluginEnabled){
+      destroy.call(instance);
     }
   }
 
-  function clearPaths(observer, node) {
-    delete node.____Path;
-    Object.observe(node, observer);
-    for (var i = 0, nodeLen = node.length; i < nodeLen; i++) {
-      var kid = node[i];
-      if (kid instanceof Object) {
-        clearPaths(observer, kid);
+  function createObserver(){
+    var instance = this;
+
+    instance.observeChangesActive = true;
+
+    instance.pauseObservingChanges = function(){
+      instance.observeChangesActive = false;
+    };
+
+    instance.resumeObservingChanges = function(){
+      instance.observeChangesActive = true;
+    };
+
+    instance.observer = jsonpatch.observe(instance.getData(), function (patches) {
+      if(instance.observeChangesActive){
+        runHookForOperation.call(instance, patches);
+        instance.render();
       }
-    }
+
+      instance.runHooks('afterChangesObserved');
+    });
   }
 
-  var beforeDict = [];
-  var callbacks = [];
+  function runHookForOperation(rawPatches){
+    var instance = this;
+    var patches = cleanPatches(rawPatches);
 
-  function observe(obj, callback) {
-    var patches = [];
-    var root = obj;
-    if (Object.observe) {
-      var observer = function (arr) {
-        if (!root.___Path) {
-          Object.unobserve(root, observer);
-          root.____Path = "";
-          markPaths(observer, root);
+    for(var i = 0, len = patches.length; i < len; i++){
+      var patch = patches[i];
+      var parsedPath = parsePath(patch.path);
 
-          for (var index = 0, arrLen = arr.length; i < arrLen; i++) {
-            var elem = arr[index];
 
-            if (elem.name != "____Path") {
-              observeOps[elem.type].call(elem, patches, elem.object.____Path);
-            }
+      switch(patch.op){
+        case 'add':
+          if(isNaN(parsedPath.col)){
+            instance.runHooks('afterCreateRow', parsedPath.row);
+          } else {
+            instance.runHooks('afterCreateCol', parsedPath.col);
           }
-
-          clearPaths(observer, root);
-        }
-        if (callback) {
-          callback.call(patches);
-        }
-      };
-    } else {
-      observer = {
-      };
-      var mirror;
-      for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-        if (beforeDict[i].obj === obj) {
-          mirror = beforeDict[i];
           break;
-        }
-      }
-      if (!mirror) {
-        mirror = {
-          obj: obj
-        };
-        beforeDict.push(mirror);
-      }
 
-      mirror.value = deepCopy(obj);
-
-      if (callback) {
-        callbacks.push(callback);
-        var next;
-        var intervals = [
-          100
-        ];
-        var currentInterval = 0;
-        var dirtyCheck = function () {
-          var temp = generate(observer);
-          if (temp.length > 0) {
-            observer.patches = [];
-            callback.call(null, temp);
+        case 'remove':
+          if(isNaN(parsedPath.col)){
+            instance.runHooks('afterRemoveRow', parsedPath.row, 1);
+          } else {
+            instance.runHooks('afterRemoveCol', parsedPath.col, 1);
           }
-        };
-        var fastCheck = function () {
-          clearTimeout(next);
-          next = setTimeout(function () {
-            dirtyCheck();
-            currentInterval = 0;
-            next = setTimeout(slowCheck, intervals[currentInterval++]);
-          }, 0);
-        };
-        var slowCheck = function () {
-          dirtyCheck();
-          if (currentInterval == intervals.length) {
-            currentInterval = intervals.length - 1;
-          }
-          next = setTimeout(slowCheck, intervals[currentInterval++]);
-        };
-
-        if (window.addEventListener) {
-          window.addEventListener('mousedown', fastCheck);
-          window.addEventListener('mouseup', fastCheck);
-          window.addEventListener('keydown', fastCheck);
-        } else {
-          //IE8 has different syntax
-          window.attachEvent('onmousedown', fastCheck);
-          window.attachEvent('onmouseup', fastCheck);
-          window.attachEvent('onkeydown', fastCheck);
-        }
-
-        next = setTimeout(slowCheck, intervals[currentInterval++]);
-      }
-    }
-    observer.patches = patches;
-    observer.object = obj;
-    return _observe(observer, obj, patches);
-  }
-
-  /// Listen to changes on an object tree, accumulate patches
-  function _observe(observer, obj, patches) {
-    if (Object.observe) {
-      Object.observe(obj, observer);
-    }
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        var v = obj[key];
-        if (v && typeof (v) === "object") {
-          _observe(observer, v, patches);
-        }
-      }
-    }
-    return observer;
-  }
-
-  function generate(observer) {
-    if (Object.observe) {
-      Object.deliverChangeRecords(observer);
-    } else {
-      var mirror;
-      for (var i = 0, ilen = beforeDict.length; i < ilen; i++) {
-        if (beforeDict[i].obj === observer.object) {
-          mirror = beforeDict[i];
           break;
-        }
-      }
-      _generate(mirror.value, observer.object, observer.patches, "");
-    }
-    return observer.patches;
-  }
 
-  function _generate(mirror, obj, patches, path) {
-    var newKeys = []
-      , oldKeys = []
-      , key;
-
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        newKeys.push(key);
+        case 'replace':
+          instance.runHooks('afterChange', [parsedPath.row, parsedPath.col, null, patch.value], 'external');
+          break;
       }
     }
 
-    for (key in mirror) {
-      if (mirror.hasOwnProperty(key)) {
-        oldKeys.push(key);
-      }
+    function cleanPatches(rawPatches){
+      var patches;
+
+      patches = removeLengthRelatedPatches(rawPatches);
+      patches = removeMultipleAddOrRemoveColPatches(patches);
+
+      return patches;
     }
 
-    var changed = false;
-    var deleted = false;
-    var t;
-    for (t = 0; t < oldKeys.length; t++) {
-      key = oldKeys[t];
-      var oldVal = mirror[key];
-      if (obj.hasOwnProperty(key)) {
-        var newVal = obj[key];
-        if (oldVal instanceof Object) {
-          _generate(oldVal, newVal, patches, path + "/" + key);
-        } else {
-          if (oldVal != newVal) {
-            changed = true;
-            patches.push({
-              op: "replace",
-              path: path + "/" + key,
-              value: newVal
-            });
-            mirror[key] = newVal;
+    /**
+     * Removing or adding column will produce one patch for each table row.
+     * This function leaves only one patch for each column add/remove operation
+     */
+    function removeMultipleAddOrRemoveColPatches(rawPatches){
+      var newOrRemovedColumns = [];
+
+      return rawPatches.filter(function(patch){
+        var parsedPath = parsePath(patch.path);
+
+        if(['add', 'remove'].indexOf(patch.op) != -1 && !isNaN(parsedPath.col)){
+          if(newOrRemovedColumns.indexOf(parsedPath.col) != -1){
+            return false;
+          } else {
+            newOrRemovedColumns.push(parsedPath.col);
           }
         }
-      } else {
-        patches.push({
-          op: "remove",
-          path: path + "/" + key
-        });
-        deleted = true;
-      }
-    }
-    if (!deleted && newKeys.length == oldKeys.length) {
-      return;
-    }
-    for (t = 0; t < newKeys.length; t++) {
-      key = newKeys[t];
-      if (!mirror.hasOwnProperty(key)) {
-        patches.push({
-          op: "add",
-          path: path + "/" + key,
-          value: obj[key]
-        });
-      }
-    }
-  }
 
-  //end shim code
-
-
-  this.afterLoadData = function () {
-    if (!this.observer && this.getSettings().observeChanges) {
-      var that = this;
-      this.observer = observe(this.getData(), function () {
-        that.render();
+        return true;
       });
-    }
-  };
 
-  /*
-   Description: Performs JSON-safe deep cloning. Equivalent of JSON.parse(JSON.stringify()).
-   Based on deepClone7() by Kyle Simpson (https://github.com/getify)
-   Source: http://jsperf.com/deep-cloning-of-objects,
-   http://jsperf.com/structured-clone-objects/2
-   https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/The_structured_clone_algorithm
-   */
-
-  function deepCopy(objToBeCopied) {
-    if (objToBeCopied === null || !(objToBeCopied instanceof Object)) {
-      return objToBeCopied;
     }
-    var copiedObj, fConstr = objToBeCopied.constructor;
-    copiedObj = new fConstr();
-    for (var sProp in objToBeCopied) {
-      if (objToBeCopied.hasOwnProperty(sProp)) {
-        copiedObj[sProp] = deepCopy(objToBeCopied[sProp]);
+
+    /**
+     * If observeChanges uses native Object.observe method, then it produces patches for length property.
+     * This function removes them.
+     */
+    function removeLengthRelatedPatches(rawPatches){
+      return rawPatches.filter(function(patch){
+        return !/[/]length/ig.test(patch.path);
+      })
+    }
+
+    function parsePath(path){
+      var match = path.match(/^\/(\d)\/?(\d)?$/);
+
+      return {
+        row: parseInt(match[1], 10),
+        col: parseInt(match[2], 10)
       }
     }
-    return copiedObj;
   }
 
-}
-var htObserveChanges = new HandsontableObserveChanges();
+  function destroy(){
+    var instance = this;
 
-Handsontable.PluginHooks.add('afterLoadData', htObserveChanges.afterLoadData);
+    if (instance.observer){
+      destroyObserver.call(instance);
+      unbindEvents.call(instance);
+    }
+  }
+
+  function destroyObserver(){
+    var instance = this;
+
+    jsonpatch.unobserve(instance.getData(), instance.observer);
+    delete instance.observeChangesActive;
+    delete instance.pauseObservingChanges;
+    delete instance.resumeObservingChanges;
+  }
+
+  function bindEvents(){
+    var instance = this;
+    instance.addHook('afterDestroy', destroy);
+
+    instance.addHook('afterCreateRow', afterTableAlter);
+    instance.addHook('afterRemoveRow', afterTableAlter);
+
+    instance.addHook('afterCreateCol', afterTableAlter);
+    instance.addHook('afterRemoveCol', afterTableAlter);
+
+    instance.addHook('afterChange', function(changes, source){
+      if(source != 'loadData'){
+        afterTableAlter.call(this);
+      }
+    });
+  }
+
+  function unbindEvents(){
+    var instance = this;
+    instance.removeHook('afterDestroy', destroy);
+
+    instance.removeHook('afterCreateRow', afterTableAlter);
+    instance.removeHook('afterRemoveRow', afterTableAlter);
+
+    instance.removeHook('afterCreateCol', afterTableAlter);
+    instance.removeHook('afterRemoveCol', afterTableAlter);
+
+    instance.removeHook('afterChange', afterTableAlter);
+  }
+
+  function afterTableAlter(){
+    var instance = this;
+
+    instance.pauseObservingChanges();
+
+    instance.addHookOnce('afterChangesObserved', function(){
+      instance.resumeObservingChanges();
+    });
+
+  }
+})();
+

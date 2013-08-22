@@ -5,8 +5,13 @@ function HandsontableDateEditorClass(instance) {
 
   this.isCellEdited = false;
   this.instance = instance;
+  var that = this;
   this.createElements();
   this.bindEvents();
+
+  this.instance.addHook('afterDestroy', function(){
+    that.destroyElements();
+  })
 }
 
 Handsontable.helper.inherit(HandsontableDateEditorClass, HandsontableTextEditorClass);
@@ -18,12 +23,13 @@ HandsontableDateEditorClass.prototype.createElements = function () {
   HandsontableTextEditorClass.prototype.createElements.call(this);
 
   this.datePicker = document.createElement('DIV');
+  this.instance.view.wt.wtDom.addClass(this.datePicker, 'htDatepickerHolder');
   this.datePickerStyle = this.datePicker.style;
   this.datePickerStyle.position = 'absolute';
   this.datePickerStyle.top = 0;
   this.datePickerStyle.left = 0;
   this.datePickerStyle.zIndex = 99;
-  this.instance.rootElement[0].appendChild(this.datePicker);
+  document.body.appendChild(this.datePicker);
   this.$datePicker = $(this.datePicker);
 
   var that = this;
@@ -38,7 +44,20 @@ HandsontableDateEditorClass.prototype.createElements = function () {
     }
   };
   this.$datePicker.datepicker(defaultOptions);
+
+  /**
+   * Prevent recognizing clicking on jQuery Datepicker as clicking outside of table
+   */
+  this.$datePicker.on('mousedown', function(event){
+    event.stopPropagation();
+  });
+
   this.hideDatepicker();
+};
+
+HandsontableDateEditorClass.prototype.destroyElements = function(){
+  this.$datePicker.datepicker('destroy');
+  this.$datePicker.remove();
 };
 
 /**
@@ -59,9 +78,9 @@ HandsontableDateEditorClass.prototype.finishEditing = function (isCancelled, ctr
 
 HandsontableDateEditorClass.prototype.showDatepicker = function () {
   var $td = $(this.instance.dateEditor.TD);
-  var position = $td.position();
-  this.datePickerStyle.top = (position.top + $td.height()) + 'px';
-  this.datePickerStyle.left = position.left + 'px';
+  var offset = $td.offset();
+  this.datePickerStyle.top = (offset.top + $td.height()) + 'px';
+  this.datePickerStyle.left = offset.left + 'px';
 
   var dateOptions = {
     defaultDate: this.originalValue || void 0

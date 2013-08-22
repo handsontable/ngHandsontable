@@ -23,13 +23,19 @@
   top: 0;
 }
 
-.handsontable * {
+.handsontable table,
+.handsontable tbody,
+.handsontable thead,
+.handsontable td,
+.handsontable th,
+.handsontable div
+{
   box-sizing: content-box;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
 }
 
-.handsontable table {
+.handsontable table.htCore {
   border-collapse: separate; /*it must be separate, otherwise there are offset miscalculations in WebKit: http://stackoverflow.com/questions/2655987/border-collapse-differences-in-ff-and-webkit*/
   position: relative;
   /*this actually only changes appearance of user selection - does not make text unselectable

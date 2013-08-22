@@ -18,23 +18,37 @@ describe('Core_view', function () {
     });
     selectCell(0, 0);
 
+    expect(document.activeElement.nodeName).toBe('BODY');
+
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
+
+    expect(getSelected()).toEqual([4, 0, 4, 0]);
+
     keyDown('enter');
 
     expect(isEditorVisible()).toEqual(true);
   });
 
   it('should scroll viewport when partially visible cell is clicked', function () {
+
     handsontable({
-      data: createSpreadsheetData(10, 3)
+      data: createSpreadsheetData(10, 3),
+      height: 60
     });
 
+    expect(this.$container.height()).toEqual(60);
+    expect(this.$container.find('.wtHider').height()).toEqual(60);
+
+    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
+    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
     expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A2");
 
     this.$container.find('tr:eq(2) td:eq(0)').trigger('mousedown');
+    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A1"); //test whether it scrolled
+    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A2"); //test whether it scrolled
     expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A3"); //test whether it scrolled
     expect(getSelected()).toEqual([2, 0, 2, 0]); //test whether it is selected
   });
@@ -70,14 +84,11 @@ describe('Core_view', function () {
 
   it('should enable to change fixedRowsTop with updateSettings', function () {
 
-    spec().$container.css({
-      width: '200px',
-      height: '100px'
-    });
-
     var HOT = handsontable({
       data: createSpreadsheetData(10, 9),
-      fixedRowsTop: 1
+      fixedRowsTop: 1,
+      width: 200,
+      height: 100
     });
 
     selectCell(0, 0);
@@ -140,7 +151,6 @@ describe('Core_view', function () {
     expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A2");
 
   });
-
 
   it('should enable to change fixedColumnsLeft with updateSettings', function () {
 
@@ -289,6 +299,42 @@ describe('Core_view', function () {
     });
 
     expect(this.$container.find('.wtHider').width()).toEqual(107); //rootElement is full width but this should do the trick
+  });
+
+  it("should fire beforeRender event after table has been scrolled", function () {
+
+    var hot = handsontable({
+      data: createSpreadsheetData(20, 3)
+    });
+
+    var beforeRenderCallback = jasmine.createSpy('beforeRenderCallback');
+
+    hot.addHook('beforeRender', beforeRenderCallback);
+
+    $(hot.view.wt.wtTable.TABLE).trigger('mousewheel', [0, 0, -1]);
+
+    waitsFor(function(){
+      return beforeRenderCallback.calls.length > 0;
+    }, 'beforeRender event to fire', 1000);
+
+  });
+
+  it("should fire afterRender event after table has been scrolled", function () {
+
+    var hot = handsontable({
+      data: createSpreadsheetData(20, 3)
+    });
+
+    var afterRenderCallback = jasmine.createSpy('afterRenderCallback');
+
+    hot.addHook('afterRender', afterRenderCallback);
+
+    $(hot.view.wt.wtTable.TABLE).trigger('mousewheel', [0, 0, -1]);
+
+    waitsFor(function(){
+      return afterRenderCallback.calls.length > 0;
+    }, 'afterRender event to fire', 1000);
+
   });
 
   describe('maximumVisibleElementWidth', function () {

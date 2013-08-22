@@ -1,3 +1,56 @@
+## [0.9.14](https://github.com/warpech/jquery-handsontable/tree/v0.9.13) (Aug 20, 2013)
+
+Bugfixes:
+
+- fixed selecting date using jQuery UI Datepicker ([#970](https://github.com/warpech/jquery-handsontable/issues/970))
+- fixed opening cell editor after clearing cell data with Delete or Backspace ([#975](https://github.com/warpech/jquery-handsontable/issues/975))
+
+
+## [0.9.13](https://github.com/warpech/jquery-handsontable/tree/v0.9.13) (Aug 16, 2013)
+
+Features:
+- removed the need to declare `.handsontable .htCore td` in user CSS. Now `.handsontable td` works ok ([#965](https://github.com/warpech/jquery-handsontable/issues/965), [#956](https://github.com/warpech/jquery-handsontable/issues/956))
+
+Bugfixes:
+- cellProperties were not refreshed after removing a row ([#959](https://github.com/warpech/jquery-handsontable/issues/959))
+- manual column resize handles were misplaced when table changes width ([#949](https://github.com/warpech/jquery-handsontable/issues/949))
+- when no cells have focus CTRL+V pastes into all cells up to last cell to have focus ([#946](https://github.com/warpech/jquery-handsontable/issues/946))
+- afterColumnResize callback can be called with an incorrect size, or undefined ([#945](https://github.com/warpech/jquery-handsontable/issues/945))
+- can't start cell editing while holding SHIFT ([#944](https://github.com/warpech/jquery-handsontable/issues/944))
+- autocomplete text editor was throwing afterChange event twice ([#939](https://github.com/warpech/jquery-handsontable/issues/939))
+- fixed inserting and removing rows when columnSorting is enabled, but table hasn't been sorted yet ([#915](https://github.com/warpech/jquery-handsontable/issues/915))
+- toggling checkbox state using spacebar did not update the data source and trigger afterChange event ([#895](https://github.com/warpech/jquery-handsontable/issues/895))
+- context menu functions did not work properly when the cell selection was performed upwards or leftwards  ([#674](https://github.com/warpech/jquery-handsontable/issues/674))
+- `observeChanges` should register only external changes, not changes made with Handsontable (which led to plugin hooks triggered twice)
+- ~~error adding row when column sorting is in effect ([#858](https://github.com/warpech/jquery-handsontable/issues/858))~~ - still not fixed. We will address it with high priority
+- Opening autocomplete list, hovering over a list item and then clicking outside of the table will close the editor and won't change cell value ([#638](https://github.com/warpech/jquery-handsontable/issues/638))
+
+## [0.9.12](https://github.com/warpech/jquery-handsontable/tree/v0.9.12) (Aug 7, 2013)
+
+Features:
+
+- closing cell editors when table is being scrolled ([#914](https://github.com/warpech/jquery-handsontable/issues/914))
+- added `sort()` method to programmatically sort table
+- plugin `contextMenu` can now be enabled or disabled using `updateSettings()` method
+- extension `removeRow` can now be enabled or disabled using `updateSettings()` method ([#934](https://github.com/warpech/jquery-handsontable/issues/934))
+- plugin `observeChanges` can now be enabled or disabled using `updateSettings()` method
+- plugin `autoColumnSize` can now be enabled or disabled using `updateSettings()` method
+- 2 new events: `beforColumnSort` and `afterColumnSort` fired before and after table sort
+
+Bugfixes:
+
+- fixed incorrect width of horizontal scrollbar when scrolled to rightmost column ([#909](https://github.com/warpech/jquery-handsontable/issues/909))
+- fix ability to check/uncheck checkboxes using spacebar ([#895](https://github.com/warpech/jquery-handsontable/issues/895))
+- added more specific selectors in CSS, so that jQuery UI styles and default HandsonTable styles does not interfere ([#498](https://github.com/warpech/jquery-handsontable/issues/498))
+- fixed moving table column, when table is scrolled horizontally ([#527](https://github.com/warpech/jquery-handsontable/issues/527))
+- `afterRender` event is now fired after every table scroll ([#733](https://github.com/warpech/jquery-handsontable/issues/733))
+- fixed inserting and removing rows form sorted table ([#915](https://github.com/warpech/jquery-handsontable/issues/915))
+- added proper mapping of cell properties when table is sorted ([#917](https://github.com/warpech/jquery-handsontable/issues/917))
+- fixed IE `Array.filter()` shim ([#934](https://github.com/warpech/jquery-handsontable/issues/934))
+- fixed tests, so that they all pass on Sauce Labs servers
+- fixed support for legacy syntax in cells method `return {type: {renderer: function(){ /*...*/ }}`
+- autoColumnSize plugin no longer tests column width using number '9999999999' (now it takes first value from data source)
+
 ## [0.9.11](https://github.com/warpech/jquery-handsontable/tree/v0.9.11) (Jul 29, 2013)
 
 This version fixes some severe cell listener issues introduced in the last version.

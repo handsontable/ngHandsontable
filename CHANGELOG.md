@@ -1,3 +1,7 @@
+## 0.3.16 (Aug 22, 2013)
+
+Upgrade Handsontable to 0.9.14 (see [changelog](https://github.com/warpech/jquery-handsontable/blob/master/CHANGELOG.md))
+
 ## 0.3.15 (Jul 31, 2013)
 
 Fix a bug introduced in 0.3.14 (some of the options were not correct).

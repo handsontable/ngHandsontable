@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Sep 17 2013 13:30:26 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Sep 17 2013 13:58:44 GMT+0200 (Central European Daylight Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -10228,7 +10228,7 @@ WalkontableTable.prototype._doDraw = function () {
     var first = true;
 
     while (source_r < totalRows && source_r >= 0) {
-      if (r > 100) {
+      if (r > 1000) {
         throw new Error('Security brake: Too much TRs. Please define height for your table, which will enforce scrollbars.');
       }
 

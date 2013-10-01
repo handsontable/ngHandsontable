@@ -1,4 +1,11 @@
 /**
+ * DOM helper optimized for maximum performance
+ * It is recommended for Handsontable plugins and renderers, because it is much faster than jQuery
+ * @type {WalkonableDom}
+ */
+Handsontable.Dom = new WalkontableDom();
+
+/**
  * Returns true if keyCode represents a printable character
  * @param {Number} keyCode
  * @return {Boolean}
@@ -223,4 +230,14 @@ Handsontable.helper.isOutsideInput = function (element) {
   var inputs = ['INPUT', 'SELECT', 'TEXTAREA'];
 
   return inputs.indexOf(element.nodeName) > -1 && element.className.indexOf('handsontableInput') == -1;
+};
+
+/**
+ * Determines whether given object is an Array.
+ * Note: String is not an Array
+ * @param {*} obj
+ * @returns {boolean}
+ */
+Handsontable.helper.isArray = function(obj){
+  return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) == '[object Array]';
 };

@@ -1,6 +1,6 @@
 {
   "name": "handsontable",
-  "version": "0.9.14",
+  "version": "0.9.19",
   "main": [
     "./dist/jquery.handsontable.full.js",
     "./dist/jquery.handsontable.full.css"
@@ -14,11 +14,11 @@
     "jquery": ">=1.9.0"
   },
   "homepage": "https://github.com/warpech/jquery-handsontable",
-  "_release": "0.9.14",
+  "_release": "0.9.19",
   "_resolution": {
     "type": "version",
-    "tag": "0.9.14",
-    "commit": "9d35c3592b4771539291fb58d7e0d1e37d91d6cf"
+    "tag": "v0.9.19",
+    "commit": "8cbf89d305fc5caa5116c0c851ca195f35953b12"
   },
   "_source": "git://github.com/warpech/jquery-handsontable.git",
   "_target": "~0.9.11",

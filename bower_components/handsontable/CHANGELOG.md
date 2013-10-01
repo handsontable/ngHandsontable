@@ -1,10 +1,67 @@
-## [0.9.14](https://github.com/warpech/jquery-handsontable/tree/v0.9.13) (Aug 20, 2013)
+## [0.9.19](https://github.com/warpech/jquery-handsontable/tree/v0.9.19) (Oct 01, 2013)
+
+Two features that come in handy for plugin developers:
+- new plugin hook: `afterRenderer`
+- (previously private) DOM helpers are now exposed as `Handosontable.Dom` (see [api](https://github.com/warpech/jquery-handsontable/blob/master/src/3rdparty/walkontable/src/dom.js))
+
+## [0.9.18](https://github.com/warpech/jquery-handsontable/tree/v0.9.18) (Sep 19, 2013)
+
+Features:
+- native browser scrollbars feature becomes usable, but currently only works vertically ([demo](http://handsontable.com/demo/scroll_native.html))
+
+Bugfixes:
+- it was possible to move a column by just double clicking on move handle ([#963](https://github.com/warpech/jquery-handsontable/issues/963))
+- can't edit a cell that is outside of the viewport ([#1035](https://github.com/warpech/jquery-handsontable/issues/1035))
+- context-menu-layer was not removed from DOM after $.contextMenu destroy
+- cleanup CSS from excessive vendor prefixes
+- performance improvement of scrolling with autoColumnSize
+
+## [0.9.17](https://github.com/warpech/jquery-handsontable/tree/v0.9.17) (Sep 5, 2013)
+
+Features:
+- `beforeRemoveRow` and `beforeRemoveCol` events are now invoked with absolute index
+- if table has custom column headers, removing column will also remove the corresponding header
+
+Bugfix:
+
+- fixed crashing the whole page when autocomplete is on ([#1011](https://github.com/warpech/jquery-handsontable/issues/1011))
+- fixed changing multiple cells values when using autocomplete ([#1021](https://github.com/warpech/jquery-handsontable/issues/1021))
+- fixed handling multiple tables with different sorting options on the same page ([#1020](https://github.com/warpech/jquery-handsontable/issues/1020))
+- fixed undoing row removal from tables which data source is array of objects ([#966](https://github.com/warpech/jquery-handsontable/issues/966))
+- fixed undoing column removal
+- fixed removing columns form table which has more rows than can be rendered in viewport ([#1012](https://github.com/warpech/jquery-handsontable/issues/1012))
+- fixed marking Undo/Redo in context menu as enabled/disabled
+- fixed adding new rows directly to data source, when table is sorted ([#858](https://github.com/warpech/jquery-handsontable/issues/858))
+
+## [0.9.16](https://github.com/warpech/jquery-handsontable/tree/v0.9.16) (Aug 27, 2013)
+
+Features:
+
+- New cell type: `password`
+- Rebuilt UndoRedo module
+
+Bugfix:
+
+- fixed using manualColumnMove with multiple HOT instances  ([#999](https://github.com/warpech/jquery-handsontable/issues/999))
+- fixed autoWrapCol and autoWrapRow behaviour ([#992](https://github.com/warpech/jquery-handsontable/issues/992))
+- autocomplete fields will now behave the same as regular fields after closing editor by clicking on another cell (if in non strict mode)  ([#991](https://github.com/warpech/jquery-handsontable/issues/991))
+- fixed validation after changing column order ([#980](https://github.com/warpech/jquery-handsontable/issues/980))
+
+## [0.9.15](https://github.com/warpech/jquery-handsontable/tree/v0.9.15) (Aug 26, 2013)
+
+Features:
+- `colWidths` property of the constructor may now be of type: number, string, array, function (was only array) ([#947](https://github.com/warpech/jquery-handsontable/issues/947), [#997](https://github.com/warpech/jquery-handsontable/issues/997))
+- `widths` property of `columns` or `cells` option may now be of type: number, string (was only number)
+
+Bugfix:
+- autoColumnSize now calculates width using the actual cell renderer ([#486](https://github.com/warpech/jquery-handsontable/issues/486))
+
+## [0.9.14](https://github.com/warpech/jquery-handsontable/tree/v0.9.14) (Aug 20, 2013)
 
 Bugfixes:
 
 - fixed selecting date using jQuery UI Datepicker ([#970](https://github.com/warpech/jquery-handsontable/issues/970))
 - fixed opening cell editor after clearing cell data with Delete or Backspace ([#975](https://github.com/warpech/jquery-handsontable/issues/975))
-
 
 ## [0.9.13](https://github.com/warpech/jquery-handsontable/tree/v0.9.13) (Aug 16, 2013)
 

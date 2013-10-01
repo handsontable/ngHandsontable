@@ -24,10 +24,10 @@
         "remove_col": {name: "Remove column", disabled: isDisabled},
         "hsep3": "---------",
         "undo": {name: "Undo", disabled: function () {
-          return !instance.isUndoAvailable();
+          return !instance.undoRedo || !instance.isUndoAvailable();
         }},
         "redo": {name: "Redo", disabled: function () {
-          return !instance.isRedoAvailable();
+          return !instance.undoRedo || !instance.isRedoAvailable();
         }}
       }
       , defaultOptions = {
@@ -170,6 +170,12 @@
   function destroyContextMenu() {
     var id = this.rootElement[0].id;
     $.contextMenu('destroy', "#" + id + ' table, #' + id + ' div');
+
+    /*
+     * There is a bug in $.contextMenu: 'destroy' does not remove layer when selector is provided. When the below line
+     * is removed, running the context menu tests in Jasmine will produce invisible layers that are never removed from DOM
+     */
+    $(document.querySelectorAll('#context-menu-layer')).remove();
   }
 
   Handsontable.PluginHooks.add('afterInit', init);

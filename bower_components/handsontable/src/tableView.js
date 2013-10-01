@@ -349,16 +349,16 @@ Handsontable.TableView.prototype.getHeight = function () {
 };
 
 Handsontable.TableView.prototype.beforeRender = function (force) {
-  if (force) {
-    this.instance.PluginHooks.run('beforeRender');
+  if (force) { //force = did Walkontable decide to do full render
+    this.instance.PluginHooks.run('beforeRender', this.instance.forceFullRender); //this.instance.forceFullRender = did Handsontable request full render?
     this.wt.update('width', this.getWidth());
     this.wt.update('height', this.getHeight());
   }
 };
 
 Handsontable.TableView.prototype.onDraw = function(force){
-  if (force) {
-    this.instance.PluginHooks.run('afterRender');
+  if (force) { //force = did Walkontable decide to do full render
+    this.instance.PluginHooks.run('afterRender', this.instance.forceFullRender); //this.instance.forceFullRender = did Handsontable request full render?
   }
 };
 
@@ -373,7 +373,14 @@ Handsontable.TableView.prototype.applyCellTypeMethod = function (methodName, td,
     , cellProperties = this.instance.getCellMeta(row, col)
     , method = Handsontable.helper.getCellMethod(methodName, cellProperties[methodName]); //methodName is 'renderer' or 'editor'
 
-  return method(this.instance, td, row, col, prop, this.instance.getDataAtRowProp(row, prop), cellProperties);
+  var value = this.instance.getDataAtRowProp(row, prop);
+  var res = method(this.instance, td, row, col, prop, value, cellProperties);
+
+  if (methodName === 'renderer') {
+    this.instance.PluginHooks.run('afterRenderer', td, row, col, prop, value, cellProperties);
+  }
+
+  return res;
 };
 
 /**
@@ -450,5 +457,8 @@ Handsontable.TableView.prototype.maximumVisibleElementWidth = function (left) {
  */
 Handsontable.TableView.prototype.maximumVisibleElementHeight = function (top) {
   var rootHeight = this.wt.wtViewport.getWorkspaceHeight();
+  if(this.wt.isNativeScroll) {
+    return rootHeight;
+  }
   return rootHeight - top;
 };

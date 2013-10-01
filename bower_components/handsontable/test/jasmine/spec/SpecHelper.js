@@ -231,10 +231,12 @@ var selectCell = handsontableMethodFactory('selectCell');
 var deselectCell = handsontableMethodFactory('deselectCell');
 var getSelected = handsontableMethodFactory('getSelected');
 var setDataAtCell = handsontableMethodFactory('setDataAtCell');
+var setDataAtRowProp = handsontableMethodFactory('setDataAtRowProp');
 var getCell = handsontableMethodFactory('getCell');
 var getCellMeta = handsontableMethodFactory('getCellMeta');
 var getData = handsontableMethodFactory('getData');
 var getDataAtCell = handsontableMethodFactory('getDataAtCell');
+var getDataAtRowProp = handsontableMethodFactory('getDataAtRowProp');
 var getDataAtRow = handsontableMethodFactory('getDataAtRow');
 var getDataAtCol = handsontableMethodFactory('getDataAtCol');
 var getRowHeader = handsontableMethodFactory('getRowHeader');
@@ -274,6 +276,24 @@ function createSpreadsheetData(rowCount, colCount) {
   return rows;
 }
 
+function createSpreadsheetObjectData(rowCount, colCount) {
+  rowCount = typeof rowCount === 'number' ? rowCount : 100;
+  colCount = typeof colCount === 'number' ? colCount : 4;
+
+  var rows = []
+    , i
+    , j;
+
+  for (i = 0; i < rowCount; i++) {
+    var row = {};
+    for (j = 0; j < colCount; j++) {
+      row['prop'+j] = Handsontable.helper.spreadsheetColumnLabel(j) + i
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
 /**
  * Returns column width for HOT container
  * @param $elem
@@ -286,4 +306,14 @@ function colWidth($elem, col) {
     throw new Error("Cannot find table column of index '" + col + "'");
   }
   return TD.offsetWidth;
+}
+
+/**
+ * Returns value that has been rendered in table cell
+ * @param {Number} trIndex
+ * @param {Number} tdIndex
+ * @returns {String}
+ */
+function getRenderedValue(trIndex, tdIndex){
+  return spec().$container.find('tbody tr').eq(trIndex).find('td').eq(tdIndex).text();
 }

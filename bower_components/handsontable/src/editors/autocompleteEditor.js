@@ -84,6 +84,10 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     }
   });
 
+  this.typeahead.$menu.on('mouseleave', function(){
+    that.typeahead.$menu.find('.active').removeClass('active');
+  });
+
 
   HandsontableTextEditorClass.prototype.bindEvents.call(this);
 };
@@ -95,9 +99,9 @@ HandsontableAutocompleteEditorClass.prototype.bindTemporaryEvents = function (td
     , i
     , j;
 
-  this.typeahead.select = function () {
-    var output = this.hide(); //need to hide it before destroyEditor, because destroyEditor checks if menu is expanded
+  this.typeahead._valueSelected = false;
 
+  this.typeahead.select = function () {
     var active = this.$menu[0].querySelector('.active');
     var val = active.getAttribute('data-value');
     if (val === that.emptyStringLabel) {
@@ -110,9 +114,12 @@ HandsontableAutocompleteEditorClass.prototype.bindTemporaryEvents = function (td
       that.TEXTAREA.value = val;
     }
 
+    this._valueSelected = true;
+
+    this.hide(); //need to hide it before destroyEditor, because destroyEditor checks if menu is expanded
     that.finishEditing();
 
-    return output;
+    return this;
   };
 
   this.typeahead.render = function (items) {
@@ -128,30 +135,28 @@ HandsontableAutocompleteEditorClass.prototype.bindTemporaryEvents = function (td
 
   /* overwrite typeahead options and methods (matcher, sorter, highlighter, updater, etc) if provided in cellProperties */
   for (i in cellProperties) {
-    // if (cellProperties.hasOwnProperty(i)) {
     if (i === 'options') {
       for (j in cellProperties.options) {
-        // if (cellProperties.options.hasOwnProperty(j)) {
         this.typeahead.options[j] = cellProperties.options[j];
-        // }
       }
     }
     else {
       this.typeahead[i] = cellProperties[i];
     }
-    // }
   }
 
   HandsontableTextEditorClass.prototype.bindTemporaryEvents.call(this, td, row, col, prop, value, cellProperties);
 
-  function onDblClick() {
-    that.beginEditing(row, col, prop, true);
-    that.instance.registerTimeout('IE9_align_fix', function () { //otherwise is misaligned in IE9
-      that.typeahead.lookup();
-    }, 1);
-  }
+};
 
-  this.instance.view.wt.update('onCellDblClick', onDblClick);
+HandsontableAutocompleteEditorClass.prototype.beginEditing = function () {
+  HandsontableTextEditorClass.prototype.beginEditing.apply(this, arguments);
+
+  var that = this;
+
+  this.instance.registerTimeout('IE9_align_fix', function () { //otherwise is misaligned in IE9
+    that.typeahead.lookup();
+  }, 1);
 };
 /**
  * @see HandsontableTextEditorClass.prototype.finishEditing
@@ -195,8 +200,8 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, value,
     instance.autocompleteEditor = new HandsontableAutocompleteEditorClass(instance);
   }
   instance.autocompleteEditor.bindTemporaryEvents(td, row, col, prop, value, cellProperties);
-  return function () {
-    var isCancelled = true;
+  return function (isCancelled) {
+//    var isCancelled = true;
     instance.autocompleteEditor.finishEditing(isCancelled);
   }
 };

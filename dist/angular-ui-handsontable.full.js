@@ -1,7 +1,7 @@
 /**
- * angular-ui-handsontable 0.3.16
+ * angular-ui-handsontable 0.3.17
  * 
- * Date: Tue Sep 17 2013 13:59:25 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Oct 01 2013 13:44:26 GMT+0200 (Central European Daylight Time)
 */
 
 /**
@@ -428,14 +428,14 @@ angular.module('uiHandsontable', [])
     return directiveDefinitionObject;
   });
 /**
- * Handsontable 0.9.17
+ * Handsontable 0.9.19
  * Handsontable is a simple jQuery plugin for editable tables with basic copy-paste compatibility with Excel and Google Docs
  *
  * Copyright 2012, Marcin Warpechowski
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Sep 17 2013 13:58:44 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Oct 01 2013 13:17:18 GMT+0200 (Central European Daylight Time)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2356,13 +2356,11 @@ Handsontable.Core = function (rootElement, userSettings) {
    * @public
    */
   this.render = function () {
-    instance.PluginHooks.run('beforeRenderMethod');
     if (instance.view) {
       instance.forceFullRender = true; //used when data was changed
       instance.parseSettingsFromDOM();
       selection.refreshBorders(null, true);
     }
-    instance.PluginHooks.run('afterRenderMethod');
   };
 
   /**
@@ -3176,7 +3174,7 @@ Handsontable.Core = function (rootElement, userSettings) {
   /**
    * Handsontable version
    */
-  this.version = '0.9.17'; //inserted by grunt from package.json
+  this.version = '0.9.19'; //inserted by grunt from package.json
 };
 
 var DefaultSettings = function () {
@@ -3616,16 +3614,16 @@ Handsontable.TableView.prototype.getHeight = function () {
 };
 
 Handsontable.TableView.prototype.beforeRender = function (force) {
-  if (force) {
-    this.instance.PluginHooks.run('beforeRender');
+  if (force) { //force = did Walkontable decide to do full render
+    this.instance.PluginHooks.run('beforeRender', this.instance.forceFullRender); //this.instance.forceFullRender = did Handsontable request full render?
     this.wt.update('width', this.getWidth());
     this.wt.update('height', this.getHeight());
   }
 };
 
 Handsontable.TableView.prototype.onDraw = function(force){
-  if (force) {
-    this.instance.PluginHooks.run('afterRender');
+  if (force) { //force = did Walkontable decide to do full render
+    this.instance.PluginHooks.run('afterRender', this.instance.forceFullRender); //this.instance.forceFullRender = did Handsontable request full render?
   }
 };
 
@@ -3640,7 +3638,14 @@ Handsontable.TableView.prototype.applyCellTypeMethod = function (methodName, td,
     , cellProperties = this.instance.getCellMeta(row, col)
     , method = Handsontable.helper.getCellMethod(methodName, cellProperties[methodName]); //methodName is 'renderer' or 'editor'
 
-  return method(this.instance, td, row, col, prop, this.instance.getDataAtRowProp(row, prop), cellProperties);
+  var value = this.instance.getDataAtRowProp(row, prop);
+  var res = method(this.instance, td, row, col, prop, value, cellProperties);
+
+  if (methodName === 'renderer') {
+    this.instance.PluginHooks.run('afterRenderer', td, row, col, prop, value, cellProperties);
+  }
+
+  return res;
 };
 
 /**
@@ -3722,6 +3727,13 @@ Handsontable.TableView.prototype.maximumVisibleElementHeight = function (top) {
   }
   return rootHeight - top;
 };
+
+/**
+ * DOM helper optimized for maximum performance
+ * It is recommended for Handsontable plugins and renderers, because it is much faster than jQuery
+ * @type {WalkonableDom}
+ */
+Handsontable.Dom = new WalkontableDom();
 
 /**
  * Returns true if keyCode represents a printable character
@@ -5292,6 +5304,7 @@ Handsontable.PluginHookClass = (function () {
       afterLoadData : [],
       afterUpdateSettings: [],
       afterRender : [],
+      afterRenderer : [],
       afterChange : [],
       afterValidate: [],
       afterGetCellMeta: [],
@@ -5485,19 +5498,13 @@ Handsontable.PluginHooks = new Handsontable.PluginHookClass();
           };
         }
 
-        instance.addHook('beforeRender', htAutoColumnSize.performScheduledDetermine);
-        instance.addHook('beforeRenderMethod', htAutoColumnSize.scheduleDetermine);
-        instance.addHook('beforeChange', htAutoColumnSize.scheduleDetermine);
-        instance.addHook('afterUpdateSettings', htAutoColumnSize.scheduleDetermine);
+        instance.addHook('beforeRender', htAutoColumnSize.determineIfChanged);
         instance.addHook('afterGetColWidth', htAutoColumnSize.getColWidth);
         instance.addHook('afterDestroy', htAutoColumnSize.afterDestroy);
 
         instance.determineColumnWidth = plugin.determineColumnWidth;
       } else {
-        instance.removeHook('beforeRender', htAutoColumnSize.performScheduledDetermine);
-        instance.removeHook('beforeRenderMethod', htAutoColumnSize.scheduleDetermine);
-        instance.removeHook('beforeChange', htAutoColumnSize.scheduleDetermine);
-        instance.removeHook('afterUpdateSettings', htAutoColumnSize.scheduleDetermine);
+        instance.removeHook('beforeRender', htAutoColumnSize.determineIfChanged);
         instance.removeHook('afterGetColWidth', htAutoColumnSize.getColWidth);
         instance.removeHook('afterDestroy', htAutoColumnSize.afterDestroy);
 
@@ -5509,14 +5516,9 @@ Handsontable.PluginHooks = new Handsontable.PluginHookClass();
 
     };
 
-    this.scheduleDetermine = function () {
-      this.autoColumnSizeTmp.determineBeforeNextRender = true;
-    };
-
-    this.performScheduledDetermine = function () {
-      if (this.autoColumnSizeTmp.determineBeforeNextRender) {
+    this.determineIfChanged = function (force) {
+      if (force) {
         htAutoColumnSize.determineColumnsWidth.apply(this, arguments);
-        this.autoColumnSizeTmp.determineBeforeNextRender = false;
       }
     };
 
@@ -6142,6 +6144,12 @@ Handsontable.PluginHooks.add('afterGetColHeader', htSortColumn.getColHeader);
   function destroyContextMenu() {
     var id = this.rootElement[0].id;
     $.contextMenu('destroy', "#" + id + ' table, #' + id + ' div');
+
+    /*
+     * There is a bug in $.contextMenu: 'destroy' does not remove layer when selector is provided. When the below line
+     * is removed, running the context menu tests in Jasmine will produce invisible layers that are never removed from DOM
+     */
+    $(document.querySelectorAll('#context-menu-layer')).remove();
   }
 
   Handsontable.PluginHooks.add('afterInit', init);
@@ -6267,6 +6275,7 @@ function HandsontableManualColumnMove() {
       var mover = e.currentTarget;
       var TH = instance.view.wt.wtDom.closest(mover, 'TH');
       startCol = instance.view.wt.wtDom.index(TH) + instance.colOffset();
+      endCol = startCol;
       pressed = true;
       startX = e.pageX;
 
@@ -8490,7 +8499,7 @@ WalkontableCellStrategy.prototype.countVisible = function () {
 };
 
 WalkontableCellStrategy.prototype.isLastIncomplete = function () {
-  return this.remainingSize > 0;
+  return this.remainingSize >= 0;
 };
 /**
  * WalkontableClassNameList

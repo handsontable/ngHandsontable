@@ -1,3 +1,11 @@
+## 0.3.17 (Oct 1, 2013)
+
+Upgrade Handsontable to 0.9.19 (see [changelog](https://github.com/warpech/jquery-handsontable/blob/master/CHANGELOG.md))
+
+Includes:
+- improved native vertical scrollbar (use directive `scrollbarModelV="'native'"`)
+- new plugin hook `afterRenderer`
+
 ## 0.3.16 (Aug 22, 2013)
 
 Upgrade Handsontable to 0.9.14 (see [changelog](https://github.com/warpech/jquery-handsontable/blob/master/CHANGELOG.md))

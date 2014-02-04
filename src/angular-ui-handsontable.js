@@ -156,110 +156,141 @@ angular.module('uiHandsontable', [])
         rhs = match[2];
 
         return function postLink(scope, element, attrs) {
-          var uiDatagrid = getHandsontableSettings(element)
-            , i
-            , ilen;
-
-          uiDatagrid.lhs = lhs;
-          uiDatagrid.rhs = rhs;
-          uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.uiHandsontable || attrs.settings));
-
-          for (i in htOptions) {
-            if (htOptions.hasOwnProperty(i) && typeof scope[htOptions[i]] !== 'undefined') {
-              uiDatagrid.settings[htOptions[i]] = scope[htOptions[i]];
+          var listener = scope.$parent.$watch(rhs,function(newValue,oldvalue){
+            if(newValue){
+              init();
+              listener();
             }
-          }
+          });
+          var init = function(){
+            var uiDatagrid = getHandsontableSettings(element)
+              , i
+              , ilen;
 
-          $(element).append(uiDatagrid.$container);
+            uiDatagrid.lhs = lhs;
+            uiDatagrid.rhs = rhs;
+            uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.uiHandsontable || attrs.settings));
 
-          var data = scope.$parent.$eval(rhs);
-          if (typeof data !== 'undefined') {
-            uiDatagrid.settings['data'] = data;
-          }
-
-          if (uiDatagrid.settings.columns) {
-            var pattern = new RegExp("^(" + lhs + "\\.)");
-            for (i = 0, ilen = uiDatagrid.settings.columns.length; i < ilen; i++) {
-              uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
-
-              if (uiDatagrid.settings.columns[i].type === 'autocomplete') {
-                parseAutocomplete(scope, uiDatagrid.settings.columns[i], uiDatagrid);
+            for (i in htOptions) {
+              if (htOptions.hasOwnProperty(i) && typeof scope[htOptions[i]] !== 'undefined') {
+                uiDatagrid.settings[htOptions[i]] = scope[htOptions[i]];
               }
             }
-          }
 
-          uiDatagrid.settings.afterChange = function () {
-            if (!$rootScope.$$phase) { //if digest is not in progress
-              scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
-            }
-          };
+            $(element).append(uiDatagrid.$container);
 
-          uiDatagrid.settings.afterSelectionByProp = function (r, p, r2, p2) {
-            scope.$emit('datagridSelection', uiDatagrid.$container, r, p, r2, p2);
-          };
-
-          uiDatagrid.$container.handsontable(uiDatagrid.settings);
-
-          // set up watcher for visible part of the table
-          var lastTotalRows = 0;
-          scope.$watch(function () {
-            //check if visible data has changed
-            if (scope.$parent.$eval(rhs) !== uiDatagrid.$container.handsontable('getData')) {
-              return true;
+            var data = scope.$parent.$eval(rhs);
+            if (typeof data !== 'undefined') {
+              uiDatagrid.settings['data'] = data;
             }
 
-            var instance = uiDatagrid.$container.data('handsontable')
-              , totalRows = instance.countRows();
-
-            if (lastTotalRows !== totalRows) {
-              lastTotalRows = totalRows; //needed to render newly added rows
-              return lastTotalRows;
-            }
-
-            var out = ''
-              , totalCols = instance.countCols();
-            for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
-              for (var c = 0; c < totalCols; c++) {
-                out += instance.getDataAtCell(r, c)
-              }
-            }
-            return out;
-          }, function (newVal, oldVal) {
-            //if data has changed, render the table
-            if (newVal == true) {
-              uiDatagrid.$container.handsontable('loadData', scope.$parent.$eval(rhs));
-            }
-            else if (newVal !== oldVal) {
-              uiDatagrid.$container.handsontable('render');
-            }
-          }, false);
-
-          // set up watchers for settings
-          for (i = 0, ilen = htOptions.length; i < ilen; i++) {
-            (function (key) {
-              scope.$watch(key, function (newVal, oldVal) {
-                //if configuration has changed, call updateSettings
-                if (newVal === oldVal) {
-                  return;
+            if (uiDatagrid.settings.columns) {
+              var pattern = new RegExp("^(" + lhs + "\\.)"),
+                pattern2 = new RegExp("^" + lhs + "\\[(\\d+)\\]"),
+                match;
+              for (i = 0, ilen = uiDatagrid.settings.columns.length; i < ilen; i++) {
+                if(pattern2.test(uiDatagrid.settings.columns[i].value)){
+                  match = uiDatagrid.settings.columns[i].value.match(pattern2);
+                  uiDatagrid.settings.columns[i].data = parseInt(match[1]);
+                }else{
+                  uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
                 }
 
-                if (key === 'columns') {
-                  var pattern = new RegExp("^(" + lhs + "\\.)");
-                  for (var i = 0, ilen = newVal.length; i < ilen; i++) {
-                    newVal[i].data = newVal[i].value.replace(pattern, '');
+                if (uiDatagrid.settings.columns[i].type === 'autocomplete') {
+                  parseAutocomplete(scope, uiDatagrid.settings.columns[i], uiDatagrid);
+                }
+              }
+            }
 
-                    if (newVal[i].type === 'autocomplete') {
-                      parseAutocomplete(scope, newVal[i], uiDatagrid);
+            uiDatagrid.settings.afterChange = function () {
+              if (!$rootScope.$$phase) { //if digest is not in progress
+                scope.$apply(); //programmatic change does not trigger digest in AnuglarJS so we need to trigger it automatically
+              }
+            };
+
+            uiDatagrid.settings.afterSelectionByProp = function (r, p, r2, p2) {
+              scope.$emit('datagridSelection', uiDatagrid.$container, r, p, r2, p2);
+            };
+
+            if(typeof uiDatagrid.settings.data === 'undefined'){
+              var listener = scope.$parent.$watch(rhs,function(newValue,oldvalue){
+                if(newValue){
+                  uiDatagrid.settings['data'] = scope.$parent.$eval(rhs);
+                  listener();
+                }
+              });
+            }else{
+              uiDatagrid.$container.handsontable(uiDatagrid.settings);
+            }
+
+            // set up watcher for visible part of the table
+            var lastTotalRows = 0;
+            scope.$watch(function () {
+              //check if visible data has changed
+              if (scope.$parent.$eval(rhs) !== uiDatagrid.$container.handsontable('getData')) {
+                return true;
+              }
+
+              var instance = uiDatagrid.$container.data('handsontable')
+                , totalRows = instance.countRows();
+
+              if (lastTotalRows !== totalRows) {
+                lastTotalRows = totalRows; //needed to render newly added rows
+                return lastTotalRows;
+              }
+
+              var out = ''
+                , totalCols = instance.countCols();
+              for (var r = instance.rowOffset(), rlen = r + instance.countVisibleRows(); r < rlen; r++) {
+                for (var c = 0; c < totalCols; c++) {
+                  out += instance.getDataAtCell(r, c)
+                }
+              }
+              return out;
+            }, function (newVal, oldVal) {
+              //if data has changed, render the table
+              if (newVal == true) {
+                uiDatagrid.$container.handsontable('loadData', scope.$parent.$eval(rhs));
+              }
+              else if (newVal !== oldVal) {
+                uiDatagrid.$container.handsontable('render');
+              }
+            }, false);
+
+            // set up watchers for settings
+            for (i = 0, ilen = htOptions.length; i < ilen; i++) {
+              (function (key) {
+                scope.$watch(key, function (newVal, oldVal) {
+                  //if configuration has changed, call updateSettings
+                  if (newVal === oldVal) {
+                    return;
+                  }
+
+                  if (key === 'columns') {
+                    var pattern = new RegExp("^(" + lhs + "\\.)"),
+                      pattern2 = new RegExp("^" + lhs + "\\[(\\d+)\\]"),
+                      match;
+                    for (var i = 0, ilen = newVal.length; i < ilen; i++) {
+                      if(pattern2.test(newVal[i].value)){
+                        match = newVal[i].value;
+                        newVal[i].data = parseInt(match[1]); 
+                      }else{
+                        newVal[i].data = newVal[i].value.replace(pattern, '');
+                      }
+
+                      if (newVal[i].type === 'autocomplete') {
+                        parseAutocomplete(scope, newVal[i], uiDatagrid);
+                      }
                     }
                   }
-                }
 
-                var obj = {};
-                obj[key] = newVal;
-                uiDatagrid.$container.handsontable('updateSettings', obj);
-              }, true);
-            })(htOptions[i]);
-          }
+                  var obj = {};
+                  obj[key] = newVal;
+                  uiDatagrid.$container.handsontable('updateSettings', obj);
+                }, true);
+              })(htOptions[i]);
+            }
+          };
         }
       }
     };

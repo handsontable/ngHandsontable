@@ -40,7 +40,7 @@ angular.module('uiHandsontable', [])
     }
   })
 
-  .directive('uiHandsontable', function ($compile, $rootScope, getHandsontableSettings) {
+  .directive('uiHandsontable', ["$compile", "$rootScope", "getHandsontableSettings", function ($compile, $rootScope, getHandsontableSettings) {
     var htOptions = ['data', 'width', 'height', 'rowHeaders', 'colHeaders', 'colWidths', 'columns', 'cells', 'dataSchema', 'contextMenu', 'onSelection', 'onSelectionByProp', 'onBeforeChange', 'onChange', 'onCopyLimit', 'startRows', 'startCols', 'minRows', 'minCols', 'maxRows', 'maxCols', 'minSpareRows', 'minSpareCols', 'multiSelect', 'fillHandle', 'undo', 'outsideClickDeselects', 'enterBeginsEditing', 'enterMoves', 'tabMoves', 'autoWrapRow', 'autoWrapCol', 'copyRowsLimit', 'copyColsLimit', 'currentRowClassName', 'currentColClassName', 'asyncRendering', 'stretchH', 'columnSorting', 'manualColumnMove', 'manualColumnResize', 'fragmentSelection', 'scrollbarModelV', 'scrollbarModelH'];
 
     var scopeDef = {
@@ -264,9 +264,9 @@ angular.module('uiHandsontable', [])
       }
     };
     return directiveDefinitionObject;
-  })
+  }])
 
-  .directive('datacolumn', function (getHandsontableSettings, getDatacolumnSettings) {
+  .directive('datacolumn', ["getHandsontableSettings", "getDatacolumnSettings", function (getHandsontableSettings, getDatacolumnSettings) {
     var directiveDefinitionObject = {
       restrict: 'E',
       priority: 500,
@@ -336,9 +336,9 @@ angular.module('uiHandsontable', [])
       }
     };
     return directiveDefinitionObject;
-  })
+  }])
 
-  .directive('optionlist', function (getDatacolumnSettings) {
+  .directive('optionlist', ["getDatacolumnSettings", function (getDatacolumnSettings) {
     var directiveDefinitionObject = {
       restrict: 'E',
       transclude: 'element',
@@ -354,9 +354,9 @@ angular.module('uiHandsontable', [])
       }
     };
     return directiveDefinitionObject;
-  })
+  }])
 
-  .directive('selectedindex', function (getHandsontableSettings) {
+  .directive('selectedindex', ["getHandsontableSettings", function (getHandsontableSettings) {
     var directiveDefinitionObject = {
       restrict: 'A',
       priority: 491,
@@ -410,4 +410,4 @@ angular.module('uiHandsontable', [])
       }
     };
     return directiveDefinitionObject;
-  });
+  }]);

@@ -14306,7 +14306,7 @@ WalkontableVerticalScrollbarNative.prototype.applyToDOM = function () {
     this.measureAfter = this.sumCellSizes(last, this.total - last);
   }
   var headerSize = this.instance.wtViewport.getColumnHeaderHeight();
-  this.fixedContainer.style.height = headerSize + this.sumCellSizes(0, this.total) + 4 + 'px'; //+4 is needed, otherwise vertical scroll appears in Chrome (window scroll mode) - maybe because of fill handle in last row or because of box shadow
+  this.fixedContainer.style.height = headerSize + this.sumCellSizes(0, this.total) + 8 + 'px'; //+4 is needed, otherwise vertical scroll appears in Chrome (window scroll mode) - maybe because of fill handle in last row or because of box shadow
   this.fixed.style.top = this.measureBefore + 'px';
   this.fixed.style.bottom = '';
 };

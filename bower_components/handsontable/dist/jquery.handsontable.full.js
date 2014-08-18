@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Fri Aug 15 2014 11:57:14 GMT+0200 (CEST)
+ * Date: Fri Aug 15 2014 14:49:55 GMT+0200 (CEST)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -733,6 +733,9 @@ Handsontable.Core = function (rootElement, userSettings) {
       priv.selRange = null;
       instance.view.wt.selections.current.clear();
       instance.view.wt.selections.area.clear();
+      if (priv.settings.currentRowClassName || priv.settings.currentColClassName) {
+        instance.view.wt.selections.highlight.clear();
+      }
       editorManager.destroyEditor();
       selection.refreshBorders();
       Handsontable.hooks.run(instance, 'afterDeselect');

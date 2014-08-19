@@ -6,7 +6,7 @@
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Fri Aug 15 2014 14:49:55 GMT+0200 (CEST)
+ * Date: Tue Aug 19 2014 15:47:45 GMT+0200 (CEST)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -2230,7 +2230,7 @@ DefaultSettings.prototype = {
   pasteMode: 'overwrite',
   currentRowClassName: void 0,
   currentColClassName: void 0,
-  stretchH: 'hybrid',
+  stretchH: 'none',
   isEmptyRow: function (r) {
     var val;
     for (var c = 0, clen = this.countCols(); c < clen; c++) {
@@ -13684,6 +13684,9 @@ function WalkontableEvent(instance) {
   $(this.instance.wtTable.TABLE).on('mouseover', onMouseOver);
   $(this.instance.wtTable.holder).on('mouseup', onMouseUp);
 
+  $(window).on('resize.' + this.instance.guid, function () {
+    that.instance.draw();
+  });
 }
 
 WalkontableEvent.prototype.parentCell = function (elem) {
@@ -14306,7 +14309,7 @@ WalkontableVerticalScrollbarNative.prototype.applyToDOM = function () {
     this.measureAfter = this.sumCellSizes(last, this.total - last);
   }
   var headerSize = this.instance.wtViewport.getColumnHeaderHeight();
-  this.fixedContainer.style.height = headerSize + this.sumCellSizes(0, this.total) + 8 + 'px'; //+4 is needed, otherwise vertical scroll appears in Chrome (window scroll mode) - maybe because of fill handle in last row or because of box shadow
+  this.fixedContainer.style.height = headerSize + this.sumCellSizes(0, this.total) + 4 + 'px'; //+4 is needed, otherwise vertical scroll appears in Chrome (window scroll mode) - maybe because of fill handle in last row or because of box shadow
   this.fixed.style.top = this.measureBefore + 'px';
   this.fixed.style.bottom = '';
 };

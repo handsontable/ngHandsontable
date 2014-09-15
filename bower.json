@@ -5,7 +5,7 @@
     "handsontable": "0.11.2"
   },
   "dependencies": {
-    "angular": "~1.0.7",
+    "angular": "~1.2.17",
     "jquery": "~2.0.3",
     "angular-ui-select2": "~0.0.2"
   }

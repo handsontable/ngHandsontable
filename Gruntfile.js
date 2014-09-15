@@ -32,6 +32,16 @@ module.exports = function (grunt) {
       options: {
         banner: myBanner
       },
+			new: {
+				src: [
+//					'src/ie-shim.js',
+					'src/ngHandsontable.js',
+					'src/services/*.js',
+					'src/directives/*.js',
+					'bower_components/handsontable/dist/jquery.handsontable.full.js'
+				],
+				dest: 'dist/ngHandsontable.full.js'
+			},
       full_js: {
         src: [
           'src/ie-shim.js',
@@ -51,7 +61,8 @@ module.exports = function (grunt) {
       options: {
         banner: myBanner
       },
-      "dist/angular-ui-handsontable.full.min.js": ["dist/angular-ui-handsontable.full.js" ]
+      "dist/angular-ui-handsontable.full.min.js": ["dist/angular-ui-handsontable.full.js" ],
+			"dist/ngHandsontable.full.min.js": ["dist/ngHandsontable.full.js"]
     },
     cssmin: {
       options: {

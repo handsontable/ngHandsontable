@@ -28,7 +28,7 @@
 
 <p>Angular UI Handsontable <b>can</b> coexist with <a href="http://angular-ui.github.com/">Angular UI</a>, but <b>does not</b> have dependency on it.</p>
 
-<ui-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="item in db.items" height="300" width="600">
+<ng-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="item in db.items" height="300" width="600">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -38,7 +38,7 @@
       <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>
-</ui-handsontable>
+</ng-handsontable>
 
 <p>Address of the first person:</p>
 

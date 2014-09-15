@@ -30,14 +30,19 @@ angular.module('ngHandsontable.services',[])
 					var i,
 						settings = {};
 
+					angular.extend(settings, scopeOptions.settings);
+
 					for (i in htOptions) {
 						if (htOptions.hasOwnProperty(i) && typeof scopeOptions[htOptions[i]] !== 'undefined') {
 							settings[htOptions[i]] = scopeOptions[htOptions[i]];
 						}
 					}
-					console.log(settings);
-					return settings;
 
+					if (scopeOptions.datarows) {
+						settings['data'] = scopeOptions.datarows;
+					}
+
+					return settings;
 				},
 
 				/***
@@ -58,7 +63,8 @@ angular.module('ngHandsontable.services',[])
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
 						selectedIndex: '=selectedindex',
-						datarows: '='
+						datarows: '=',
+						settings: '='
 					};
 
 					for (var i = 0, length = options.length; i<length; i++) {

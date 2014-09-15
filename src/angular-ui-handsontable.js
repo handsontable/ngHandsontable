@@ -15,7 +15,7 @@ angular.module('uiHandsontable', [])
             outsideClickDeselects: true,
             autoComplete: []
           },
-          $container: $('<div class="ui-handsontable-container"></div>')
+          $container: $('<div class="ng-handsontable-container"></div>')
         };
         $element.data('uiDatagrid', uiDatagrid);
       }
@@ -40,7 +40,7 @@ angular.module('uiHandsontable', [])
     }
   })
 
-  .directive('uiHandsontable', ["$compile", "$rootScope", "getHandsontableSettings", function ($compile, $rootScope, getHandsontableSettings) {
+  .directive('ngHandsontable', ["$compile", "$rootScope", "getHandsontableSettings", function ($compile, $rootScope, getHandsontableSettings) {
     var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype);
     var publicHooks = Object.keys(Handsontable.PluginHooks.hooks);
     var htOptions = publicProperties.concat(publicHooks);
@@ -164,7 +164,7 @@ angular.module('uiHandsontable', [])
 
           uiDatagrid.lhs = lhs;
           uiDatagrid.rhs = rhs;
-          uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.uiHandsontable || attrs.settings));
+          uiDatagrid.settings = angular.extend(uiDatagrid.settings, scope.$parent.$eval(attrs.ngHandsontable || attrs.settings));
 
           for (i in htOptions) {
             if (htOptions.hasOwnProperty(i) && typeof scope[htOptions[i]] !== 'undefined') {
@@ -172,7 +172,7 @@ angular.module('uiHandsontable', [])
             }
           }
 
-          $(element).append(uiDatagrid.$container);
+					$(element).append(uiDatagrid.$container);
 
           var data = scope.$parent.$eval(rhs);
           if (typeof data !== 'undefined') {
@@ -180,7 +180,7 @@ angular.module('uiHandsontable', [])
           }
 
           if (uiDatagrid.settings.columns) {
-            var pattern = new RegExp("^(" + lhs + "\\.)");
+						var pattern = new RegExp("^(" + lhs + "\\.)");
             for (i = 0, ilen = uiDatagrid.settings.columns.length; i < ilen; i++) {
               uiDatagrid.settings.columns[i].data = uiDatagrid.settings.columns[i].value.replace(pattern, '');
 

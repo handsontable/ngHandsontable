@@ -30,7 +30,7 @@
 
 <p>Selection: <input ng-model="MySelectedIndex"></p>
 
-<ui-handsontable id="example1" minSpareRows="1" stretchH="'last'" manualColumnMove="true" manualColumnResize="true" columnSorting="true" selectedIndex="MySelectedIndex" rowheaders="true" HeIgHT="calcHeight" width="calcWidth" datarows="item in db.items">
+<ng-handsontable id="example1" minSpareRows="1" stretchH="'last'" manualColumnMove="true" manualColumnResize="true" columnSorting="true" selectedIndex="MySelectedIndex" rowheaders="true" HeIgHT="calcHeight" width="calcWidth" datarows="item in db.items">
   <datacolumn width="50" value="item.id" title="'ID'"></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn width="100" type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
@@ -43,13 +43,13 @@
   <datacolumn type="'numeric'" width="50" value="item.price" format="'$ 0,0.00'" title="'Price'"></datacolumn>
   <datacolumn width="65" type="'checkbox'" value="item.isActive" title="'Is active'" checkedTemplate="'Yes'"
               uncheckedTemplate="'No'"></datacolumn>
-</ui-handsontable>
+</ng-handsontable>
 
 <h2>Instance 2</h2>
 
 <p>Filter: <input ng-model="query"> | <button ng-click="addColumn()">Dynamically add column</button></p>
 
-<div ui-handsontable="{rowHeaders: false}" datarows="item in filteredItems" columns="db.dynamicColumns" height="320" width="640">
+<div ng-handsontable="{rowHeaders: false}" datarows="item in filteredItems" columns="db.dynamicColumns" height="320" width="640">
 </div>
 
 </body>

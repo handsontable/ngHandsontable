@@ -2,7 +2,7 @@
   "name": "ng-datagrid",
   "version": "0.3.17",
   "devDependencies": {
-    "handsontable": "handsontable/jquery-handsontable#develop"
+    "handsontable": "0.11.2"
   },
   "dependencies": {
     "angular": "~1.0.7",

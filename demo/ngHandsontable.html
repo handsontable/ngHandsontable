@@ -8,20 +8,26 @@
 	<script src="../bower_components/jquery/jquery.min.js"></script>
 	<script src="../dist/ngHandsontable.full.js"></script>
 	<script src="js/ngHandsontableDemo.js"></script>
+	<style>
+		body {
+			font-family: Arial;
+		}
+	</style>
 </head>
 <body ng-controller="DemoCtrl">
 	<h1>Handsontable with Angular</h1>
 
-	<ng-handsontable settings="{minSpareRows: 1, rowHeaders: true}" datarows="db.items" height="300" width="600">
-		<datacolumn value="item.id" title="'ID'"></datacolumn>
-		<datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
-		<datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
-		<datacolumn value="item.address" title="1"></datacolumn>
-		<datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'">
-			<optionlist datarows="item in item.Product.Options" clickrow="item.Product.Description = option.Description">
+	<ng-handsontable settings="{minSpareRows: 1, rowHeaders: true, contextMenu: true}" datarows="db.items" height="300" width="600">
+		<datacolumn value="id"          title="'ID'"></datacolumn>
+		<datacolumn value="name.first"  title="'First Name'"  type="grayedOut"  readOnly></datacolumn>
+		<datacolumn value="name.last"   title="'Last Name'"   type="grayedOut"  readOnly></datacolumn>
+		<datacolumn value="address"     title="1"></datacolumn>
+		<datacolumn value="Product.Description" title="'Favorite food'" type="'autocomplete'">
+			<optionlist datarows="Product.Options" clickrow="item.Product.Description = option.Description">
 				<img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
 			</optionlist>
 		</datacolumn>
+
 	</ng-handsontable>
 
 

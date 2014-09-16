@@ -34,7 +34,7 @@
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>
   <datacolumn value="item.address" title="'Address'"></datacolumn>
   <datacolumn value="item.Product.Description" title="'Favorite food'" type="'autocomplete'">
-    <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = option.Description">
+    <optionlist datarows="option in item.Product.Options" clickrow="item.Product.Description = Description">
       <img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
     </optionlist>
   </datacolumn>

@@ -40,7 +40,8 @@ angular.module('uiHandsontable', [])
     }
   })
 
-  .directive('ngHandsontable', ["$compile", "$rootScope", "getHandsontableSettings", function ($compile, $rootScope, getHandsontableSettings) {
+  .directive('ngHandsontable', ["$compile", "$rootScope", "getHandsontableSettings",
+		function ($compile, $rootScope, getHandsontableSettings) {
     var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype);
     var publicHooks = Object.keys(Handsontable.PluginHooks.hooks);
     var htOptions = publicProperties.concat(publicHooks);
@@ -90,15 +91,46 @@ angular.module('uiHandsontable', [])
               var htInstance = uiDatagrid.$container.data('handsontable');
               var row = htInstance.getSelected()[0];
               childScope[uiDatagrid.lhs] = scope.$parent.$eval(uiDatagrid.rhs)[row];
-              return childScope.$eval(rhs);
+							var ret = childScope.$eval(rhs);
+
+
+
+							if (column.clickrow) {
+								var clickrowRule = column.clickrow;
+								var clickrowMatch = clickrowRule.match(/^\s*(.+)\s+=\s+(.*)\s*$/);
+
+								if (clickrowMatch) {
+									var objProperty = clickrowMatch[2];
+
+									var returnArray = [];
+									for (var i= 0, length = ret.length; i < length; i++) {
+
+										returnArray.push(ret[i][objProperty]);
+									}
+									return returnArray;
+								} else {
+									throw Error("Expected clickrow in form of '_item_ = _objectProperty_' but got '" +
+										column.clickrow + "'.");
+								}
+
+
+							} else {
+								return childScope.$eval(rhs);
+							}
+
             };
 
             lastItems = getItems();
+
+
             if (!childScope.$$phase) {
               childScope.$apply();
             }
             process(lastItems);
-            lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
+
+						lastOptionScope.$apply(); //without this, last option is never rendered. TODO: why?
+
+
 
             deregister = scope.$parent.$watch(getItems, function (newVal, oldVal) {
               if (newVal === oldVal) {

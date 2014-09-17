@@ -112,8 +112,6 @@ angular.module('uiHandsontable', [])
 									throw Error("Expected clickrow in form of '_item_ = _objectProperty_' but got '" +
 										column.clickrow + "'.");
 								}
-
-
 							} else {
 								return childScope.$eval(rhs);
 							}
@@ -397,6 +395,7 @@ angular.module('uiHandsontable', [])
       compile: function compile() {
 
         return function postLink(scope, element) {
+					console.log('selectedIndex');
           var $container = getHandsontableSettings(element).$container;
 
           var isSelected

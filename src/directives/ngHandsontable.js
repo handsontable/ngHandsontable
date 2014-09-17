@@ -4,7 +4,8 @@ angular.module('ngHandsontable.directives', [])
 	[
 		'settingFactory',
 		'autoCompleteFactory',
-		function (settingFactory, autoCompleteFactory) {
+		'$rootScope',
+		function (settingFactory, autoCompleteFactory, $rootScope) {
 
 			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
 				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
@@ -26,27 +27,27 @@ angular.module('ngHandsontable.directives', [])
 					}
 				},
 				link: function (scope, element, attrs) {
-					console.log('directive: ngHandsontable');
 					if (!scope.htSettings) {
 						scope.htSettings = {};
 					}
+					scope.htSettings['data'] = scope.datarows;
 					angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
-
-					var container = settingFactory.getHandsontableContainer();
-
-
 
 					if(scope.htSettings.columns) {
 						for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
 							if (scope.htSettings.columns[i].type == 'autocomplete') {
-								autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.htSettings.data);
+								autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.datarows, true);
 							}
 						}
 					}
 
-					element.append(container);
-					console.log(scope.htSettings);
-					container.handsontable(scope.htSettings);
+					scope.htSettings.afterChange = function () {
+						if (!$rootScope.$$phase){
+							scope.$apply();
+						}
+					};
+
+					settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
 		}
@@ -55,56 +56,56 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'datacolumn',
 	[
-
 		function () {
 			return {
 				restrict: 'E',
 				require:'^ngHandsontable',
-				scope:true,
+				scope:{},
 				controller: function ($scope) {
-					this.setColumnOptions = function (options) {
+					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
 							$scope.column = {}
 						}
-						angular.extend($scope.column, options);
+
+						var optionList = {};
+
+						var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+						if (match) {
+							optionList.property = match[1];
+							optionList.object = match[2];
+						} else {
+							optionList.object = options;
+						}
+						$scope.column['optionList'] = optionList;
 					}
 				},
-				link: function (scope, element, attrs, controllerInstance) {
-					console.log('directive: datacolumn');
-					var column = {
-							data: attrs.value,
-							title: scope.$eval(attrs.title)
-						};
+				link: function (scope, element, attributes, controllerInstance) {
+					var column = {};
 
-					var width = scope.$eval(attrs.width);
-					var type = scope.$eval(attrs.type);
-
-					if (type){
-						column.type = type;
+					for (var i in attributes) {
+						if (attributes.hasOwnProperty(i)) {
+							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
+								if (i === 'value') {
+									column['data'] = attributes[i];
+								} else {
+									column[i] = scope.$eval(attributes[i]);
+								}
+							}
+						}
 					}
-
-					if (width){
-						column.width = width;
-					}
-
-
 
 					switch (column.type) {
-						case 'autocomplete':
-
-							break;
-
 						case 'checkbox':
-							if (typeof attrs.checkedtemplate !== 'undefined') {
-								column.checkedTemplate = scope.$eval(attrs.checkedtemplate); //if undefined then defaults to Boolean true
+							if (typeof attributes.checkedtemplate !== 'undefined') {
+								column.checkedTemplate = scope.$eval(attributes.checkedtemplate); //if undefined then defaults to Boolean true
 							}
-							if (typeof attrs.uncheckedtemplate !== 'undefined') {
-								column.uncheckedTemplate = scope.$eval(attrs.uncheckedtemplate); //if undefined then defaults to Boolean true
+							if (typeof attributes.uncheckedtemplate !== 'undefined') {
+								column.uncheckedTemplate = scope.$eval(attributes.uncheckedtemplate); //if undefined then defaults to Boolean true
 							}
 							break;
 					}
 
-					if (typeof attrs.readonly !== 'undefined') {
+					if (typeof attributes.readonly !== 'undefined') {
 						column.readOnly = true;
 					}
 
@@ -113,7 +114,6 @@ angular.module('ngHandsontable.directives', [])
 					}
 
 					angular.extend(scope.column, column);
-
 					controllerInstance.setColumnSetting(scope.column);
 				}
 			}
@@ -129,13 +129,8 @@ angular.module('ngHandsontable.directives', [])
 				scope: true,
 				require:'^datacolumn',
 				link: function (scope, element, attrs, controllerInstance) {
-					console.log('directive: optionlist');
-					var options = {
-						optionList: attrs.datarows,
-						clickrow: attrs.clickrow
-					};
-
-					controllerInstance.setColumnOptions(options);
+					var options = attrs.datarows;
+					controllerInstance.setColumnOptionList(options);
 				}
 			}
 		}

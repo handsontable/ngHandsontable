@@ -9,21 +9,21 @@ angular.module('ngHandsontableDemo',
 
 				var products = [
 					{
-						"Description": "Big Mac",
-						"Options": [
-							{"Description": "Big Mac", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-							{"Description": "Big Mac & Co", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-							{"Description": "McRoyal", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-							{"Description": "Hamburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-							{"Description": "Cheeseburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
-							{"Description": "Double Cheeseburger", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
+						"description": "Big Mac",
+						"options": [
+							{"description": "Big Mac", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+							{"description": "Big Mac & Co", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+							{"description": "McRoyal", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+							{"description": "Hamburger", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+							{"description": "Cheeseburger", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null},
+							{"description": "Double Cheeseburger", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/hamburger.png", Pick$: null}
 						]
 					},
 					{
-						"Description": "Fried Potatoes",
-						"Options": [
-							{"Description": "Fried Potatoes", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null},
-							{"Description": "Fried Onions", "Image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null}
+						"description": "Fried Potatoes",
+						"options": [
+							{"description": "Fried Potatoes", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null},
+							{"description": "Fried Onions", "image": "//a248.e.akamai.net/assets.github.com/images/icons/emoji/fries.png", Pick$: null}
 						]
 					}
 				];
@@ -34,7 +34,7 @@ angular.module('ngHandsontableDemo',
 
 				$scope.db = {};
 				$scope.db.items = [];
-				for (var i = 0; i < 10000; i++) {
+				for (var i = 0; i < 10; i++) {
 					$scope.db.items.push(
 						{
 							id: i + 1,
@@ -44,12 +44,11 @@ angular.module('ngHandsontableDemo',
 							},
 							address: Math.floor(Math.random() * 100000) + ' ' + address[Math.floor(Math.random() * address.length)],
 							price: Math.floor(Math.random() * 100000) / 100,
-							isActive: 'Yes',
-							Product: $.extend({}, products[Math.floor(Math.random() * products.length)])
+							isActive: Math.floor(Math.random() * products.length) / 2 == 0 ? 'Yes' : 'No',
+							product: angular.extend({}, products[Math.floor(Math.random() * products.length)])
 						}
 					);
 				}
-
 			}
 		]
 	);

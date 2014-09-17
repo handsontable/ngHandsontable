@@ -6,10 +6,23 @@ angular.module('ngHandsontable.services', [])
 
 			return {
 
-				getHandsontableContainer: function () {
-					return $('<div class="ng-handsontable-container"></div>');
+				initializeHandsontable: function (element, htSettings) {
+					var container = $('<div class="ng-handsontable-container"></div>');
+					element.append(container);
+					container.handsontable(htSettings);
 				},
 
+				updateHandsontable: function (element, settings) {
+					var container = element.find('.ng-handsontable-container');
+					container.handsontable('updateSettings', settings);
+				},
+
+				/***
+				 *
+				 * @param htOptions
+				 * @param scopeOptions
+				 * @return {{}}
+				 */
 				setHandsontableSettingsFromScope: function (htOptions, scopeOptions) {
 					var i,
 						settings = {},
@@ -23,16 +36,17 @@ angular.module('ngHandsontable.services', [])
 						}
 					}
 
-					if (allOptions.datarows) {
-						settings['data'] = allOptions.datarows;
-					}
-
 					return settings;
 				},
 
+				/***
+				 *
+				 * @param options
+				 * @return {{selectedIndex: string, datarows: string, settings: string}}
+				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
-						selectedIndex: '=selectedindex',
+//						selectedIndex: '=selectedindex',
 						datarows: '=',
 						settings: '='
 					};
@@ -50,14 +64,40 @@ angular.module('ngHandsontable.services', [])
 	.factory(
 	'autoCompleteFactory',
 
-		function (settingFactory) {
+		function () {
 			return {
-				parseAutoComplete: function (column, data) {
-					console.log(data);
-					column.source = ["a", "b", "c"];
+				parseAutoComplete: function (column, dataSet,  propertyOnly) {
 
+					column.source = function (query, process) {
+						var hotInstance = $('.ng-handsontable-container').data('handsontable'),
+							row = hotInstance.getSelected()[0];
+
+						var data = dataSet[row];
+						if (data) {
+							var options = column.optionList;
+
+							if(options.object) {
+								var objKeys = options.object.split('.')
+									,paramObject = data;
+
+								while(objKeys.length > 0) {
+									var key = objKeys.shift();
+									paramObject = paramObject[key];
+								}
+
+								var source = [];
+								if (propertyOnly) {
+									for(var i = 0, length = paramObject.length; i < length; i++) {
+										source.push(paramObject[i][options.property]);
+									}
+								} else{
+									source = paramObject;
+								}
+								process(source);
+							}
+						}
+					};
 				}
 			}
 		}
-
 );

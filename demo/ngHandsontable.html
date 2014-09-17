@@ -6,6 +6,7 @@
 	<link rel="stylesheet" media="screen" href="../dist/angular-ui-handsontable.full.css">
 	<script src="../bower_components/angular/angular.js"></script>
 	<script src="../bower_components/jquery/jquery.min.js"></script>
+	<script src="../bower_components/handsontable/dist/jquery.handsontable.full.min.js"></script>
 	<script src="../dist/ngHandsontable.full.js"></script>
 	<script src="js/ngHandsontableDemo.js"></script>
 	<style>
@@ -17,19 +18,49 @@
 <body ng-controller="DemoCtrl">
 	<h1>Handsontable with Angular</h1>
 
-	<ng-handsontable settings="{minSpareRows: 1, rowHeaders: true, contextMenu: true}" datarows="db.items" height="300" width="600">
-		<datacolumn value="id"          title="'ID'"></datacolumn>
-		<datacolumn value="name.first"  title="'First Name'"  type="grayedOut"  readOnly></datacolumn>
-		<datacolumn value="name.last"   title="'Last Name'"   type="grayedOut"  readOnly></datacolumn>
-		<datacolumn value="address"     title="1"></datacolumn>
-		<datacolumn value="Product.Description" title="'Favorite food'" type="'autocomplete'">
-			<optionlist datarows="Product.Options" clickrow="item.Product.Description = option.Description">
-				<img ng-src="{{option.Image}}" style="width: 16px; height: 16px; border-width: 0"> {{option.Description}}
+	<ng-handsontable
+		settings ="{minSpareRows: 1,rowHeaders: true,contextMenu: true }"
+		datarows="db.items"
+		height="300"
+		width="700">
+		<datacolumn value="id"                  title="'ID'"></datacolumn>
+		<datacolumn value="name.first"          title="'First Name'"  type="grayedOut"  readOnly></datacolumn>
+		<datacolumn value="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></datacolumn>
+		<datacolumn value="address"             title="'Address'"></datacolumn>
+		<datacolumn value="product.description" title="'Favorite food'" type="'autocomplete'">
+			<optionlist datarows="description in product.options">
+				<!--<img ng-src="{{image}}" style="width: 16px; height: 16px; border-width: 0">-->
+				<!--{{description}}-->
 			</optionlist>
 		</datacolumn>
-
+		<datacolumn value="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></datacolumn>
+		<datacolumn value="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></datacolumn>
 	</ng-handsontable>
 
 
+
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Address</th>
+				<th>Favourite food</th>
+				<th>Price</th>
+				<th>isActive</th>
+			</tr>
+		</thead>
+		<tr ng-repeat="item in db.items">
+			<td>{{item.id}}</td>
+			<td>{{item.name.first}}</td>
+			<td>{{item.name.last}}</td>
+			<td>{{item.address}}</td>
+			<td>{{item.product.description}}</td>
+			<td>{{item.price}}</td>
+			<td>{{item.isActive}}</td>
+		</tr>
+	</table>
+	<input type="text" ng-model="db.items[0].address" style="width: 300px">
 </body>
 </html>

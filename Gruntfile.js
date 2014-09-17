@@ -37,8 +37,7 @@ module.exports = function (grunt) {
 //					'src/ie-shim.js',
 					'src/ngHandsontable.js',
 					'src/services/*.js',
-					'src/directives/*.js',
-					'bower_components/handsontable/dist/jquery.handsontable.full.js'
+					'src/directives/*.js'
 				],
 				dest: 'dist/ngHandsontable.full.js'
 			},

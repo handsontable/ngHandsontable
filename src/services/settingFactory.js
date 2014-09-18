@@ -61,7 +61,7 @@ angular.module('ngHandsontable.services', [])
 				/***
 				 *
 				 * @param options
-				 * @return {{selectedIndex: string, datarows: string, settings: string}}
+				 * @return {{datarows: String("="), settings: String("=")}}
 				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {

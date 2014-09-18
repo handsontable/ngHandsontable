@@ -130,11 +130,11 @@ angular.module('ngHandsontable.directives', [])
 
 					switch (column.type) {
 						case 'checkbox':
-							if (typeof attributes.checkedtemplate !== 'undefined') {
-								column.checkedTemplate = scope.$eval(attributes.checkedtemplate); //if undefined then defaults to Boolean true
+							if (typeof attributes['checkedtemplate'] !== 'undefined') {
+								column.checkedTemplate = scope.$eval(attributes['checkedtemplate']); //if undefined then defaults to Boolean true
 							}
-							if (typeof attributes.uncheckedtemplate !== 'undefined') {
-								column.uncheckedTemplate = scope.$eval(attributes.uncheckedtemplate); //if undefined then defaults to Boolean true
+							if (typeof attributes['uncheckedtemplate'] !== 'undefined') {
+								column.uncheckedTemplate = scope.$eval(attributes['uncheckedtemplate']); //if undefined then defaults to Boolean true
 							}
 							break;
 					}

@@ -31,15 +31,15 @@
 		datarows="db.items"
 		height="300"
 		width="700">
-		<hot-column value="id"                  title="'ID'"></hot-column>
-		<hot-column value="name.first"          title="'First Name'"  type="grayedOut"  readOnly></hot-column>
-		<hot-column value="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></hot-column>
-		<hot-column value="address"             title="'Address'" width="150"></hot-column>
-		<hot-column value="product.description" title="'Favorite food'" type="'autocomplete'">
+		<hot-column data="id"                  title="'ID'"></hot-column>
+		<hot-column data="name.first"          title="'First Name'"  type="grayedOut"  readOnly></hot-column>
+		<hot-column data="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></hot-column>
+		<hot-column data="address"             title="'Address'" width="150"></hot-column>
+		<hot-column data="product.description" title="'Favorite food'" type="'autocomplete'">
 			<hot-autocomplete datarows="description in product.options"></hot-autocomplete>
 		</hot-column>
-		<hot-column value="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></hot-column>
-		<hot-column value="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></hot-column>
+		<hot-column data="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></hot-column>
+		<hot-column data="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></hot-column>
 	</hot-table>
 
 	<div hot-table="{rowHeaders: false}" datarows="db.items" columns="db.dynamicColumns" height="300" width="700">

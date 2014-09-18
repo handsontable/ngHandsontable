@@ -102,7 +102,6 @@ angular.module('ngHandsontable.directives', [])
 						function () {
 							settingFactory.renderHandsontable(element);
 						});
-
 					settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
@@ -143,7 +142,7 @@ angular.module('ngHandsontable.directives', [])
 					for (var i in attributes) {
 						if (attributes.hasOwnProperty(i)) {
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
-								if (i === 'value') {
+								if (i === 'data') {
 									column['data'] = attributes[i];
 								}
 								else {

@@ -52,6 +52,7 @@ angular.module('ngHandsontable.services', [])
 						settings = {},
 						allOptions = angular.extend({}, scopeOptions);
 
+					console.log(scopeOptions);
 					angular.extend(allOptions, scopeOptions.settings);
 
 					for (i in htOptions) {

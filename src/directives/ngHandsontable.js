@@ -102,6 +102,7 @@ angular.module('ngHandsontable.directives', [])
 						function () {
 							settingFactory.renderHandsontable(element);
 						});
+
 					settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}

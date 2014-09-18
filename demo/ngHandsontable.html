@@ -25,7 +25,7 @@
 	</p>
 
 	<hot-table
-		settings ="{colHeaders: colHeaders, contextMenu: true }"
+		settings ="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'] }"
 		rowHeaders = "false"
 		minSpareRows = "minSpareRows"
 		datarows="db.items"
@@ -42,7 +42,7 @@
 		<hot-column data="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></hot-column>
 	</hot-table>
 
-	<div hot-table="{rowHeaders: false}" datarows="db.items" columns="db.dynamicColumns" height="300" width="700">
+	<hot-table settings="{rowHeaders: false, contextMenu: true}" colHeaders="true" datarows="db.items" columns="db.dynamicColumns" height="300" width="700"></hot-table>
 	<input type="text" ng-model="db.items[0].address" style="width: 300px">
 </body>
 </html>

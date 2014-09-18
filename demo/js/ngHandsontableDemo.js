@@ -27,7 +27,6 @@ angular.module('ngHandsontableDemo',
 						]
 					}
 				];
-
 				var firstNames = ["Ted", "John", "Macy", "Rob", "Gwen", "Fiona", "Mario", "Ben", "Kate", "Kevin", "Thomas", "Frank"];
 				var lastNames = ["Tired", "Johnson", "Moore", "Rocket", "Goodman", "Farewell", "Manson", "Bentley", "Kowalski", "Schmidt", "Tucker", "Fancy"];
 				var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
@@ -75,16 +74,16 @@ angular.module('ngHandsontableDemo',
 
 				setInterval(function () {
 					if( $scope.db.dynamicColumns[0].title == 'ID') {
+						$scope.db.dynamicColumns[3].readOnly = true;
 						$scope.db.dynamicColumns.shift();
+
+
 					} else {
-						$scope.db.dynamicColumns.unshift({value: 'id', title: 'ID'});
+						$scope.db.dynamicColumns[2].readOnly = false;
+						$scope.db.dynamicColumns.unshift({data: 'id', title: 'ID'});
 					}
 					$scope.$apply();
 				}, 3000);
-
 			}
-
-
-
 		]
 	);

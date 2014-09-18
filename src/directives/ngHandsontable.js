@@ -79,6 +79,7 @@ angular.module('ngHandsontable.directives', [])
 								return angular.toJson([settingToCheck]);
 							},
 							function () {
+								console.log(scope.htSettings.columns);
 								settingFactory.updateHandsontableSettings(element, scope.htSettings);
 							}
 						);

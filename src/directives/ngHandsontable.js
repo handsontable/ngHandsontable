@@ -61,6 +61,32 @@ angular.module('ngHandsontable.directives', [])
 						}
 					};
 
+
+					var columnSetting = attrs.columns;
+					if (columnSetting) {
+						/***
+						 * Check if settings has been changed
+						 */
+						scope.$parent.$watch(
+							function () {
+								var settingKeys = columnSetting.split('.'),
+									settingToCheck = scope.$parent;
+
+								while(settingKeys.length > 0) {
+									var key = settingKeys.shift();
+									settingToCheck = settingToCheck[key];
+								}
+								return angular.toJson([settingToCheck]);
+							},
+							function () {
+								settingFactory.updateHandsontableSettings(element, scope.htSettings);
+							}
+						);
+					}
+
+					/***
+					 * Check if data has been changed
+					 */
 					scope.$parent.$watch(
 						function () {
 							var objKeys = attrs.datarows.split('.'),
@@ -77,7 +103,6 @@ angular.module('ngHandsontable.directives', [])
 							settingFactory.renderHandsontable(element);
 						});
 
-					console.log(scope.htSettings);
 					settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}

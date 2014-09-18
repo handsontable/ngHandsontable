@@ -72,6 +72,19 @@ angular.module('ngHandsontableDemo',
 					{data: 'price', title:'Price', type: 'numeric', width: 80, format: '$ 0,0.00'},
 					{data: 'isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No', width:65}
 				];
+
+				setInterval(function () {
+					if( $scope.db.dynamicColumns[0].title == 'ID') {
+						$scope.db.dynamicColumns.shift();
+					} else {
+						$scope.db.dynamicColumns.unshift({value: 'id', title: 'ID'});
+					}
+					$scope.$apply();
+				}, 3000);
+
 			}
+
+
+
 		]
 	);

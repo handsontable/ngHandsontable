@@ -22,6 +22,11 @@ angular.module('ngHandsontable.services', [])
 					container.handsontable(htSettings);
 				},
 
+				/***
+				 * Set new settings to handsontable instance
+				 * @param element
+				 * @param settings
+				 */
 				updateHandsontableSettings: function (element, settings) {
 					var container = $(element).find('.' + this.containerClassName);
 					container.handsontable('updateSettings', settings);

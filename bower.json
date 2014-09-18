@@ -2,10 +2,10 @@
   "name": "ng-datagrid",
   "version": "0.3.17",
   "devDependencies": {
-    "handsontable": "0.11.2"
+    "handsontable": ""
   },
   "dependencies": {
-    "angular": "~1.2.17",
+    "angular": "~1.2.25",
     "jquery": "~2.0.3",
     "angular-ui-select2": "~0.0.2"
   }

@@ -1,20 +1,21 @@
 angular.module('ngHandsontable.directives', [])
+/***
+ * Main Angular Handsontable directive
+ */
 	.directive(
-	'ngHandsontable',
+	'hotTable',
 	[
 		'settingFactory',
 		'autoCompleteFactory',
 		'$rootScope',
 		function (settingFactory, autoCompleteFactory, $rootScope) {
-
 			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
 				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
 				htOptions = publicProperties.concat(publicHooks);
 
 			return {
-				restrict: 'E',
+				restrict: 'EA',
 				scope: settingFactory.getScopeDefinition(htOptions),
-
 				controller: function ($scope) {
 					this.setColumnSetting = function (column) {
 						if (!$scope.htSettings) {
@@ -35,8 +36,21 @@ angular.module('ngHandsontable.directives', [])
 
 					if(scope.htSettings.columns) {
 						for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
+
 							if (scope.htSettings.columns[i].type == 'autocomplete') {
-								autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.datarows, true);
+								if(typeof scope.htSettings.columns[i].optionList === 'string'){
+									var optionList = {};
+									var match = scope.htSettings.columns[i].optionList.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+									if (match) {
+										optionList.property = match[1];
+										optionList.object = match[2];
+									} else {
+										optionList.object = options;
+									}
+									scope.htSettings.columns[i].optionList = optionList;
+								}
+
+								autoCompleteFactory.parseAutoComplete(element, scope.htSettings.columns[i], scope.datarows, true);
 							}
 						}
 					}
@@ -47,19 +61,39 @@ angular.module('ngHandsontable.directives', [])
 						}
 					};
 
+					scope.$parent.$watch(
+						function () {
+							var objKeys = attrs.datarows.split('.'),
+								objToCheck = scope.$parent;
+
+							while(objKeys.length > 0) {
+								var key = objKeys.shift();
+								objToCheck = objToCheck[key];
+							}
+
+							return angular.toJson([objToCheck]);
+						},
+						function () {
+							settingFactory.renderHandsontable(element);
+						});
+
+					console.log(scope.htSettings);
 					settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
 		}
 	]
 )
+/***
+ * Angular Handsontable directive for single column settings
+ */
 	.directive(
-	'datacolumn',
+	'hotColumn',
 	[
 		function () {
 			return {
 				restrict: 'E',
-				require:'^ngHandsontable',
+				require:'^hotTable',
 				scope:{},
 				controller: function ($scope) {
 					this.setColumnOptionList = function (options) {
@@ -68,7 +102,6 @@ angular.module('ngHandsontable.directives', [])
 						}
 
 						var optionList = {};
-
 						var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
 						if (match) {
 							optionList.property = match[1];
@@ -87,7 +120,8 @@ angular.module('ngHandsontable.directives', [])
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
 								if (i === 'value') {
 									column['data'] = attributes[i];
-								} else {
+								}
+								else {
 									column[i] = scope.$eval(attributes[i]);
 								}
 							}
@@ -120,14 +154,17 @@ angular.module('ngHandsontable.directives', [])
 		}
 	]
 )
+/***
+ * Angular Handsontable directive for autocomplete settings
+ */
 	.directive(
-	'optionlist',
+	'hotAutocomplete',
 	[
 		function () {
 			return {
 				restrict: 'E',
 				scope: true,
-				require:'^datacolumn',
+				require:'^hotColumn',
 				link: function (scope, element, attrs, controllerInstance) {
 					var options = attrs.datarows;
 					controllerInstance.setColumnOptionList(options);

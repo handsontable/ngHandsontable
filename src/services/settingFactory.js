@@ -1,4 +1,7 @@
 angular.module('ngHandsontable.services', [])
+/***
+ *
+ */
 	.factory(
 	'settingFactory',
 	[
@@ -6,15 +9,31 @@ angular.module('ngHandsontable.services', [])
 
 			return {
 
+				containerClassName: 'handsontable-container',
+
+				/***
+				 * Append handsontable container div and initialize handsontable instance inside element
+				 * @param element
+				 * @param htSettings
+				 */
 				initializeHandsontable: function (element, htSettings) {
-					var container = $('<div class="ng-handsontable-container"></div>');
+					var container = $('<div class="'+ this.containerClassName +'"></div>');
 					element.append(container);
 					container.handsontable(htSettings);
 				},
 
-				updateHandsontable: function (element, settings) {
-					var container = element.find('.ng-handsontable-container');
+				updateHandsontableSettings: function (element, settings) {
+					var container = $(element).find('.' + this.containerClassName);
 					container.handsontable('updateSettings', settings);
+				},
+
+				/***
+				 * Render handsontable instance inside element
+				 * @param element
+				 */
+				renderHandsontable: function (element) {
+					var container = $(element).find('.' + this.containerClassName);
+					container.handsontable('render');
 				},
 
 				/***
@@ -46,7 +65,6 @@ angular.module('ngHandsontable.services', [])
 				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
-//						selectedIndex: '=selectedindex',
 						datarows: '=',
 						settings: '='
 					};
@@ -61,20 +79,26 @@ angular.module('ngHandsontable.services', [])
 		}
 	]
 )
+/***
+ *
+ */
 	.factory(
 	'autoCompleteFactory',
 
-		function () {
+		function (settingFactory) {
 			return {
-				parseAutoComplete: function (column, dataSet,  propertyOnly) {
+				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
 
 					column.source = function (query, process) {
-						var hotInstance = $('.ng-handsontable-container').data('handsontable'),
+						var container = $(element).find('.' + settingFactory.containerClassName),
+							hotInstance = container.data('handsontable'),
 							row = hotInstance.getSelected()[0];
 
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
+
+							console.log(options);
 
 							if(options.object) {
 								var objKeys = options.object.split('.')

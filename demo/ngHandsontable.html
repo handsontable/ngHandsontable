@@ -7,7 +7,7 @@
 	<script src="../bower_components/angular/angular.js"></script>
 	<script src="../bower_components/jquery/jquery.min.js"></script>
 	<script src="../bower_components/handsontable/dist/jquery.handsontable.full.min.js"></script>
-	<script src="../dist/ngHandsontable.full.js"></script>
+	<script src="../dist/ngHandsontable.js"></script>
 	<script src="js/ngHandsontableDemo.js"></script>
 	<style>
 		body {
@@ -16,51 +16,33 @@
 	</style>
 </head>
 <body ng-controller="DemoCtrl">
-	<h1>Handsontable with Angular</h1>
+	<h1>ngHandsontable - Handsontable with Angular</h1>
 
-	<ng-handsontable
-		settings ="{minSpareRows: 1,rowHeaders: true,contextMenu: true }"
+	<p>
+		<code>hot-table</code> is main and required directive for ngHandsontable<br />
+		You can put all your settings in <code>settings = "{colHeaders: colHeaders, contextMenu: true }"</code> attribute <br />
+		or in separated attributes like <code>minSpareRows = "minSpareRows"</code>, <code>rowHeaders = "false"</code>
+	</p>
+
+	<hot-table
+		settings ="{colHeaders: colHeaders, contextMenu: true }"
+		rowHeaders = "false"
+		minSpareRows = "minSpareRows"
 		datarows="db.items"
 		height="300"
 		width="700">
-		<datacolumn value="id"                  title="'ID'"></datacolumn>
-		<datacolumn value="name.first"          title="'First Name'"  type="grayedOut"  readOnly></datacolumn>
-		<datacolumn value="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></datacolumn>
-		<datacolumn value="address"             title="'Address'"></datacolumn>
-		<datacolumn value="product.description" title="'Favorite food'" type="'autocomplete'">
-			<optionlist datarows="description in product.options">
-				<!--<img ng-src="{{image}}" style="width: 16px; height: 16px; border-width: 0">-->
-				<!--{{description}}-->
-			</optionlist>
-		</datacolumn>
-		<datacolumn value="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></datacolumn>
-		<datacolumn value="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></datacolumn>
-	</ng-handsontable>
+		<hot-column value="id"                  title="'ID'"></hot-column>
+		<hot-column value="name.first"          title="'First Name'"  type="grayedOut"  readOnly></hot-column>
+		<hot-column value="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></hot-column>
+		<hot-column value="address"             title="'Address'" width="150"></hot-column>
+		<hot-column value="product.description" title="'Favorite food'" type="'autocomplete'">
+			<hot-autocomplete datarows="description in product.options"></hot-autocomplete>
+		</hot-column>
+		<hot-column value="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></hot-column>
+		<hot-column value="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></hot-column>
+	</hot-table>
 
-
-
-	<table>
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>First Name</th>
-				<th>Last Name</th>
-				<th>Address</th>
-				<th>Favourite food</th>
-				<th>Price</th>
-				<th>isActive</th>
-			</tr>
-		</thead>
-		<tr ng-repeat="item in db.items">
-			<td>{{item.id}}</td>
-			<td>{{item.name.first}}</td>
-			<td>{{item.name.last}}</td>
-			<td>{{item.address}}</td>
-			<td>{{item.product.description}}</td>
-			<td>{{item.price}}</td>
-			<td>{{item.isActive}}</td>
-		</tr>
-	</table>
+	<div hot-table="{rowHeaders: false}" datarows="db.items" columns="db.dynamicColumns" height="300" width="700">
 	<input type="text" ng-model="db.items[0].address" style="width: 300px">
 </body>
 </html>

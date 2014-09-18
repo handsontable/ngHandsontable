@@ -1,6 +1,6 @@
 {
-  "name": "angular-ui-handsontable",
-  "description": "Angular UI directive for Handsontable. Enables creation of data grid applications in AngularJS",
+  "name": "ngHandsontable",
+  "description": "Angular directive for Handsontable. Enables creation of data grid applications in AngularJS",
   "homepage": "https://github.com/warpech/angular-ui-handsontable",
   "bugs": {
     "url": "https://github.com/warpech/angular-ui-handsontable/issues"

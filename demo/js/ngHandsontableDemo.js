@@ -32,6 +32,9 @@ angular.module('ngHandsontableDemo',
 				var lastNames = ["Tired", "Johnson", "Moore", "Rocket", "Goodman", "Farewell", "Manson", "Bentley", "Kowalski", "Schmidt", "Tucker", "Fancy"];
 				var address = ["Turkey", "Japan", "Michigan", "Russia", "Greece", "France", "USA", "Germany", "Sweden", "Denmark", "Poland", "Belgium"];
 
+				$scope.minSpareRows = 1;
+				$scope.colHeaders = true;
+
 				$scope.db = {};
 				$scope.db.items = [];
 				for (var i = 0; i < 10; i++) {
@@ -49,6 +52,26 @@ angular.module('ngHandsontableDemo',
 						}
 					);
 				}
+
+				$scope.db.dynamicColumns = [
+					{
+						data: 'id',
+						title: 'ID'},
+					{
+						data: 'name.first',
+						title: 'First Name',
+						readOnly: true
+					},
+					{
+						data: 'name.last',
+						title: 'Last Name',
+						readOnly: true
+					},
+					{data: 'address', title: 'Address', width: 150},
+					{data: 'product.description', type: 'autocomplete', title: 'Favorite food', width: 150, optionList: 'description in product.options'},
+					{data: 'price', title:'Price', type: 'numeric', width: 80, format: '$ 0,0.00'},
+					{data: 'isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No', width:65}
+				];
 			}
 		]
 	);

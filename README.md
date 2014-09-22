@@ -22,7 +22,7 @@ Include the library files (see [dist/](https://github.com/warpech/angular-ui-han
 Template:
 
 ```html
-<div minSpareRows="1" datarows="item in items">
+<div ui-handsontable minSpareRows="1" datarows="item in items">
   <datacolumn value="item.id" title="'ID'"></datacolumn>
   <datacolumn type="grayedOut" value="item.name.first" title="'First Name'" readOnly></datacolumn>
   <datacolumn type="grayedOut" value="item.name.last" title="'Last Name'" readOnly></datacolumn>

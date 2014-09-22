@@ -32,6 +32,7 @@ angular.module('ngHandsontable.directives', [])
 						scope.htSettings = {};
 					}
 					scope.htSettings['data'] = scope.datarows;
+
 					angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
 
 					if(scope.htSettings.columns) {
@@ -63,27 +64,31 @@ angular.module('ngHandsontable.directives', [])
 
 
 					var columnSetting = attrs.columns;
-					if (columnSetting) {
-						/***
-						 * Check if settings has been changed
-						 */
-						scope.$parent.$watch(
-							function () {
-								var settingKeys = columnSetting.split('.'),
-									settingToCheck = scope.$parent;
 
-								while(settingKeys.length > 0) {
+					/***
+					 * Check if settings has been changed
+					 */
+					scope.$parent.$watch(
+						function () {
+
+							var settingToCheck = scope.$parent;
+
+							if (columnSetting) {
+								var settingKeys = columnSetting.split('.');
+								while (settingKeys.length > 0) {
 									var key = settingKeys.shift();
 									settingToCheck = settingToCheck[key];
 								}
 								return angular.toJson([settingToCheck]);
-							},
-							function () {
-								console.log(scope.htSettings.columns);
-								settingFactory.updateHandsontableSettings(element, scope.htSettings);
 							}
-						);
-					}
+
+						},
+						function () {
+							angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope.$parent));
+							settingFactory.updateHandsontableSettings(element, scope.htSettings);
+						}
+					);
+
 
 					/***
 					 * Check if data has been changed

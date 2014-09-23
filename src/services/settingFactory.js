@@ -28,7 +28,6 @@ angular.module('ngHandsontable.services', [])
 				 * @param settings
 				 */
 				updateHandsontableSettings: function (element, settings) {
-					console.log(settings.afterChange);
 					var container = $(element).find('.' + this.containerClassName);
 					container.handsontable('updateSettings', settings);
 				},

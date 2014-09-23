@@ -1,6 +1,10 @@
 {
   "name": "ng-datagrid",
   "version": "0.3.17",
+  "main": [
+    "./dist/angular-ui-handsontable.full.js",
+    "./dist/angular-ui-handsontable.full.css"
+  ],
   "devDependencies": {
     "handsontable": ""
   },

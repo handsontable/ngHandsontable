@@ -77,14 +77,14 @@ angular.module('ngHandsontableDemo',
 						$scope.db.dynamicColumns[3].readOnly = true;
 						$scope.db.dynamicColumns.shift();
 						$scope.afterChange = function () {
-							console.log('afterChange: ','when ID column has been removed');
+//							console.log('afterChange: ','when ID column has been removed');
 						};
 
 					} else {
 						$scope.db.dynamicColumns[2].readOnly = false;
 						$scope.db.dynamicColumns.unshift({data: 'id', title: 'ID'});
 						$scope.afterChange = function () {
-							console.log('afterChange: ','when ID column has been added');
+//							console.log('afterChange: ','when ID column has been added');
 						};
 					}
 					$scope.$apply();

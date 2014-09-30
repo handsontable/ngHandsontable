@@ -228,14 +228,13 @@
         }
       });
     }
-
-    var menu = document.querySelector("#global-menu");
-    if (menu) {
-      bindMenuEvents(menu)
-    }
-    else {
-      $.get("../index.html", onMenuLoad);
-    }
+//    var menu = document.querySelector("#global-menu");
+//    if (menu) {
+//      bindMenuEvents(menu)
+//    }
+//    else {
+//      $.get("../index.html", onMenuLoad);
+//    }
   }
 
   $(function () {

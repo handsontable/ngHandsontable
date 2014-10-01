@@ -82,19 +82,21 @@
 			<div class="descLayout">
 				<div class="pad" data-jsfiddle="example">
 
-					<p style="font-size: 20px"><strong>ngHandsontable</strong> is a wrapper for <a href="http://www.handsontable.com">Handsontable</a> library</p>
+					<p style="font-size: 20px"><strong>ngHandsontable</strong> is the <a href="https://angularjs.org/">AngularJS</a> version of the <a href="http://www.handsontable.com">Handsontable</a> data grid</p>
 
-					<div class="warning">
-						This is ngHandsontable <a href="https://github.com/handsontable/ngHandsontable/releases" class="ver"></a>, a release published on Sep 19, 2014.
-					</div>
+          <h2>Static configuration with dynamic data</h2>
 
-                    <p>
-                      <code>hot-table</code> is main and required directive for ngHandsontable<br />
-                      You can put all your settings in <code>settings = "{colHeaders: colHeaders, contextMenu: true }"</code> attribute <br />
-                      or in separated attributes like <code>minSpareRows = "minSpareRows"</code>, <code>rowHeaders = "false"</code>
-                    </p>
+          <p>
+            The main directive for ngHandsontable is <code>hot-table</code>
+          </p>
 
-					<div id="example">
+          <p>
+            You can put all your settings in <code>settings="{colHeaders: colHeaders, <br>contextMenu: true }"</code>
+            attribute
+            or in separated attributes, e.g. <code>minSpareRows="minSpareRows"</code>, <code>rowHeaders="false"</code>.
+          </p>
+
+					<div id="example1">
 						<hot-table
 							settings ="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'], afterChange: afterChange }"
 							rowHeaders = "false"
@@ -114,11 +116,21 @@
 						</hot-table>
 					</div>
 
-					<div id="expamle1">
+          <h2>Dynamic configuration with dynamic data</h2>
+
+          <p>This example uses a dynamic <code>columns</code> configuration that changes every 3 seconds!</p>
+
+          <p>It is bound to the same data source as the first instance on this page.</p>
+
+					<div id="example2">
 						<hot-table settings="{rowHeaders: false, contextMenu: true, afterChange: afterChange}" colHeaders="true" datarows="db.items" columns="db.dynamicColumns" height="300" width="700"></hot-table>
 					</div>
 
-					<input type="text" ng-model="db.items[0].address" style="width: 300px">
+          <h2>Data binding</h2>
+
+          <p>The below <code>input</code> field is bound to the <code>address</code> property of the first data row.</p>
+
+					<label>Address <input type="text" ng-model="db.items[0].address" style="width: 300px"></label>
 				</div>
 			</div>
 		</div>

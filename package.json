@@ -6,7 +6,7 @@
     "url": "https://github.com/handsontable/ngHandsontable"
   },
   "author": "Marcin Warpechowski <hello@handsontable.com>",
-  "version": "0.3.17",
+  "version": "0.4.0",
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-uglify": "~0.5.1",

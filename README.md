@@ -22,9 +22,9 @@ Template:
 
 ```html
 <hot-table
-    settings ="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'], afterChange: afterChange }"
-    rowHeaders = "false"
-    minSpareRows = "minSpareRows"
+    settings="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'], afterChange: afterChange }"
+    rowHeaders="false"
+    minSpareRows="minSpareRows"
     datarows="db.items"
     height="300"
     width="700">

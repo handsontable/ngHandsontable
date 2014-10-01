@@ -1,4 +1,4 @@
-if (window.location.hostname === 'handsontable.com' || window.location.hostname === 'www.handsontable.com' || window.location.hostname === 'warpech.github.com') {
+if (window.location.hostname === 'handsontable.com' || window.location.hostname === 'www.handsontable.com' || window.location.hostname === 'handsontable.github.io') {
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-33932793-1']);
   _gaq.push(['_trackPageview']);

@@ -6,7 +6,6 @@
   },
   "dependencies": {
     "angular": "~1.2.25",
-    "jquery": "~2.0.3",
-    "angular-ui-select2": "~0.0.2"
+    "jquery": "~2.0.3"
   }
 }

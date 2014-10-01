@@ -79,19 +79,19 @@ All **Handsontable** options listed [here](https://github.com/handsontable/jquer
   
  Directive                       | Attribute&nbsp;&nbsp;&nbsp; | Description
  --------------------------------|-----------------------------|-------------
- **&lt;div ui-handsontable&gt;** |                             | Defines the grid container. Can also be declared as element `<ui-handsontable>`
- &lt;div ui-handsontable&gt;     | datarows                    | Data provider for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
- &lt;div ui-handsontable&gt;     | settings                    | jquery-handsontable settings. For list of options, see: [handsontable/jquery-handsontable](https://github.com/handsontable/jquery-handsontable)
- &lt;div ui-handsontable&gt;     | selectedIndex               | Allows to bind a scope variable to get/set selected row index
- **&lt;datacolumn&gt;**          |                             | Defines a column in the grid
- &lt;datacolumn&gt;              | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
- &lt;datacolumn&gt;              | value                       | Row property that will be used as data source for each cell
- &lt;datacolumn&gt;              | title                       | Column title
- &lt;datacolumn&gt;              | readOnly                    | If set, column will be read-only
- &lt;datacolumn&gt;              | saveOnBlur                  | (Autocomplete columns only) If set, `value` will be updated after autocomplete is blured. This is in contrast to default behavior, where `value` is updated after each keystroke
- &lt;datacolumn&gt;              | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
- &lt;datacolumn&gt;              | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
- &lt;datacolumn&gt;              | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
+ **&lt;div hot-table&gt;**       |                             | Defines the grid container. Can also be declared as element `<ui-handsontable>`
+ &lt;div hot-table&gt;           | datarows                    | Data provider for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+ &lt;div hot-table&gt;           | settings                    | jquery-handsontable settings. For list of options, see: [handsontable/jquery-handsontable](https://github.com/handsontable/jquery-handsontable)
+ &lt;div hot-table&gt;           | selectedIndex               | Allows to bind a scope variable to get/set selected row index
+ **&lt;hot-column&gt;**          |                             | Defines a column in the grid
+ &lt;hot-column&gt;              | type                        | Column type. Possible values: `text`, `checkbox`, `autocomplete` (default: `text`)
+ &lt;hot-column&gt;              | value                       | Row property that will be used as data source for each cell
+ &lt;hot-column&gt;              | title                       | Column title
+ &lt;hot-column&gt;              | readOnly                    | If set, column will be read-only
+ &lt;hot-column&gt;              | saveOnBlur                  | (Autocomplete columns only) If set, `value` will be updated after autocomplete is blured. This is in contrast to default behavior, where `value` is updated after each keystroke
+ &lt;hot-column&gt;              | strict                      | (Autocomplete columns only) If set, `value` can only be selected from autocomplete options. If not set, also custom `value` is allowed if entered to the text box
+ &lt;hot-column&gt;              | checkedTemplate             | (Checkbox columns only) Expression that will be used as the value for checked `checkbox` cell (default: boolean `true`)
+ &lt;hot-column&gt;              | uncheckedTemplate           | (Checkbox columns only) Expression that will be used as the value for unchecked `checkbox` cell (default: boolean `false`)
 
 ## License
 

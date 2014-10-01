@@ -1,5 +1,5 @@
 /**
- * This file is used to build Angular UI Handsontable from `src/*`
+ * This file is used to build ngHandsontable from `src/*`
  *
  * Installation:
  * 1. Install Grunt CLI (`npm install -g grunt-cli`)
@@ -10,7 +10,7 @@
  * To execute automatically after each change, execute `grunt --force default watch`
  *
  * Result:
- * building Angular UI Handsontable will create files:
+ * building ngHandsontable will create files:
  *  - dist/ngHandsontable.js
  *  - dist/ngHandsontable.min.js
  *

@@ -1,13 +1,18 @@
 (function HandsontableObserveChanges() {
 
-  Handsontable.PluginHooks.add('afterLoadData', init);
-  Handsontable.PluginHooks.add('afterUpdateSettings', init);
+  Handsontable.hooks.add('afterLoadData', init);
+  Handsontable.hooks.add('afterUpdateSettings', init);
+
+  Handsontable.hooks.register('afterChangesObserved');
 
   function init() {
     var instance = this;
     var pluginEnabled = instance.getSettings().observeChanges;
 
-    if (!instance.observer && pluginEnabled) {
+    if (pluginEnabled) {
+      if(instance.observer) {
+        destroy.call(instance); //destroy observer for old data object
+      }
       createObserver.call(instance);
       bindEvents.call(instance);
 
@@ -29,7 +34,8 @@
       instance.observeChangesActive = true;
     };
 
-    instance.observer = jsonpatch.observe(instance.getData(), function (patches) {
+    instance.observedData = instance.getData();
+    instance.observer = jsonpatch.observe(instance.observedData, function (patches) {
       if(instance.observeChangesActive){
         runHookForOperation.call(instance, patches);
         instance.render();
@@ -134,7 +140,7 @@
   function destroyObserver(){
     var instance = this;
 
-    jsonpatch.unobserve(instance.getData(), instance.observer);
+    jsonpatch.unobserve(instance.observedData, instance.observer);
     delete instance.observeChangesActive;
     delete instance.pauseObservingChanges;
     delete instance.resumeObservingChanges;

@@ -2,7 +2,7 @@ describe('Core_view', function () {
   var id = 'testContainer';
 
   beforeEach(function () {
-    this.$container = $('<div id="' + id + '" style="width: 400px; height: 60px; overflow: scroll"></div>').appendTo('body');
+    this.$container = $('<div id="' + id + '"></div>').appendTo('body');
   });
 
   afterEach(function () {
@@ -13,6 +13,9 @@ describe('Core_view', function () {
   });
 
   it('should focus cell after viewport is scrolled using down arrow', function () {
+    this.$container[0].style.width = '400px';
+    this.$container[0].style.height = '60px';
+
     handsontable({
       startRows: 20
     });
@@ -32,42 +35,45 @@ describe('Core_view', function () {
     expect(isEditorVisible()).toEqual(true);
   });
 
-  it('should scroll viewport when partially visible cell is clicked', function () {
+  xit('should scroll viewport when partially visible cell is clicked', function () {
+    this.$container[0].style.width = '400px';
+    this.$container[0].style.height = '60px';
 
     handsontable({
       data: createSpreadsheetData(10, 3),
       height: 60
     });
 
+    var htCore = getHtCore();
+
     expect(this.$container.height()).toEqual(60);
-    expect(this.$container.find('.wtHider').height()).toEqual(60);
+    expect(this.$container.find('.wtHolder .wtHider').height()).toBeGreaterThan(60);
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
-    expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
 
-    this.$container.find('tr:eq(2) td:eq(0)').trigger('mousedown');
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A1"); //test whether it scrolled
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A2"); //test whether it scrolled
-    expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A3"); //test whether it scrolled
-    expect(getSelected()).toEqual([2, 0, 2, 0]); //test whether it is selected
+    htCore.find('tr:eq(3) td:eq(0)').trigger('mousedown');
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A2"); //test whether it scrolled
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A3"); //test whether it scrolled
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A4"); //test whether it scrolled
+    expect(getSelected()).toEqual([3, 0, 3, 0]); //test whether it is selected
   });
 
-  it('should scroll viewport, respecting fixed rows', function () {
-
-    spec().$container.css({
-      width: '200px',
-      height: '100px'
-    });
+  xit('should scroll viewport, respecting fixed rows', function () {
+    this.$container[0].style.width = '200px';
+    this.$container[0].style.height = '100px';
 
     handsontable({
       data: createSpreadsheetData(10, 9),
       fixedRowsTop: 1
     });
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("B0");
-    expect(this.$container.find('tr:eq(0) td:eq(2)').html()).toEqual("C0");
+    var htCore = getHtCore();
+
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(0) td:eq(1)').html()).toEqual("B1");
+    expect(htCore.find('tr:eq(0) td:eq(2)').html()).toEqual("C1");
 
     selectCell(0, 0);
 
@@ -76,13 +82,15 @@ describe('Core_view', function () {
     keyDown('arrow_down');
     keyDown('arrow_down');
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("B0");
-    expect(this.$container.find('tr:eq(0) td:eq(2)').html()).toEqual("C0");
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A3");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A4");
 
   });
 
-  it('should enable to change fixedRowsTop with updateSettings', function () {
+  xit('should enable to change fixedRowsTop with updateSettings', function () {
+    this.$container[0].style.width = '400px';
+    this.$container[0].style.height = '60px';
 
     var HOT = handsontable({
       data: createSpreadsheetData(10, 9),
@@ -93,51 +101,83 @@ describe('Core_view', function () {
 
     selectCell(0, 0);
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
+    var htCore = getHtCore();
+    var topClone = this.$container.find('.ht_clone_top');
+
+    expect(topClone.find('tr').length).toEqual(1);
+    expect(topClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+    expect(htCore.find('tr:eq(3) td:eq(0)').html()).toEqual("A4");
 
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A3");
+    expect(topClone.find('tr').length).toEqual(1);
+    expect(topClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A3");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A4");
+    expect(htCore.find('tr:eq(3) td:eq(0)').html()).toEqual("A5");
 
     selectCell(0, 0);
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+    expect(htCore.find('tr:eq(3) td:eq(0)').html()).toEqual("A4");
 
     HOT.updateSettings({
       fixedRowsTop: 2
     });
 
+    expect(topClone.find('tr').length).toEqual(2);
+    expect(topClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(topClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+    expect(htCore.find('tr:eq(3) td:eq(0)').html()).toEqual("A4");
+
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
     keyDown('arrow_down');
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A4");
+    expect(htCore.find('tr:eq(3) td:eq(0)').html()).toEqual("A5");
 
   });
 
   it('should scroll viewport, respecting fixed columns', function () {
-
-    spec().$container.css({
-      width: '200px',
-      height: '100px'
-    });
+    this.$container[0].style.width = '200px';
+    this.$container[0].style.height = '100px';
 
     handsontable({
       data: createSpreadsheetData(10, 9),
       fixedColumnsLeft: 1
     });
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
-    expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A2");
+    var htCore = getHtCore();
+    var leftClone = this.$container.find('.ht_clone_left');
+
+
+    expect(leftClone.find('tr:eq(0) td').length).toEqual(1);
+    expect(leftClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(leftClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+
+    expect(htCore.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
 
     selectCell(0, 3);
 
@@ -146,74 +186,76 @@ describe('Core_view', function () {
     keyDown('arrow_right');
     keyDown('arrow_right');
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual("A1");
-    expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(leftClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+
 
   });
 
   it('should enable to change fixedColumnsLeft with updateSettings', function () {
-
-    spec().$container.css({
-      width: '200px',
-      height: '100px'
-    });
+    this.$container[0].style.width = '200px';
+    this.$container[0].style.height = '100px';
 
     var HOT = handsontable({
       data: createSpreadsheetData(10, 9),
       fixedColumnsLeft: 1
     });
 
-    selectCell(0, 0);
-
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("B0");
-
-    keyDown('arrow_right');
-    keyDown('arrow_right');
-    keyDown('arrow_right');
-    keyDown('arrow_right');
-
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("D0");
 
     selectCell(0, 0);
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("D0"); //clicking on a fixed cell should not scroll the table
+    var leftClone = this.$container.find('.ht_clone_left');
+
+    expect(leftClone.find('tr:eq(0) td').length).toEqual(1);
+    expect(leftClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(leftClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+
+    keyDown('arrow_right');
+    keyDown('arrow_right');
+    keyDown('arrow_right');
+    keyDown('arrow_right');
+
+    expect(leftClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(leftClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+
+    selectCell(0, 0);
 
     HOT.updateSettings({
       fixedColumnsLeft: 2
     });
 
-    keyDown('arrow_right');
-    keyDown('arrow_right');
-    keyDown('arrow_right');
-    keyDown('arrow_right');
+    expect(leftClone.find('tr:eq(0) td').length).toEqual(2);
+    expect(leftClone.find('tr:eq(0) td:eq(0)').html()).toEqual("A1");
+    expect(leftClone.find('tr:eq(0) td:eq(1)').html()).toEqual("B1");
+    expect(leftClone.find('tr:eq(1) td:eq(0)').html()).toEqual("A2");
+    expect(leftClone.find('tr:eq(1) td:eq(1)').html()).toEqual("B2");
+    expect(leftClone.find('tr:eq(2) td:eq(0)').html()).toEqual("A3");
+    expect(leftClone.find('tr:eq(2) td:eq(1)').html()).toEqual("B3");
 
-    expect(this.$container.find('tr:eq(0) td:eq(0)').html()).toEqual("A0");
-    expect(this.$container.find('tr:eq(0) td:eq(1)').html()).toEqual("B0");
+
 
   });
 
   it('should not scroll viewport when last cell is clicked', function () {
-    this.$container.remove();
-    this.$container = $('<div id="' + id + '"></div>').appendTo('body');
     handsontable({
-      startRows: 50
+      startRows: 40
     });
 
     var lastScroll;
 
     $(window).scrollTop(10000);
     lastScroll = $(window).scrollTop();
-    selectCell(47, 0);
+    render(); //renders synchronously so we don't have to put stuff in waits/runs
+    selectCell(39, 0);
 
     expect($(window).scrollTop()).toEqual(lastScroll);
 
     keyDown('arrow_right');
 
-    expect(getSelected()).toEqual([47, 1, 47, 1]);
+    expect(getSelected()).toEqual([39, 1, 39, 1]);
     expect($(window).scrollTop()).toEqual(lastScroll);
   });
 
@@ -222,8 +264,7 @@ describe('Core_view', function () {
     var initHeight;
 
     runs(function () {
-      this.$container.remove();
-      this.$container = $('<div id="' + id + '" style="overflow: scroll;"></div>').appendTo('body');
+      this.$container[0].style.overflow = 'scroll';
       this.$container.wrap('<div style="width: 50px;"></div>');
       handsontable({
         startRows: 10,
@@ -246,9 +287,6 @@ describe('Core_view', function () {
   });
 
   it('should allow height to be a number', function () {
-    this.$container[0].style.width = '';
-    this.$container[0].style.height = '';
-
     handsontable({
       startRows: 10,
       startCols: 10,
@@ -259,9 +297,6 @@ describe('Core_view', function () {
   });
 
   it('should allow height to be a function', function () {
-    this.$container[0].style.width = '';
-    this.$container[0].style.height = '';
-
     handsontable({
       startRows: 10,
       startCols: 10,
@@ -274,9 +309,6 @@ describe('Core_view', function () {
   });
 
   it('should allow width to be a number', function () {
-    this.$container[0].style.width = '';
-    this.$container[0].style.height = '';
-
     handsontable({
       startRows: 10,
       startCols: 10,
@@ -287,9 +319,6 @@ describe('Core_view', function () {
   });
 
   it('should allow width to be a function', function () {
-    this.$container[0].style.width = '';
-    this.$container[0].style.height = '';
-
     handsontable({
       startRows: 10,
       startCols: 10,
@@ -302,16 +331,19 @@ describe('Core_view', function () {
   });
 
   it("should fire beforeRender event after table has been scrolled", function () {
+    this.$container[0].style.width = '400px';
+    this.$container[0].style.height = '60px';
+    this.$container[0].style.overflow = 'auto';
 
     var hot = handsontable({
-      data: createSpreadsheetData(20, 3)
+      data: createSpreadsheetData(100, 3)
     });
 
     var beforeRenderCallback = jasmine.createSpy('beforeRenderCallback');
 
     hot.addHook('beforeRender', beforeRenderCallback);
 
-    $(hot.view.wt.wtTable.TABLE).trigger('mousewheel', [0, 0, -1]);
+    this.$container.scrollTop(1000);
 
     waitsFor(function(){
       return beforeRenderCallback.calls.length > 0;
@@ -320,6 +352,9 @@ describe('Core_view', function () {
   });
 
   it("should fire afterRender event after table has been scrolled", function () {
+    this.$container[0].style.width = '400px';
+    this.$container[0].style.height = '60px';
+    this.$container[0].style.overflow = 'auto';
 
     var hot = handsontable({
       data: createSpreadsheetData(20, 3)
@@ -329,7 +364,7 @@ describe('Core_view', function () {
 
     hot.addHook('afterRender', afterRenderCallback);
 
-    $(hot.view.wt.wtTable.TABLE).trigger('mousewheel', [0, 0, -1]);
+    this.$container.scrollTop(1000);
 
     waitsFor(function(){
       return afterRenderCallback.calls.length > 0;
@@ -337,6 +372,7 @@ describe('Core_view', function () {
 
   });
 
+  //TODO fix these tests - https://github.com/handsontable/jquery-handsontable/issues/1559
   describe('maximumVisibleElementWidth', function () {
     it('should return maximum width until right edge of the viewport', function () {
       var hot = handsontable({
@@ -346,7 +382,7 @@ describe('Core_view', function () {
         height: 100
       });
 
-      expect(hot.view.maximumVisibleElementWidth(20)).toEqual(80);
+      expect(hot.view.maximumVisibleElementWidth(0)).toEqual(100);
     });
 
     it('should return maximum width until right edge of the viewport (excluding the scrollbar)', function () {
@@ -357,7 +393,7 @@ describe('Core_view', function () {
         height: 100
       });
 
-      expect(hot.view.maximumVisibleElementWidth(20)).toEqual(70);
+      expect(hot.view.maximumVisibleElementWidth(200)).toBeLessThan(100);
     });
   });
 
@@ -370,7 +406,7 @@ describe('Core_view', function () {
         height: 100
       });
 
-      expect(hot.view.maximumVisibleElementHeight(20)).toEqual(80);
+      expect(hot.view.maximumVisibleElementHeight(0)).toEqual(100);
     });
 
     it('should return maximum height until bottom edge of the viewport (excluding the scrollbar)', function () {
@@ -381,7 +417,193 @@ describe('Core_view', function () {
         height: 100
       });
 
-      expect(hot.view.maximumVisibleElementHeight(20)).toEqual(70);
+      expect(hot.view.maximumVisibleElementHeight()).toBeLessThan(100);
     });
   });
+
+  describe('fixed column row heights', function () {
+    it('should be the same as the row heights in the main table', function () {
+        var hot = handsontable({
+          data: [["A","B","C","D"],["a","b","c\nc","d"],["aa","bb","cc","dd"]],
+          startRows: 3,
+          startCols: 4,
+          fixedColumnsLeft: 2
+        });
+
+        expect(hot.getCell(1,2).clientHeight).toEqual(hot.getCell(1,1).clientHeight);
+
+        hot.setDataAtCell(1,2,"c");
+
+        expect(hot.getCell(1,2).clientHeight).toEqual(hot.getCell(1,1).clientHeight);
+    });
+
+    it('should be the same as the row heights in the main table (after scroll)', function () {
+      var myData = createSpreadsheetData(20, 4);
+      myData[1][3] = "very\nlong\ntext";
+      myData[5][3] = "very\nlong\ntext";
+      myData[10][3] = "very\nlong\ntext";
+      myData[15][3] = "very\nlong\ntext";
+
+      var hot = handsontable({
+        data: myData,
+        startRows: 3,
+        startCols: 4,
+        fixedRowsTop: 2,
+        fixedColumnsLeft: 2,
+        width: 200,
+        height: 200
+      });
+
+      this.$container.scrollTop(200);
+      hot.render();
+
+      var masterTD = this.$container.find('.ht_master tbody tr:eq(5) td:eq(1)')[0];
+      var cloneTD = this.$container.find('.ht_clone_left tbody tr:eq(5) td:eq(1)')[0];
+
+      expect(cloneTD.clientHeight).toEqual(masterTD.clientHeight);
+    });
+
+    it('should be the same as the row heights in the main table (after scroll, in corner)', function () {
+      var myData = createSpreadsheetData(20, 4);
+      myData[1][3] = "very\nlong\ntext";
+      myData[5][3] = "very\nlong\ntext";
+      myData[10][3] = "very\nlong\ntext";
+      myData[15][3] = "very\nlong\ntext";
+
+      var hot = handsontable({
+        data: myData,
+        startRows: 3,
+        startCols: 4,
+        fixedRowsTop: 2,
+        fixedColumnsLeft: 2,
+        width: 200,
+        height: 200
+      });
+
+      var rowHeight = hot.getCell(1,3).clientHeight;
+
+      expect(this.$container.find('.ht_clone_corner tbody tr:eq(1) td:eq(1)')[0].clientHeight).toEqual(rowHeight);
+
+      this.$container.scrollTop(200);
+      hot.render();
+
+      expect(this.$container.find('.ht_clone_corner tbody tr:eq(1) td:eq(1)')[0].clientHeight).toEqual(rowHeight);
+    });
+
+  });
+
+  describe('fixed column widths', function () {
+    it("should set the columns width correctly after changes made during updateSettings", function () {
+      var hot = handsontable({
+        startRows: 2,
+        fixedColumnsLeft: 2,
+        columns: [{
+          width: 50
+        }, {
+          width: 80
+        }, {
+          width: 110
+        }, {
+          width: 140
+        }, {
+          width: 30
+        }, {
+          width: 30
+        }, {
+          width: 30
+        }]
+      });
+
+      var leftClone = this.$container.find('.ht_clone_left');
+
+      expect(Handsontable.Dom.outerWidth(leftClone.find("tbody tr:nth-child(1) td:nth-child(2)")[0])).toEqual(80);
+
+      hot.updateSettings({
+        manualColumnMove: [2, 0, 1],
+        fixedColumnsLeft: 1
+      });
+
+      expect(leftClone.find("tbody tr:nth-child(1) td:nth-child(2)")[0]).toBe(undefined);
+
+      hot.updateSettings({
+        manualColumnMove: false,
+        fixedColumnsLeft: 2
+      });
+
+      expect(Handsontable.Dom.outerWidth(leftClone.find("tbody tr:nth-child(1) td:nth-child(2)")[0])).toEqual(80);
+
+    });
+  });
+
+  describe('stretchH', function () {
+
+    it("should stretch all visible columns with the ratio appropriate to the container's width", function() {
+
+      this.$container[0].style.width = '300px';
+
+      var hot = handsontable({
+        startRows: 5,
+        startCols: 5,
+        rowHeaders: true,
+        colHeaders: true,
+        stretchH: 'all'
+      }),
+      rowHeaderWidth = hot.view.wt.wtViewport.getRowHeaderWidth(),
+      expectedCellWidth = 0;
+
+      expectedCellWidth = (parseInt(this.$container[0].style.width,10) - rowHeaderWidth) / 5;
+
+      expect(getCell(0,0).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,1).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,2).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,3).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,4).offsetWidth).toEqual(expectedCellWidth);
+
+
+      this.$container[0].style.width = '';
+      this.$container.wrap('<div class="temp_wrapper" style="width:400px;"></div>');
+      hot.render();
+
+      expectedCellWidth = (parseInt($('.temp_wrapper')[0].style.width,10) - rowHeaderWidth) / 5;
+
+      expect(getCell(0,0).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,1).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,2).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,3).offsetWidth).toEqual(expectedCellWidth);
+      expect(getCell(0,4).offsetWidth).toEqual(expectedCellWidth);
+
+      this.$container.unwrap();
+    });
+
+    it("should stretch all visible columns with overflow auto", function() {
+      this.$container[0].style.width = '501px';
+      this.$container[0].style.height = '100px';
+      this.$container[0].style.overflow = 'auto';
+
+      var hot = handsontable({
+        startRows: 10,
+        startCols: 5,
+        colWidths: [47, 47, 47, 47, 47],
+        rowHeaders: true,
+        colHeaders: true,
+        stretchH: 'all'
+      });
+
+      var masterTH = this.$container[0].querySelectorAll(".ht_master thead tr th");
+      var overlayTH = this.$container[0].querySelectorAll(".ht_clone_top thead tr th");
+
+      expect(masterTH[0].offsetWidth).toEqual(50);
+      expect(overlayTH[0].offsetWidth).toEqual(50);
+
+      expect(masterTH[1].offsetWidth).toEqual(87);
+      expect(overlayTH[1].offsetWidth).toEqual(87); //if you get 90, it means it is calculated before scrollbars were applied
+
+      expect(masterTH[2].offsetWidth).toEqual(overlayTH[2].offsetWidth);
+      expect(masterTH[3].offsetWidth).toEqual(overlayTH[3].offsetWidth);
+      expect(masterTH[4].offsetWidth).toEqual(overlayTH[4].offsetWidth);
+      expect(masterTH[5].offsetWidth).toEqual(overlayTH[5].offsetWidth);
+    });
+
+  });
+
 });

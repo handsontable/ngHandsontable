@@ -9,16 +9,38 @@ var handsontable = function (options) {
   return currentSpec.$container.data('handsontable');
 };
 
+/**
+ * As for v. 0.11 the only scrolling method is native scroll, which creates copies of main htCore table inside of the container.
+ * Therefore, simple $(".htCore") will return more than one object. Most of the time, you're interested in the original
+ * htCore, not the copies made by native scroll.
+ *
+ * This method returns the original htCore object
+ *
+ * @returns {jqObject} reference to the original htCore
+ */
+
+var getHtCore = function () {
+  return spec().$container.find('.htCore').first();
+};
+
+var getTopClone = function () {
+  return spec().$container.find('.ht_clone_top');
+};
+
+var getLeftClone = function () {
+  return spec().$container.find('.ht_clone_left');
+};
+
 var countRows = function () {
-  return spec().$container.find('.htCore tbody tr').length;
+  return getHtCore().find('tbody tr').length;
 };
 
 var countCols = function () {
-  return spec().$container.find('.htCore tbody tr:eq(0) td').length;
+  return getHtCore().find('tbody tr:eq(0) td').length;
 };
 
 var countCells = function () {
-  return spec().$container.find('.htCore tbody td').length;
+  return getHtCore().find('tbody td').length;
 };
 
 var isEditorVisible = function () {
@@ -29,19 +51,31 @@ var isFillHandleVisible = function () {
   return !!spec().$container.find('.wtBorder.corner:visible').length;
 };
 
-var isAutocompleteVisible = function () {
-  return !!(autocompleteEditor() && autocompleteEditor().data("typeahead") && autocompleteEditor().data("typeahead").$menu.is(":visible"));
-};
-
 /**
  * Shows context menu
  */
 var contextMenu = function () {
-  var ev = $.Event('contextmenu');
-  ev.button = 2;
-  var instance = spec().$container.data('handsontable');
-  var selector = "#" + instance.rootElement.attr('id') + ' table, #' + instance.rootElement.attr('id') + ' div';
-  $(selector).trigger(ev);
+  var hot = spec().$container.data('handsontable');
+  var selected = hot.getSelected();
+
+  if (!selected) {
+    hot.selectCell(0, 0);
+    selected = hot.getSelected();
+  }
+
+  var cell = getCell(selected[0], selected[1]);
+  var cellOffset = $(cell).offset();
+
+  var ev = $.Event('contextmenu', {
+    pageX: cellOffset.left,
+    pageY: cellOffset.top
+  });
+
+  $(cell).trigger(ev);
+};
+
+var closeContextMenu = function () {
+  $(document).trigger('mousedown');
 };
 
 /**
@@ -49,25 +83,28 @@ var contextMenu = function () {
  * @param {String} type Event type
  * @return {Function}
  */
-var handsontableMouseTriggerFactory = function (type) {
+var handsontableMouseTriggerFactory = function (type, button) {
   return function (element) {
-    if(!(element instanceof jQuery)){
+    if (!(element instanceof jQuery)) {
       element = $(element);
     }
     var ev = $.Event(type);
-    ev.which = 1; //left mouse button
+    ev.which = button || 1; //left click by default
     element.trigger(ev);
   }
 };
 
 var mouseDown = handsontableMouseTriggerFactory('mousedown');
 var mouseUp = handsontableMouseTriggerFactory('mouseup');
-var mouseDoubleClick = function(element){
-    mouseDown(element);
-    mouseUp(element);
-    mouseDown(element);
-    mouseUp(element);
+var mouseDoubleClick = function (element) {
+  mouseDown(element);
+  mouseUp(element);
+  mouseDown(element);
+  mouseUp(element);
 };
+
+var mouseRightDown = handsontableMouseTriggerFactory('mousedown', 3);
+var mouseRightUp = handsontableMouseTriggerFactory('mouseup', 3);
 
 /**
  * Returns a function that triggers a key event
@@ -82,6 +119,12 @@ var handsontableKeyTriggerFactory = function (type) {
         key = key.substring(6);
         ev.shiftKey = true;
       }
+
+      if (key.indexOf('ctrl+') > -1) {
+        key = key.substring(5);
+        ev.ctrlKey = true;
+      }
+
       switch (key) {
         case 'tab':
           ev.keyCode = 9;
@@ -124,8 +167,8 @@ var handsontableKeyTriggerFactory = function (type) {
           break;
 
         case 'backspace':
-        ev.keyCode = 8;
-        break;
+          ev.keyCode = 8;
+          break;
 
         case 'space':
           ev.keyCode = 32;
@@ -172,7 +215,7 @@ var keyProxy = function () {
 };
 
 var autocompleteEditor = function () {
-  return spec().$container.data('handsontable').autocompleteEditor.$textarea;
+  return spec().$container.find('.handsontableInput');
 };
 
 /**
@@ -197,7 +240,7 @@ var setCaretPosition = function (pos) {
  * Returns autocomplete instance
  */
 var autocomplete = function () {
-  return spec().$container.find('.handsontableInput').data("typeahead");
+  return spec().$container.find('.autocompleteEditor');
 };
 
 /**
@@ -234,11 +277,19 @@ var setDataAtCell = handsontableMethodFactory('setDataAtCell');
 var setDataAtRowProp = handsontableMethodFactory('setDataAtRowProp');
 var getCell = handsontableMethodFactory('getCell');
 var getCellMeta = handsontableMethodFactory('getCellMeta');
+var setCellMeta = handsontableMethodFactory('setCellMeta');
+var removeCellMeta = handsontableMethodFactory('removeCellMeta');
+var getCellRenderer = handsontableMethodFactory('getCellRenderer');
+var getCellEditor = handsontableMethodFactory('getCellEditor');
+var getCellValidator = handsontableMethodFactory('getCellValidator');
 var getData = handsontableMethodFactory('getData');
+var getCopyableData = handsontableMethodFactory('getCopyableData');
 var getDataAtCell = handsontableMethodFactory('getDataAtCell');
 var getDataAtRowProp = handsontableMethodFactory('getDataAtRowProp');
 var getDataAtRow = handsontableMethodFactory('getDataAtRow');
 var getDataAtCol = handsontableMethodFactory('getDataAtCol');
+var getSourceDataAtCol = handsontableMethodFactory('getSourceDataAtCol');
+var getSourceDataAtRow = handsontableMethodFactory('getSourceDataAtRow');
 var getRowHeader = handsontableMethodFactory('getRowHeader');
 var getColHeader = handsontableMethodFactory('getColHeader');
 var alter = handsontableMethodFactory('alter');
@@ -253,7 +304,7 @@ var destroy = handsontableMethodFactory('destroy');
 var addHook = handsontableMethodFactory('addHook');
 
 /**
- * Creates 2D array of Excel-like values "A0", "A1", ...
+ * Creates 2D array of Excel-like values "A1", "A2", ...
  * @param rowCount
  * @param colCount
  * @returns {Array}
@@ -269,7 +320,7 @@ function createSpreadsheetData(rowCount, colCount) {
   for (i = 0; i < rowCount; i++) {
     var row = [];
     for (j = 0; j < colCount; j++) {
-      row.push(Handsontable.helper.spreadsheetColumnLabel(j) + i);
+      row.push(Handsontable.helper.spreadsheetColumnLabel(j) + (i + 1));
     }
     rows.push(row);
   }
@@ -287,7 +338,7 @@ function createSpreadsheetObjectData(rowCount, colCount) {
   for (i = 0; i < rowCount; i++) {
     var row = {};
     for (j = 0; j < colCount; j++) {
-      row['prop'+j] = Handsontable.helper.spreadsheetColumnLabel(j) + i
+      row['prop' + j] = Handsontable.helper.spreadsheetColumnLabel(j) + (i + 1)
     }
     rows.push(row);
   }
@@ -309,11 +360,93 @@ function colWidth($elem, col) {
 }
 
 /**
+ * Returns row height for HOT container
+ * @param $elem
+ * @param row
+ * @returns {Number}
+ */
+function rowHeight($elem, row) {
+  var TD = $elem[0].querySelector('tbody tr:nth-child(' + (row + 1) +') td');
+  if (!TD) {
+    throw new Error("Cannot find table row of index '" + row + "'");
+  }
+  var height = Handsontable.Dom.outerHeight(TD);
+  if(row == 0) {
+    height = height - 2;
+  }
+  else {
+    height = height - 1;
+  }
+  return height;
+}
+
+/**
  * Returns value that has been rendered in table cell
  * @param {Number} trIndex
  * @param {Number} tdIndex
  * @returns {String}
  */
-function getRenderedValue(trIndex, tdIndex){
-  return spec().$container.find('tbody tr').eq(trIndex).find('td').eq(tdIndex).text();
+function getRenderedValue(trIndex, tdIndex) {
+  return spec().$container.find('tbody tr').eq(trIndex).find('td').eq(tdIndex).html();
+}
+
+/**
+ * Returns nodes that have been rendered in table cell
+ * @param {Number} trIndex
+ * @param {Number} tdIndex
+ * @returns {String}
+ */
+function getRenderedContent(trIndex, tdIndex) {
+  return spec().$container.find('tbody tr').eq(trIndex).find('td').eq(tdIndex).children()
+}
+
+/**
+ * Model factory, which creates object with private properties, accessible by setters and getters.
+ * Created for the purpose of testing HOT with Backbone-like Models
+ * @param opts
+ * @returns {{}}
+ * @constructor
+ */
+function Model(opts) {
+
+  var obj = {};
+
+  var _data = $.extend({
+    id: undefined,
+    name: undefined,
+    address: undefined
+  }, opts);
+
+  obj.attr = function (name, value) {
+    if (typeof value == 'undefined') {
+      return this.get(name);
+    } else {
+      return this.set(name, value);
+    }
+  };
+
+  obj.get = function (name) {
+    return _data[name];
+  };
+
+  obj.set = function (name, value) {
+    _data[name] = value;
+    return this;
+  }
+
+  return obj;
+
+}
+/**
+ * Factory which produces an accessor for objects of type "Model" (see above).
+ * This function should be used to create accessor for a given property name and pass it as `data` option in column
+ * configuration.
+ *
+ * @param name - name of the property for which an accessor function will be created
+ * @returns {Function}
+ */
+function createAccessorForProperty(name) {
+  return function (obj, value) {
+    return obj.attr(name, value);
+  }
 }

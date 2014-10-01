@@ -1,4 +1,4 @@
-describe('TextEditor', function () {
+describe('DateEditor', function () {
   var id = 'testContainer';
 
   beforeEach(function () {
@@ -129,6 +129,35 @@ describe('TextEditor', function () {
     $('.htDatepickerHolder').find('.ui-datepicker-calendar tbody tr:eq(0) td:eq(0) a').click();
 
     expect($('.htDatepickerHolder').is(':visible')).toBe(false);
+
+  });
+
+  it("should enable to input any value in textarea", function () {
+    var hot = handsontable({
+      data: getDates(),
+      columns: [
+        {
+          type: 'date'
+        }
+      ]
+    });
+
+    selectCell(0, 0);
+
+    var editor = hot.getActiveEditor();
+
+    editor.beginEditing();
+
+    expect(editor.isOpened()).toBe(true);
+
+    editor.TEXTAREA.value = 'foo';
+    keyDownUp('o'.charCodeAt(0));
+
+    expect(editor.getValue()).toEqual('foo');
+
+    editor.finishEditing();
+
+    expect(getDataAtCell(0, 0)).toEqual('foo');
 
   });
 });

@@ -9,7 +9,6 @@
       instance.autoColumnWidths = [];
 
       if (instance.getSettings().autoColumnSize !== false) {
-
         if (!instance.autoColumnSizeTmp) {
           instance.autoColumnSizeTmp = {
             table: null,
@@ -20,24 +19,24 @@
             containerStyle: null,
             determineBeforeNextRender: true
           };
+
+          instance.addHook('beforeRender', htAutoColumnSize.determineIfChanged);
+          instance.addHook('modifyColWidth', htAutoColumnSize.modifyColWidth);
+          instance.addHook('afterDestroy', htAutoColumnSize.afterDestroy);
+
+          instance.determineColumnWidth = plugin.determineColumnWidth;
         }
-
-        instance.addHook('beforeRender', htAutoColumnSize.determineIfChanged);
-        instance.addHook('afterGetColWidth', htAutoColumnSize.getColWidth);
-        instance.addHook('afterDestroy', htAutoColumnSize.afterDestroy);
-
-        instance.determineColumnWidth = plugin.determineColumnWidth;
       } else {
-        instance.removeHook('beforeRender', htAutoColumnSize.determineIfChanged);
-        instance.removeHook('afterGetColWidth', htAutoColumnSize.getColWidth);
-        instance.removeHook('afterDestroy', htAutoColumnSize.afterDestroy);
+        if (instance.autoColumnSizeTmp) {
+          instance.removeHook('beforeRender', htAutoColumnSize.determineIfChanged);
+          instance.removeHook('modifyColWidth', htAutoColumnSize.modifyColWidth);
+          instance.removeHook('afterDestroy', htAutoColumnSize.afterDestroy);
 
-        delete instance.determineColumnWidth;
+          delete instance.determineColumnWidth;
 
-        plugin.afterDestroy.call(instance);
-
+          plugin.afterDestroy.call(instance);
+        }
       }
-
     };
 
     this.determineIfChanged = function (force) {
@@ -83,17 +82,23 @@
         instance.view.appendColHeader(col, tmp.theadTh); //TH innerHTML
       }
 
-      instance.view.wt.wtDom.empty(tmp.tbody);
-
-      var cellProperties = instance.getCellMeta(0, col);
-      var renderer = Handsontable.helper.getCellMethod('renderer', cellProperties.renderer);
+      Handsontable.Dom.empty(tmp.tbody);
 
       for (var i in samples) {
         if (samples.hasOwnProperty(i)) {
           for (var j = 0, jlen = samples[i].strings.length; j < jlen; j++) {
+            var row = samples[i].strings[j].row;
+
+            var cellProperties = instance.getCellMeta(row, col);
+            cellProperties.col = col;
+            cellProperties.row = row;
+
+            var renderer = instance.getCellRenderer(cellProperties);
+
             var tr = document.createElement('tr');
             var td = document.createElement('td');
-            renderer(instance, td, samples[i].strings[j].row, col, instance.colToProp(col), samples[i].strings[j].value, cellProperties);
+
+            renderer(instance, td, row, col, instance.colToProp(col), samples[i].strings[j].value, cellProperties);
             r++;
             tr.appendChild(td);
             tmp.tbody.appendChild(tr);
@@ -103,13 +108,8 @@
 
       var parent = instance.rootElement[0].parentNode;
       parent.appendChild(tmp.container);
-      var width = instance.view.wt.wtDom.outerWidth(tmp.table);
+      var width = Handsontable.Dom.outerWidth(tmp.table);
       parent.removeChild(tmp.container);
-
-      var maxWidth = instance.view.wt.wtViewport.getViewportWidth() - 2; //2 is some overhead for cell border
-      if (width > maxWidth) {
-        width = maxWidth;
-      }
 
       return width;
     };
@@ -127,10 +127,11 @@
       }
     };
 
-    this.getColWidth = function (col, response) {
-      if (this.autoColumnWidths[col] && this.autoColumnWidths[col] > response.width) {
-        response.width = this.autoColumnWidths[col];
+    this.modifyColWidth = function (width, col) {
+      if (this.autoColumnWidths[col] && this.autoColumnWidths[col] > width) {
+        return this.autoColumnWidths[col];
       }
+      return width;
     };
 
     this.afterDestroy = function () {
@@ -138,6 +139,7 @@
       if (instance.autoColumnSizeTmp && instance.autoColumnSizeTmp.container && instance.autoColumnSizeTmp.container.parentNode) {
         instance.autoColumnSizeTmp.container.parentNode.removeChild(instance.autoColumnSizeTmp.container);
       }
+      instance.autoColumnSizeTmp = null;
     };
 
     function createTmpContainer(instance) {
@@ -165,7 +167,7 @@
 
   var htAutoColumnSize = new HandsontableAutoColumnSize();
 
-  Handsontable.PluginHooks.add('beforeInit', htAutoColumnSize.beforeInit);
-  Handsontable.PluginHooks.add('afterUpdateSettings', htAutoColumnSize.beforeInit);
+  Handsontable.hooks.add('beforeInit', htAutoColumnSize.beforeInit);
+  Handsontable.hooks.add('afterUpdateSettings', htAutoColumnSize.beforeInit);
 
 })(Handsontable);

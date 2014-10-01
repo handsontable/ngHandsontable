@@ -14,28 +14,70 @@ describe('Performance', function () {
     }
   });
 
-  it('should call renderer once for each cell', function () {
-    var spy = spyOn(Handsontable.TextCell, 'renderer').andCallThrough();
-
+  it('should call renderer once for one cell (fixed column width)', function () {
+    var count = 0;
     handsontable({
-      startRows: 4,
-      startCols: 4
+      data: createSpreadsheetData(1, 1),
+      colWidths: 100,
+      renderer: function () {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        count++;
+      }
     });
 
-    expect(spy.callCount).toEqual(32); //16 in main table and 16 in autocellsize
+    expect(count).toEqual(1);
   });
 
-  it('should call getCellMeta once for each cell', function () {
+  it('should call renderer twice for one cell (auto column width)', function () {
+    var count = 0;
+    handsontable({
+      data: createSpreadsheetData(1, 1),
+      renderer: function () {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        count++;
+      }
+    });
+
+    expect(count).toEqual(2); //1 for autoColumnSize, 1 for actual cell render
+  });
+
+  it('should call getCellMeta minimum number of times for one cell (auto column width)', function () {
     var count = 0;
 
     handsontable({
-      startRows: 4,
-      startCols: 4,
+      data: createSpreadsheetData(1, 1),
+      beforeGetCellMeta: function(){
+        count++;
+
+      }
+    });
+
+    expect(count).toEqual(4); //2 for autoColumnSize, 1 for getColWidth and 1 for actual cell render
+  });
+
+  it('should call renderer twice for each cell (auto column width)', function () {
+    var count = 0;
+    handsontable({
+      data: createSpreadsheetData(4, 4),
+      renderer: function () {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        count++;
+      }
+    });
+
+    expect(count).toEqual(32); //16 in main table and 16 in autocellsize
+  });
+
+  it('should call getCellMeta twice for each cell (auto column width)', function () {
+    var count = 0;
+
+    handsontable({
+      data: createSpreadsheetData(4, 4),
       beforeGetCellMeta: function(){
         count++;
       }
     });
 
-    expect(count).toEqual(28); //16 in main table and 4 in autocellsize and 8 in getColWidth
+    expect(count).toEqual(40); //16 in main table and 16 in autocellsize and 8 in getColWidth
   });
 });

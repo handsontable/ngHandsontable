@@ -32,19 +32,23 @@ describe('HandsontableObserveChanges', function () {
 
         data.push(["A3", "B3"]);
 
+        var htCore = getHtCore();
+
         waitsFor(function () {
           return afterRenderSpy.callCount > 0;
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(3);
-          expect(this.$container.find('col').length).toEqual(2);
+          expect(htCore.find('tr').length).toEqual(3);
+          expect(htCore.find('col').length).toEqual(2);
         });
       });
 
       it('should render newly added column', function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -57,14 +61,15 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(2);
-          expect(this.$container.find('col').length).toEqual(3);
+          expect(htCore.find('tr').length).toEqual(2);
+          expect(htCore.find('col').length).toEqual(3);
         });
       });
 
       it('should render removed row', function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -76,14 +81,15 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(1);
-          expect(this.$container.find('col').length).toEqual(2);
+          expect(htCore.find('tr').length).toEqual(1);
+          expect(htCore.find('col').length).toEqual(2);
         });
       });
 
       it('should render removed column', function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -96,14 +102,15 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(2);
-          expect(this.$container.find('col').length).toEqual(1);
+          expect(htCore.find('tr').length).toEqual(2);
+          expect(htCore.find('col').length).toEqual(1);
         });
       });
 
       it('should render cell change from string to string', function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -115,13 +122,14 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('td:eq(0)').html()).toEqual('new string');
+          expect(htCore.find('td:eq(0)').html()).toEqual('new string');
         });
       });
 
       it('should render cell change in a new row', function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -133,7 +141,7 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual('A3');
+          expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual('A3');
           afterRenderSpy.reset();
           data[2][0] = 'new string';
         });
@@ -143,20 +151,21 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual('new string');
+          expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual('new string');
         });
       });
 
       it('should not render cell change when turned off (`observeChanges: false`)', function () {
         var data = createSpreadsheetData(2, 2);
         createHOT(data, false);
+        var htCore = getHtCore();
 
         data[0][0] = 'new string';
 
         waits(100); //Object.observe is async
 
         runs(function () {
-          expect(this.$container.find('td:eq(0)').html()).toEqual('A0');
+          expect(htCore.find('td:eq(0)').html()).toEqual('A1');
         });
       });
     });
@@ -164,25 +173,27 @@ describe('HandsontableObserveChanges', function () {
       it('should render newly added row', function () {
         var data = createSpreadsheetObjectData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
 
-        data.push({prop0 : "A3", prop1: "B3"});
+        data.push({prop0: "A3", prop1: "B3"});
 
         waitsFor(function () {
           return afterRenderSpy.callCount > 0;
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(3);
-          expect(this.$container.find('col').length).toEqual(2);
+          expect(htCore.find('tr').length).toEqual(3);
+          expect(htCore.find('col').length).toEqual(2);
         });
       });
 
       it('should render removed row', function () {
         var data = createSpreadsheetObjectData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -194,14 +205,15 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr').length).toEqual(1);
-          expect(this.$container.find('col').length).toEqual(2);
+          expect(htCore.find('tr').length).toEqual(1);
+          expect(htCore.find('col').length).toEqual(2);
         });
       });
 
       it('should render cell change from string to string', function () {
         var data = createSpreadsheetObjectData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -213,25 +225,26 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('td:eq(0)').html()).toEqual('new string');
+          expect(htCore.find('td:eq(0)').html()).toEqual('new string');
         });
       });
 
       it('should render cell change in a new row', function () {
         var data = createSpreadsheetObjectData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
 
-        data.push({prop0 : "A3", prop1: "B3"});
+        data.push({prop0: "A3", prop1: "B3"});
 
         waitsFor(function () {
           return afterRenderSpy.callCount > 0;
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual('A3');
+          expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual('A3');
           afterRenderSpy.reset();
           data[2]['prop0'] = 'new string';
         });
@@ -241,20 +254,21 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr:eq(2) td:eq(0)').html()).toEqual('new string');
+          expect(htCore.find('tr:eq(2) td:eq(0)').html()).toEqual('new string');
         });
       });
 
       it('should not render cell change when turned off (`observeChanges: false`)', function () {
         var data = createSpreadsheetObjectData(2, 2);
         createHOT(data, false);
+        var htCore = getHtCore();
 
         data[0]['prop0'] = 'new string';
 
         waits(100); //Object.observe is async
 
         runs(function () {
-          expect(this.$container.find('td:eq(0)').html()).toEqual('A0');
+          expect(htCore.find('td:eq(0)').html()).toEqual('A1');
         });
       });
     });
@@ -264,13 +278,14 @@ describe('HandsontableObserveChanges', function () {
     it("should be possible to enable plugin using updateSettings", function () {
       var data = createSpreadsheetData(2, 2);
       var hot = createHOT(data, false);
+      var htCore = getHtCore();
 
       data[0][0] = 'new string';
 
       waits(100); //Object.observe is async
 
       runs(function () {
-        expect(this.$container.find('td:eq(0)').html()).toEqual('A0');
+        expect(htCore.find('td:eq(0)').html()).toEqual('A1');
 
         updateSettings({
           observeChanges: true
@@ -286,7 +301,7 @@ describe('HandsontableObserveChanges', function () {
         }, 'Table render', 1000);
 
         runs(function () {
-          expect(this.$container.find('tr:eq(1) td:eq(0)').html()).toEqual('another new string');
+          expect(htCore.find('tr:eq(1) td:eq(0)').html()).toEqual('another new string');
         });
 
       });
@@ -295,6 +310,7 @@ describe('HandsontableObserveChanges', function () {
     it("should be possible to disable plugin using updateSettings", function () {
       var data = createSpreadsheetData(2, 2);
       var hot = createHOT(data, true);
+      var htCore = getHtCore();
 
       var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
       hot.addHook('afterRender', afterRenderSpy);
@@ -306,8 +322,8 @@ describe('HandsontableObserveChanges', function () {
       }, 'Table render', 1000);
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A2');
       });
 
       runs(function () {
@@ -322,16 +338,16 @@ describe('HandsontableObserveChanges', function () {
 
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A2');
       });
 
 
       runs(function () {
         hot.render();
 
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
       });
 
     });
@@ -339,6 +355,7 @@ describe('HandsontableObserveChanges', function () {
     it("should be possible to pause observing changes without disabling the plugin", function () {
       var data = createSpreadsheetData(2, 2);
       var hot = createHOT(data, true);
+      var htCore = getHtCore();
 
       var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
       hot.addHook('afterRender', afterRenderSpy);
@@ -350,8 +367,8 @@ describe('HandsontableObserveChanges', function () {
       }, 'Table render', 1000);
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A2');
       });
 
       runs(function () {
@@ -364,16 +381,16 @@ describe('HandsontableObserveChanges', function () {
 
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A2');
       });
 
 
       runs(function () {
         hot.render();
 
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
       });
 
     });
@@ -381,6 +398,7 @@ describe('HandsontableObserveChanges', function () {
     it("should be possible to resume observing changes after it was paused", function () {
       var data = createSpreadsheetData(2, 2);
       var hot = createHOT(data, true);
+      var htCore = getHtCore();
 
       var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
       hot.addHook('afterRender', afterRenderSpy);
@@ -392,8 +410,8 @@ describe('HandsontableObserveChanges', function () {
       waits(100);
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('A0');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('A1');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('A2');
       });
 
       runs(function () {
@@ -408,8 +426,8 @@ describe('HandsontableObserveChanges', function () {
 
 
       runs(function () {
-        expect(this.$container.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
-        expect(this.$container.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
+        expect(htCore.find('tbody tr:eq(0) td:eq(0)').html()).toEqual('new string');
+        expect(htCore.find('tbody tr:eq(1) td:eq(0)').html()).toEqual('another new string');
       });
     });
   });
@@ -451,7 +469,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterCreateRowCallback.calls.length).toEqual(1);
-          expect(afterCreateRowCallback).toHaveBeenCalledWith(2, undefined, undefined, undefined, undefined);
+          expect(afterCreateRowCallback).toHaveBeenCalledWith(2, undefined, undefined, undefined, undefined, undefined);
         });
       });
 
@@ -471,7 +489,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterRemoveRowCallback.calls.length).toEqual(1);
-          expect(afterRemoveRowCallback).toHaveBeenCalledWith(1, 1, undefined, undefined, undefined);
+          expect(afterRemoveRowCallback).toHaveBeenCalledWith(1, 1, undefined, undefined, undefined, undefined);
         });
       });
 
@@ -496,8 +514,8 @@ describe('HandsontableObserveChanges', function () {
           var args = [];
           args.push(afterRemoveRowCallback.calls[0].args);
           args.push(afterRemoveRowCallback.calls[1].args);
-          expect(args).toContain([1, 1, undefined, undefined, undefined]);
-          expect(args).toContain([0, 1, undefined, undefined, undefined]);
+          expect(args).toContain([1, 1, undefined, undefined, undefined, undefined]);
+          expect(args).toContain([0, 1, undefined, undefined, undefined, undefined]);
         });
       });
 
@@ -518,7 +536,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterCreateColCallback.calls.length).toEqual(1);
-          expect(afterCreateColCallback.calls[0].args).toEqual([2, undefined, undefined, undefined, undefined]);
+          expect(afterCreateColCallback.calls[0].args).toEqual([2, undefined, undefined, undefined, undefined, undefined]);
         });
       });
 
@@ -539,7 +557,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterRemoveColCallback.calls.length).toEqual(1);
-          expect(afterRemoveColCallback.calls[0].args).toEqual([1, 1, undefined, undefined, undefined]);
+          expect(afterRemoveColCallback.calls[0].args).toEqual([1, 1, undefined, undefined, undefined, undefined]);
         });
       });
 
@@ -567,8 +585,8 @@ describe('HandsontableObserveChanges', function () {
           var args = [];
           args.push(afterRemoveColCallback.calls[0].args);
           args.push(afterRemoveColCallback.calls[1].args);
-          expect(args).toContain([1, 1, undefined, undefined, undefined]);
-          expect(args).toContain([0, 1, undefined, undefined, undefined]);
+          expect(args).toContain([1, 1, undefined, undefined, undefined, undefined]);
+          expect(args).toContain([0, 1, undefined, undefined, undefined, undefined]);
         });
       });
 
@@ -588,7 +606,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterChangeCallback.calls.length).toEqual(1);
-          expect(afterChangeCallback).toHaveBeenCalledWith([0, 0, null, "new string"], 'external', undefined, undefined, undefined);
+          expect(afterChangeCallback).toHaveBeenCalledWith([0, 0, null, "new string"], 'external', undefined, undefined, undefined, undefined);
         });
       });
     });
@@ -628,7 +646,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterCreateRowCallback.calls.length).toEqual(1);
-          expect(afterCreateRowCallback).toHaveBeenCalledWith(2, undefined, undefined, undefined, undefined);
+          expect(afterCreateRowCallback).toHaveBeenCalledWith(2, undefined, undefined, undefined, undefined, undefined);
         });
       });
 
@@ -648,7 +666,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterRemoveRowCallback.calls.length).toEqual(1);
-          expect(afterRemoveRowCallback).toHaveBeenCalledWith(1, 1, undefined, undefined, undefined);
+          expect(afterRemoveRowCallback).toHaveBeenCalledWith(1, 1, undefined, undefined, undefined, undefined);
         });
       });
 
@@ -673,8 +691,8 @@ describe('HandsontableObserveChanges', function () {
           var args = [];
           args.push(afterRemoveRowCallback.calls[0].args);
           args.push(afterRemoveRowCallback.calls[1].args);
-          expect(args).toContain([1, 1, undefined, undefined, undefined]);
-          expect(args).toContain([0, 1, undefined, undefined, undefined]);
+          expect(args).toContain([1, 1, undefined, undefined, undefined, undefined]);
+          expect(args).toContain([0, 1, undefined, undefined, undefined, undefined]);
         });
       });
 
@@ -694,7 +712,7 @@ describe('HandsontableObserveChanges', function () {
 
         runs(function () {
           expect(afterChangeCallback.calls.length).toEqual(1);
-          expect(afterChangeCallback).toHaveBeenCalledWith([0, 'prop0', null, "new string"], 'external', undefined, undefined, undefined);
+          expect(afterChangeCallback).toHaveBeenCalledWith([0, 'prop0', null, "new string"], 'external', undefined, undefined, undefined, undefined);
         });
       });
     });
@@ -797,6 +815,7 @@ describe('HandsontableObserveChanges', function () {
       it("should run render ONCE after detecting that table data has changed", function () {
         var data = createSpreadsheetData(2, 2);
         var hot = createHOT(data, true);
+        var htCore = getHtCore();
 
         var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
         hot.addHook('afterRender', afterRenderSpy);
@@ -812,7 +831,7 @@ describe('HandsontableObserveChanges', function () {
 
 
         runs(function () {
-          expect(this.$container.find('tbody tr:eq(0) td:eq(0)').text()).toEqual('new value');
+          expect(htCore.find('tbody tr:eq(0) td:eq(0)').text()).toEqual('new value');
           expect(afterChangesObservedCallback.calls.length).toEqual(1);
           expect(afterRenderSpy.calls.length).toEqual(1);
         });
@@ -887,6 +906,52 @@ describe('HandsontableObserveChanges', function () {
           expect(afterChangesObservedCallback.calls.length).toEqual(1);
           expect(afterRenderSpy.calls.length).toEqual(1);
         });
+      });
+    });
+  });
+
+  describe("refreshing table after changes have been detected", function () {
+    it("should observe changes to new data bound using loadData", function () {
+      var data = createSpreadsheetData(2, 2);
+      var newData = createSpreadsheetData(2, 2);
+      var hot = createHOT(data, true);
+      var htCore = getHtCore();
+      hot.loadData(newData);
+
+      var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
+      hot.addHook('afterRender', afterRenderSpy);
+
+      newData.push(["A3", "B3"]);
+
+      waitsFor(function () {
+        return afterRenderSpy.callCount > 0;
+      }, 'Table render', 1000);
+
+      runs(function () {
+        expect(afterRenderSpy.callCount).toBe(1);
+        expect(htCore.find('tr').length).toEqual(3);
+        expect(htCore.find('col').length).toEqual(2);
+      });
+    });
+
+    it("should not observe changes to old data after it was replaced using loadData", function () {
+      var data = createSpreadsheetData(2, 2);
+      var newData = createSpreadsheetData(2, 2);
+      var hot = createHOT(data, true);
+      var htCore = getHtCore();
+      hot.loadData(newData);
+
+      var afterRenderSpy = jasmine.createSpy('afterRenderSpy');
+      hot.addHook('afterRender', afterRenderSpy);
+
+      data.push(["A3", "B3"]);
+
+      waits(1000);
+
+      runs(function () {
+        expect(afterRenderSpy.callCount).toBe(0);
+        expect(htCore.find('tr').length).toEqual(2);
+        expect(htCore.find('col').length).toEqual(2);
       });
     });
   });

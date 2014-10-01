@@ -1,4 +1,4 @@
-describe('PluginHooks', function () {
+describe('hooks', function () {
   var id = 'testContainer';
 
   beforeEach(function () {
@@ -16,7 +16,7 @@ describe('PluginHooks', function () {
     var errors = 0;
 
     try {
-      Handsontable.PluginHooks.add('afterInit', function () {
+      Handsontable.hooks.add('afterInit', function () {
       });
     } catch (e) {
       errors++;
@@ -30,7 +30,7 @@ describe('PluginHooks', function () {
     handsontable();
 
     try {
-      getInstance().PluginHooks.add('afterInit', function () {
+      getInstance().addHook('afterInit', function () {
       });
     } catch (e) {
       errors++;
@@ -40,31 +40,28 @@ describe('PluginHooks', function () {
   });
 
   it('should add a local hook at init', function () {
-    var test = 0;
+    var afterInitHandler = jasmine.createSpy('afterInitHandler');
 
     handsontable({
-      afterInit: function () {
-        test = 5;
-      }
+      afterInit: afterInitHandler
     });
 
-    expect(test).toEqual(5);
+    expect(afterInitHandler).toHaveBeenCalled();
+    expect(afterInitHandler.calls.length).toEqual(1);
   });
 
-  it('should add a many local hooks at init', function () {
-    var test = 0;
+  it('should add a many local hooks at init (as array)', function () {
+    var handler1 = jasmine.createSpy('handler1');
+    var handler2 = jasmine.createSpy('handler2');
+    var handler3 = jasmine.createSpy('handler3');
 
     handsontable({
-      afterInit: [function () {
-        test = 5;
-      }, function () {
-        test++;
-      }, function () {
-        test += 3;
-      }]
+      afterInit: [handler1, handler2, handler3]
     });
 
-    expect(test).toEqual(9);
+    expect(handler1).toHaveBeenCalled();
+    expect(handler2).toHaveBeenCalled();
+    expect(handler3).toHaveBeenCalled();
   });
 
   it('should remove a global hook', function () {
@@ -73,8 +70,8 @@ describe('PluginHooks', function () {
         test = 5;
       };
 
-    Handsontable.PluginHooks.add('afterInit', hook);
-    Handsontable.PluginHooks.remove('afterInit', hook);
+    Handsontable.hooks.add('afterInit', hook);
+    Handsontable.hooks.remove('afterInit', hook);
 
     handsontable();
 
@@ -89,15 +86,15 @@ describe('PluginHooks', function () {
 
     handsontable();
 
-    getInstance().PluginHooks.add('afterInit', hook);
-    getInstance().PluginHooks.remove('afterInit', hook);
+    getInstance().addHook('afterInit', hook);
+    getInstance().removeHook('afterInit', hook);
 
     expect(test).toEqual(0);
   });
 
   it('should run global hook', function () {
     var test = 0;
-    Handsontable.PluginHooks.add('afterInit', function () {
+    Handsontable.hooks.add('afterInit', function () {
       test = 5;
     });
     handsontable();
@@ -109,11 +106,11 @@ describe('PluginHooks', function () {
 
     handsontable();
 
-    getInstance().PluginHooks.add('myHook', function () {
+    getInstance().addHook('myHook', function () {
       test += 5;
     });
-    getInstance().PluginHooks.run('myHook');
-    getInstance().PluginHooks.run('myHook');
+    getInstance().runHooks('myHook');
+    getInstance().runHooks('myHook');
 
     expect(test).toEqual(10);
   });
@@ -123,11 +120,11 @@ describe('PluginHooks', function () {
 
     handsontable();
 
-    getInstance().PluginHooks.once('myHook', function () {
+    getInstance().addHookOnce('myHook', function () {
       test += 5;
     });
-    getInstance().PluginHooks.run('myHook');
-    getInstance().PluginHooks.run('myHook');
+    getInstance().runHooks('myHook');
+    getInstance().runHooks('myHook');
 
     expect(test).toEqual(5);
   });
@@ -135,7 +132,7 @@ describe('PluginHooks', function () {
   it('should run all hooks', function () {
     var test = 0;
 
-    Handsontable.PluginHooks.add('afterInit', function () {
+    Handsontable.hooks.add('afterInit', function () {
       test += 5;
     });
 
@@ -152,7 +149,7 @@ describe('PluginHooks', function () {
   it('should run all hooks', function () {
     var test = 0;
 
-    Handsontable.PluginHooks.add('afterInit', function () {
+    Handsontable.hooks.add('afterInit', function () {
       test += 5;
     });
 
@@ -167,9 +164,9 @@ describe('PluginHooks', function () {
   });
 
   it('list of all avaliable plugin hooks should be exposed as a public object', function () {
-    var pluginHooks = Handsontable.PluginHooks.hooks.persistent; //this is used in demo/callbacks.html
+    var hooks = Handsontable.hooks.hooks; //this is used in demo/callbacks.html
 
-    expect(pluginHooks.beforeInit).toBeDefined(); //duck check is fine
+    expect(hooks.beforeInit).toBeDefined(); //duck check is fine
 
   });
 
@@ -266,5 +263,178 @@ describe('PluginHooks', function () {
     });
 
     expect(hot.runHooksAndReturn('myHook', str)).toEqual('abc');
+  });
+
+  it('adding same hook twice should register it only once (without an error)', function () {
+    var i = 0;
+    var fn = function(){
+      i++;
+    };
+
+    var hot = handsontable({
+      afterOnCellMouseOver: fn
+    });
+
+    hot.getInstance().updateSettings({afterOnCellMouseOver: fn});
+
+    hot.runHooks('afterOnCellMouseOver');
+
+    expect(i).toEqual(1);
+  });
+
+  describe("controlling handler queue execution", function () {
+    it("should execute all handlers if none of them returned false", function () {
+
+      var handler1 = jasmine.createSpy('handler1');
+      var handler2 = jasmine.createSpy('handler2');
+      var handler3 = jasmine.createSpy('handler3');
+
+      var hot = handsontable();
+
+      hot.addHook('fakeEvent', handler1);
+      hot.addHook('fakeEvent', handler2);
+      hot.addHook('fakeEvent', handler3);
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+      expect(handler3).not.toHaveBeenCalled();
+
+      var eventCancelled = hot.runHooksAndReturn('fakeEvent');
+
+      expect(handler1).toHaveBeenCalled();
+      expect(handler2).toHaveBeenCalled();
+      expect(handler3).toHaveBeenCalled();
+
+      expect(eventCancelled).not.toBe(true);
+
+    });
+
+    it("should stop executing handlers if one of them returned false", function () {
+
+      var handler1 = jasmine.createSpy('handler1');
+      var handler2 = jasmine.createSpy('handler2');
+
+      handler2.plan = function () {
+        return false;
+      };
+
+      var handler3 = jasmine.createSpy('handler3');
+
+      var hot = handsontable();
+
+      hot.addHook('fakeEvent', handler1);
+      hot.addHook('fakeEvent', handler2);
+      hot.addHook('fakeEvent', handler3);
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+      expect(handler3).not.toHaveBeenCalled();
+
+      var result = hot.runHooksAndReturn('fakeEvent');
+
+      expect(handler1).toHaveBeenCalled();
+      expect(handler2).toHaveBeenCalled();
+      expect(handler3).not.toHaveBeenCalled();
+
+      expect(result).toBe(false);
+
+    });
+
+    it("should invoke 'once' handler in the next event run, if the previous run has been interrupted", function () {
+
+      var handler1 = jasmine.createSpy('handler1');
+      handler1.plan = function () {
+        return false;
+      };
+
+      var handler2 = jasmine.createSpy('handler2');
+      var handler3 = jasmine.createSpy('handler3');
+
+      var hot = handsontable();
+
+      hot.addHookOnce('fakeEvent', handler1);
+      hot.addHookOnce('fakeEvent', handler2);
+      hot.addHook('fakeEvent', handler3);
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+      expect(handler3).not.toHaveBeenCalled();
+
+      var result = hot.runHooksAndReturn('fakeEvent');
+
+      expect(handler1).toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+      expect(handler3).not.toHaveBeenCalled();
+
+      expect(result).toBe(false);
+
+      handler1.reset();
+      handler2.reset();
+      handler3.reset();
+
+      result = hot.runHooksAndReturn('fakeEvent');
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).toHaveBeenCalled();
+      expect(handler3).toHaveBeenCalled();
+
+      expect(result).not.toBe(false);
+
+      handler1.reset();
+      handler2.reset();
+      handler3.reset();
+
+      result = hot.runHooksAndReturn('fakeEvent');
+
+      expect(handler1).not.toHaveBeenCalled();
+      expect(handler2).not.toHaveBeenCalled();
+      expect(handler3).toHaveBeenCalled();
+
+      expect(result).not.toBe(false);
+
+    });
+  });
+
+  describe("registering hooks", function() {
+    describe("getRegistered", function() {
+      it("should be an array that contains build-in hooks", function() {
+        var hooks = Handsontable.hooks.getRegistered();
+        expect(Array.isArray(hooks)).toBe(true);
+        expect('afterInit').toBeInArray(hooks);
+      });
+    });
+
+    describe("isRegistered", function() {
+      it("should return information if a hook has been registered", function() {
+        expect(Handsontable.hooks.isRegistered('afterInit')).toBe(true);
+      });
+    });
+
+    describe("register", function() {
+      it("should register a new hook name", function() {
+        expect(Handsontable.hooks.isRegistered('afterMyOwnHook')).toBe(false);
+        var hooks = Handsontable.hooks.getRegistered();
+        expect('afterMyOwnHook').not.toBeInArray(hooks);
+
+        Handsontable.hooks.register('afterMyOwnHook')
+        expect(Handsontable.hooks.isRegistered('afterMyOwnHook')).toBe(true);
+        var hooks = Handsontable.hooks.getRegistered();
+        expect('afterMyOwnHook').toBeInArray(hooks);
+      });
+    });
+
+    describe("deregister", function() {
+      it("should deregister a known hook name", function() {
+        Handsontable.hooks.register('afterMyOwnHook')
+        expect(Handsontable.hooks.isRegistered('afterMyOwnHook')).toBe(true);
+        var hooks = Handsontable.hooks.getRegistered();
+        expect('afterMyOwnHook').toBeInArray(hooks);
+
+        Handsontable.hooks.deregister('afterMyOwnHook')
+        expect(Handsontable.hooks.isRegistered('afterMyOwnHook')).toBe(false);
+        var hooks = Handsontable.hooks.getRegistered();
+        expect('afterMyOwnHook').not.toBeInArray(hooks);
+      });
+    });
   });
 });

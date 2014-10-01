@@ -14,10 +14,11 @@
   <!--
   Loading demo dependencies. They are used here only to enhance the examples on this page
   -->
-  <link data-jsfiddle="common" rel="stylesheet" media="screen" href="css/samples.css">
+  <link data-jsfiddle="common" rel="stylesheet" media="screen" href="css/samples.css?20140331">
   <script src="js/samples.js"></script>
   <script src="js/highlight/highlight.pack.js"></script>
   <link rel="stylesheet" media="screen" href="js/highlight/styles/github.css">
+  <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
 
   <!--
   Facebook open graph. Don't copy this to your project :)
@@ -39,7 +40,14 @@
 </head>
 
 <body>
-<a href="http://github.com/warpech/jquery-handsontable" class="forkMeOnGitHub">Fork me on GitHub</a>
+
+
+<div class="wrapper">
+<div class="wrapper-row">
+<div id="global-menu-clone">
+  <h1><a href="../index.html">Handsontable</a></h1>
+
+</div>
 
 <div id="container">
 <div class="columnLayout">
@@ -47,57 +55,15 @@
 <div class="rowLayout">
   <div class="descLayout">
     <div class="pad">
-      <h1><a href="../index.html">Handsontable</a></h1>
-
-      <div class="tagline">a minimalistic Excel-like <span class="nobreak">data grid</span> editor
-        for HTML, JavaScript &amp; jQuery
-      </div>
-
       <h2>Context Menu</h2>
 
       <p>This page shows how to use and configure right-click context menu with Handsontable:</p>
 
       <ul>
-        <li><a href="#dependencies">dependencies</a></li>
         <li><a href="#default">context menu with default options</a></li>
         <li><a href="#specific">context menu with specific options</a></li>
         <li><a href="#custom">context menu with fully custom configuration</a></li>
       </ul>
-    </div>
-  </div>
-</div>
-
-<div class="rowLayout">
-  <div class="descLayout">
-    <div class="pad">
-      <a name="dependencies"></a>
-
-      <h2>Dependencies</h2>
-
-      <p>Context Menu feature has a <strong>required</strong> dependency on <a
-          href="http://medialize.github.com/jQuery-contextMenu/">jQuery&nbsp;contextMenu</a>
-        plugin (tested with version 1.5.25). This plugin is included in jquery.handsontable.full.js.
-
-
-      <p>jQuery contextMenu plugin has <a href="http://medialize.github.com/jQuery-contextMenu/docs.html#ui-position">optional</a>
-        dependency on <a
-            href="http://docs.jquery.com/UI/Position">jQuery UI Position</a>, which makes sure
-        that the menu is always visible in the viewport. This plugin is NOT included in
-        jquery.handsontable.full.js. Please report in GitHub issues board if you wish it was added to
-        jquery.handsontable.full.js.</p>
-    </div>
-  </div>
-
-  <div class="codeLayout">
-    <div class="pad">
-        <pre class="html"><code>
-        &lt;script src="lib/jQuery-contextMenu/jquery.contextMenu.js"&gt;&lt;/script&gt;
-        &lt;link rel="stylesheet" media="screen"
-        href="lib/jQuery-contextMenu/jquery.contextMenu.css"&gt;
-
-        &lt;!-- optional --&gt;
-        &lt;script src="lib/jQuery-contextMenu/jquery.ui.position.js"&gt;&lt;/script&gt;
-        </code></pre>
     </div>
   </div>
 </div>
@@ -110,6 +76,10 @@
       <h2>Context Menu with default options</h2>
 
       <p>Tu run the basic configuration of the Context Menu, just set the contextMenu option to true.</p>
+
+      <p>From version 0.11, context menu also works for row and column headers. When the context menu for the row
+        header is opened, the column options are disabled. Likewise, when the context menu for the column header is opened,
+        the row options are disabled</p>
 
       <div id="example1"></div>
 
@@ -283,16 +253,17 @@
   </div>
 </div>
 
-<div class="rowLayout">
-  <div class="descLayout noMargin">
-    <div class="pad"><p>For more examples, head back to the <a href="../index.html">main page</a>.</p>
+<div class="footer-text">Handsontable &copy; 2012-2014 Marcin Warpechowski and contributors.<br> Code and documentation
+  licensed under the The MIT License.
+</div>
+</div>
 
-      <p class="small">Handsontable &copy; 2012 Marcin Warpechowski and contributors.<br> Code and documentation
-        licensed under the The MIT License.</p>
-    </div>
-  </div>
+</div>
+
 </div>
 </div>
-</div>
+
+<div id="outside-links-wrapper"></div>
+
 </body>
 </html>

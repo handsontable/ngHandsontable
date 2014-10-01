@@ -102,7 +102,6 @@ function init() {
       return arr[0].length;
     },
     offsetRow: 0,
-    offsetColumn: 0,
     height: 200,
     width: 200,
     rowHeaders: [function (row, TH) {
@@ -113,16 +112,16 @@ function init() {
         className: 'area',
         border: {
           width: 1,
-          color: '#5292F7',
-          style: 'solid'
+          color: '#5292F7'
+          //,style: 'solid'
         }
       },
       current: {
         className: 'current',
         border: {
           width: 2,
-          color: '#5292F7',
-          style: 'solid'
+          color: '#5292F7'
+          //,style: 'solid'
         }
       }
     },

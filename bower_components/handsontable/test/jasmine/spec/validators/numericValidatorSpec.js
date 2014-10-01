@@ -28,7 +28,7 @@ describe('NumericValidator', function () {
   };
 
   it('should not validate non numeric string', function () {
-    var valid = null;
+    var onAfterValidate = jasmine.createSpy('onAfterValidate');
 
     handsontable({
       data: arrayOfObjects(),
@@ -37,19 +37,24 @@ describe('NumericValidator', function () {
         {data: 'name'},
         {data: 'lastName'}
       ],
-      afterValidate : function (result, value) {
-        if(value === "test") {
-          valid = result;
-        }
-      }
+      afterValidate : onAfterValidate
     });
+
     setDataAtCell(2, 0, 'test');
 
-    expect(valid).toEqual(false);
+    waitsFor(function () {
+      return onAfterValidate.calls.length > 0;
+    }, 'Cell validation', 1000);
+
+    runs(function () {
+      expect(onAfterValidate).toHaveBeenCalledWith(false, 'test', 2, 'id', undefined, undefined);
+    });
+
+
   });
 
   it('should validate numeric string', function () {
-    var valid = null;
+    var onAfterValidate = jasmine.createSpy('onAfterValidate');
 
     handsontable({
       data: arrayOfObjects(),
@@ -58,17 +63,23 @@ describe('NumericValidator', function () {
         {data: 'name'},
         {data: 'lastName'}
       ],
-      afterValidate : function (result) {
-        valid = result;
-      }
+      afterValidate : onAfterValidate
     });
+
     setDataAtCell(2, 0, '123');
 
-    expect(valid).toEqual(true);
+    waitsFor(function () {
+      return onAfterValidate.calls.length > 0;
+    }, 'Cell validation', 1000);
+
+    runs(function () {
+      expect(onAfterValidate).toHaveBeenCalledWith(true, 123, 2, 'id', undefined, undefined);
+    });
+
   });
 
   it('should validate signed numeric string', function () {
-    var valid = null;
+    var onAfterValidate = jasmine.createSpy('onAfterValidate');
 
     handsontable({
       data: arrayOfObjects(),
@@ -77,13 +88,42 @@ describe('NumericValidator', function () {
         {data: 'name'},
         {data: 'lastName'}
       ],
-      afterValidate : function (result) {
-        valid = result;
-      }
+      afterValidate : onAfterValidate
     });
+
     setDataAtCell(2, 0, '-123');
 
-    expect(valid).toEqual(true);
+    waitsFor(function () {
+      return onAfterValidate.calls.length > 0;
+    }, 'Cell validation', 1000);
+
+    runs(function () {
+      expect(onAfterValidate).toHaveBeenCalledWith(true, -123, 2, 'id', undefined, undefined);
+    });
   });
 
+  it('should validate empty string', function () {
+    var out;
+
+    Handsontable.NumericValidator('', function (result) {
+      out = result;
+    });
+
+    expect(out).toBe(true);
+  });
+
+  //is this correct behavior is disputable, but at least it's consistent
+  it('should validate null with the same empty string', function () {
+    var out1, out2;
+
+    Handsontable.NumericValidator('', function (result) {
+      out1 = result;
+    });
+
+    Handsontable.NumericValidator(null, function (result) {
+      out2 = result;
+    });
+
+    expect(out1).toBe(out2);
+  });
 });

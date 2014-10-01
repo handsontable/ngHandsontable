@@ -14,10 +14,11 @@
   <!--
   Loading demo dependencies. They are used here only to enhance the examples on this page
   -->
-  <link data-jsfiddle="common" rel="stylesheet" media="screen" href="css/samples.css">
+  <link data-jsfiddle="common" rel="stylesheet" media="screen" href="css/samples.css?20140331">
   <script src="js/samples.js"></script>
   <script src="js/highlight/highlight.pack.js"></script>
   <link rel="stylesheet" media="screen" href="js/highlight/styles/github.css">
+  <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
 
   <!--
   Facebook open graph. Don't copy this to your project :)
@@ -50,7 +51,14 @@
 </head>
 
 <body>
-<a href="http://github.com/warpech/jquery-handsontable" class="forkMeOnGitHub">Fork me on GitHub</a>
+
+
+<div class="wrapper">
+<div class="wrapper-row">
+<div id="global-menu-clone">
+  <h1><a href="../index.html">Handsontable</a></h1>
+
+</div>
 
 <div id="container">
 <div class="columnLayout">
@@ -58,15 +66,14 @@
 <div class="rowLayout">
   <div class="descLayout">
     <div class="pad">
-      <h1><a href="../index.html">Handsontable</a></h1>
-
-      <div class="tagline">a minimalistic Excel-like <span class="nobreak">data grid</span> editor
-        for HTML, JavaScript &amp; jQuery
-      </div>
 
       <h2>Autocomplete cell type</h2>
 
-      <p>This page shows how to configure Handsontable with Autocomplete cell type:</p>
+      <p>This page shows how to configure Handsontable with Autocomplete cell type, which expands the
+      <a href="handsontable.html">Handsontable cell type.</a> with features typical for a combo box that
+      updates its options based on user input.</p>
+
+      <p>There are three demos on this page:</p>
 
       <ul>
         <li><a href="#lazy">Autocomplete lazy mode</a></li>
@@ -84,15 +91,12 @@
 
       <h2>Autocomplete lazy mode</h2>
 
-      <p>This example shows the usage of the Autocomplete feature.</p>
+      <p>This example shows the usage of the Autocomplete feature in the default <strong>lazy&nbsp;mode</strong>. In this mode,
+      user can choose one of the suggested options while typing or enter a custom value that is not included in the suggestions.</p>
 
-      <p>List of autocomplete suggestions is rendered by <a
-        href="https://github.com/twitter/bootstrap/blob/master/js/bootstrap-typeahead.js">Twitter Bootstrap
-        Typeahead</a> library.
-      </p>
+      <p>In this mode, the mouse and keyboard bindings are identical as in <a href="handsontable.html">Handsontable cell type.</a></p>
 
-      <p>The property <code>options</code> overrides <code>$.fn.typeahead.defaults</code> from Bootstrap. It may be
-        useful to configure the number of displayed suggestions.</p>
+      <p>The options are rendered from the <code>source</code> property which can be an array, or a function that returns an array.</p>
 
       <div id="example1"></div>
 
@@ -110,22 +114,6 @@
         <button class="jsFiddleLink" data-runfiddle="example1">Edit in jsFiddle</button>
       </div>
 
-      <script data-jsfiddle="common">
-        function myAutocompleteRenderer(instance, td, row, col, prop, value, cellProperties) {
-          Handsontable.AutocompleteCell.renderer.apply(this, arguments);
-          td.style.fontStyle = 'italic';
-          td.title = 'Type to show the list of options';
-        }
-
-        function colorHighlighter(item) {
-          var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-          var label = item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-            return '<strong>' + match + '</strong>';
-          });
-          return '<span style="margin-right: 10px; background-color: ' + item + '">&nbsp;&nbsp;&nbsp;</span>' + label;
-        }
-      </script>
-
       <script data-jsfiddle="example1">
         $("#example1").handsontable({
           data: getCarData(),
@@ -134,24 +122,19 @@
           colHeaders: ["Car", "Year", "Chassis color", "Bumper color"],
           columns: [
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
+              type: 'autocomplete',
               source: ["BMW", "Chrysler", "Nissan", "Suzuki", "Toyota", "Volvo"],
-              strict: false,
-              options: {
-                items: 4 //`options` overrides `defaults` defined in bootstrap typeahead
-              }
+              strict: false
             },
             {type: 'numeric'},
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"],
-              highlighter: colorHighlighter,
+              type: 'autocomplete',
+              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white", "purple", "lime", "olive", "cyan"],
               strict: false
             },
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"],
-              highlighter: colorHighlighter,
+              type: 'autocomplete',
+              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white", "purple", "lime", "olive", "cyan"],
               strict: false
             }
           ]
@@ -174,6 +157,24 @@
       <p>In this mode, the autocomplete cells will only accept values that are defined in the source
         array.</p>
 
+      <p>In this mode, the mouse and keyboard bindings are identical as in <a href="handsontable.html">Handsontable cell type</a> with the below differences:</p>
+
+      <ul>
+        <li>If there is at least one option visible, there always is a selection in HOT-in-HOT.</li>
+        <li>When the first row is selected, pressing <kbd>Arrow up</kbd> does not deselect HOT-in-HOT. Instead behaves as the ENTER key but moves the selection in the main HOT upwards.</li>
+      </ul>
+
+      <p>In strict mode, the <strong>allowInvalid</strong> option determines the behaviour in case of manual user input:</p>
+
+      <ul>
+        <li><code>allowInvalid: true</code> (optional) - allows manual input of value that does not exist in the
+          <code>source</code>. In this case, the field background highlight becomes red and the selection
+          advances to the next cell
+        </li>
+        <li><code>allowInvalid: false</code> - does not allow manual input of value that does not exist in the
+          <code>source</code>. In this case, the <kbd>ENTER</kbd> key is ignored and the editor field remains opened.</li>
+      </ul>
+
       <div id="example2"></div>
 
       <p>
@@ -195,25 +196,27 @@
           data: getCarData(),
           startRows: 7,
           startCols: 4,
-          colHeaders: ["Car", "Year", "Chassis color", "Bumper color"],
+          colHeaders: ["Car<br>(allowInvalid true)", "Year", "Chassis color<br>(allowInvalid false)", "Bumper color<br>(allowInvalid true)"],
           columns: [
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              source: ["BMW", "Chrysler", "Nissan", "Suzuki", "Toyota", "Volvo", ""], //empty string is a valid value
+              type: 'autocomplete',
+              source: ["BMW", "Chrysler", "Nissan", "Suzuki", "Toyota", "Volvo"],
               strict: true
+              //allowInvalid: true //true is default
+
             },
             {},
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"],
-              highlighter: colorHighlighter,
-              strict: true
+              type: 'autocomplete',
+              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white", "purple", "lime", "olive", "cyan"],
+              strict: true,
+              allowInvalid: false
             },
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"],
-              highlighter: colorHighlighter,
-              strict: true
+              type: 'autocomplete',
+              source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white", "purple", "lime", "olive", "cyan"],
+              strict: true,
+              allowInvalid: true //true is default
             }
           ]
         });
@@ -232,7 +235,7 @@
       <p>Autocomplete can be also used with Ajax data source. In the below example, suggestions for the "Car" column are
         loaded from server.</p>
 
-      <p>To load data from remote (asynchrous) source, assign a function to the 'source' property. Function should
+      <p>To load data from remote (asynchronous) source, assign a function to the 'source' property. Function should
         perform the server side request and call the callback function when the result is available.</p>
 
       <div id="example3"></div>
@@ -262,17 +265,20 @@
           colHeaders: ["Car", "Year", "Chassis color", "Bumper color"],
           columns: [
             {
-              type: {renderer: myAutocompleteRenderer, editor: Handsontable.AutocompleteEditor},
-              options: {items: 10}, //`options` overrides `defaults` defined in bootstrap typeahead
+              type: 'autocomplete',
               source: function (query, process) {
                 $.ajax({
-                  url: 'php/cars.php',
+                  //url: 'php/cars.php', //commented out because our website is hosted on static GitHub Pages
+                  url: 'json/autocomplete.json',
+                  dataType: 'json',
                   data: {
                     query: query
                   },
                   success: function (response) {
-                    console.log("response", response);
-                    process(response);
+                      console.log("response", response);
+                      //process(JSON.parse(response.data)); //JSON.parse takes string as a argument
+                      process(response.data);
+
                   }
                 });
               },
@@ -288,16 +294,17 @@
   </div>
 </div>
 
-<div class="rowLayout">
-  <div class="descLayout noMargin">
-    <div class="pad"><p>For more examples, head back to the <a href="../index.html">main page</a>.</p>
+<div class="footer-text">Handsontable &copy; 2012-2014 Marcin Warpechowski and contributors.<br> Code and documentation
+  licensed under the The MIT License.
+</div>
+</div>
 
-      <p class="small">Handsontable &copy; 2012 Marcin Warpechowski and contributors.<br> Code and documentation
-        licensed under the The MIT License.</p>
-    </div>
-  </div>
+</div>
+
 </div>
 </div>
-</div>
+
+<div id="outside-links-wrapper"></div>
+
 </body>
 </html>

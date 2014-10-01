@@ -1,24 +1,3 @@
-//http://stackoverflow.com/questions/3629183/why-doesnt-indexof-work-on-an-array-ie8
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function (elt /*, from*/) {
-    var len = this.length >>> 0;
-
-    var from = Number(arguments[1]) || 0;
-    from = (from < 0)
-      ? Math.ceil(from)
-      : Math.floor(from);
-    if (from < 0)
-      from += len;
-
-    for (; from < len; from++) {
-      if (from in this &&
-        this[from] === elt)
-        return from;
-    }
-    return -1;
-  };
-}
-
 /**
  * http://notes.jetienne.com/2011/05/18/cancelRequestAnimFrame-for-paul-irish-requestAnimFrame.html
  */
@@ -54,11 +33,21 @@ if (!window.getComputedStyle) {
         if (prop == 'float') prop = 'styleFloat';
         return elem.currentStyle[prop.toUpperCase()] || null;
       }
-    }
+    };
 
     window.getComputedStyle = function (el) {
       elem = el;
       return styleObj;
     }
   })();
+}
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+ */
+if (!String.prototype.trim) {
+  var trimRegex = /^\s+|\s+$/g;
+  String.prototype.trim = function () {
+    return this.replace(trimRegex, '');
+  };
 }

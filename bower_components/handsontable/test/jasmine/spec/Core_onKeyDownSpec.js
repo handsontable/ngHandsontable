@@ -13,7 +13,7 @@ describe('Core_onKeyDown', function () {
   });
 
   it('should advance to next cell when TAB is pressed', function () {
-    //https://github.com/warpech/jquery-handsontable/issues/151
+    //https://github.com/handsontable/jquery-handsontable/issues/151
     handsontable();
     selectCell(0, 0);
     keyDownUp('tab');
@@ -21,7 +21,7 @@ describe('Core_onKeyDown', function () {
   });
 
   it('while editing, should finish editing and advance to next cell when TAB is pressed', function () {
-    //https://github.com/warpech/jquery-handsontable/issues/215
+    //https://github.com/handsontable/jquery-handsontable/issues/215
     handsontable();
     selectCell(1, 1);
 
@@ -33,7 +33,7 @@ describe('Core_onKeyDown', function () {
   });
 
   it('while editing, should finish editing and advance to lower cell when down arrow is pressed', function () {
-    //https://github.com/warpech/jquery-handsontable/issues/215
+    //https://github.com/handsontable/jquery-handsontable/issues/215
     handsontable();
     selectCell(1, 1);
 
@@ -45,52 +45,66 @@ describe('Core_onKeyDown', function () {
   });
 
   it('while editing, should finish editing and advance to lower cell when down arrow is pressed (with sync validator)', function () {
-    var called;
+    var onAfterValidate = jasmine.createSpy('onAfterValidate');
+
     handsontable({
       validator: function(val, cb){
-        called = true;
         cb(true);
-      }
+      },
+      afterValidate: onAfterValidate
     });
+
     selectCell(1, 1);
 
     keyDownUp('enter');
     keyProxy().val('Ted');
-    called = false;
+
+    onAfterValidate.reset();
     keyDownUp('arrow_down');
-    expect(called).toBe(true);
-    expect(getData()[1][1]).toEqual('Ted');
-    expect(getSelected()).toEqual([2, 1, 2, 1]);
+
+    waitsFor(function () {
+      return onAfterValidate.calls.length > 0;
+    }, 'Cell validation', 1000);
+
+    runs(function () {
+      expect(onAfterValidate).toHaveBeenCalled();
+      expect(getData()[1][1]).toEqual('Ted');
+      expect(getSelected()).toEqual([2, 1, 2, 1]);
+    });
   });
 
   it('while editing, should finish editing and advance to lower cell when down arrow is pressed (with async validator)', function () {
-    var called;
+    var onAfterValidate = jasmine.createSpy('onAfterValidate');
+
     handsontable({
       validator: function(val, cb){
         setTimeout(function(){
-          called = true;
           cb(true);
         }, 10);
-      }
+      },
+      afterValidate: onAfterValidate
     });
     selectCell(1, 1);
 
     keyDownUp('enter');
     keyProxy().val('Ted');
-    called = false;
+
+    onAfterValidate.reset();
     keyDownUp('arrow_down');
 
-    waits(11);
+    waitsFor(function () {
+      return onAfterValidate.calls.length > 0;
+    }, 'Cell validation', 1000);
 
-    runs(function(){
-      expect(called).toBe(true);
+    runs(function () {
+      expect(onAfterValidate).toHaveBeenCalled();
       expect(getData()[1][1]).toEqual('Ted');
       expect(getSelected()).toEqual([2, 1, 2, 1]);
     });
   });
 
   it('while editing, should finish editing and advance to upper cell when up arrow is pressed', function () {
-    //https://github.com/warpech/jquery-handsontable/issues/215
+    //https://github.com/handsontable/jquery-handsontable/issues/215
     handsontable();
     selectCell(1, 1);
 
@@ -102,7 +116,7 @@ describe('Core_onKeyDown', function () {
   });
 
   it('while editing, should finish editing and advance to next cell when right arrow is pressed', function () {
-    //https://github.com/warpech/jquery-handsontable/issues/215
+    //https://github.com/handsontable/jquery-handsontable/issues/215
     handsontable();
     selectCell(1, 1);
 
@@ -115,7 +129,7 @@ describe('Core_onKeyDown', function () {
 
   it('while editing, should finish editing and advance to previous cell when left arrow is pressed and the text cursor is at position 0', function () {
     //this test almost always *succeeds* in Chrome so be sure to also test in FF, IE
-    //https://github.com/warpech/jquery-handsontable/issues/215
+    //https://github.com/handsontable/jquery-handsontable/issues/215
     handsontable();
     selectCell(2, 2);
 

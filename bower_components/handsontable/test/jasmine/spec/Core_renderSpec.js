@@ -14,7 +14,7 @@ describe('Core_render', function () {
 
   it('all cells should get green background', function () {
     function greenCell(instance, td, row, col, prop, value, cellProperties) {
-      Handsontable.TextRenderer.apply(this, arguments);
+      Handsontable.renderers.TextRenderer.apply(this, arguments);
       td.style.backgroundColor = "green";
 
     }
@@ -30,7 +30,7 @@ describe('Core_render', function () {
       minSpareCols: 4,
       cells: function () {
         return {
-          type: {renderer: greenCell}
+          renderer: greenCell
         };
       }
     });
@@ -80,13 +80,21 @@ describe('Core_render', function () {
   });
 
   it('should run afterRenderer hook', function () {
+    var lastCellProperties;
+
     handsontable({
       data : [[1,2,3,4,5],[1,2,3,4,5]],
       afterRenderer: function (td, row, col, prop, value, cellProperties) {
         td.innerHTML = 'Changed by plugin';
+        if(!cellProperties) {
+          throw new Error();
+        }
+        lastCellProperties = cellProperties;
       }
     });
 
     expect(this.$container.find('td:eq(0)')[0].innerHTML).toEqual('Changed by plugin');
+    expect(lastCellProperties.row).toEqual(1);
+    expect(lastCellProperties.col).toEqual(4);
   });
 });

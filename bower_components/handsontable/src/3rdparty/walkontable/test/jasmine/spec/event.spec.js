@@ -22,8 +22,7 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
         onCellMouseDown: function (event, coords, TD) {
@@ -33,10 +32,10 @@ describe('WalkontableEvent', function () {
       });
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     $td.trigger('mousedown');
 
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
@@ -48,8 +47,7 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
         onCellMouseOver: function (event, coords, TD) {
@@ -59,10 +57,10 @@ describe('WalkontableEvent', function () {
       });
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     $td.trigger('mouseover');
 
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
@@ -74,8 +72,7 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
         onCellDblClick: function (event, coords, TD) {
@@ -85,12 +82,12 @@ describe('WalkontableEvent', function () {
       });
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     $td.trigger('mousedown');
     $td.trigger('mouseup');
     $td.trigger('mousedown');
     $td.trigger('mouseup');
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
@@ -102,14 +99,13 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100
       });
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     $td.trigger('mousedown');
     $td.trigger('mouseup');
     $td.trigger('mousedown');
@@ -118,11 +114,11 @@ describe('WalkontableEvent', function () {
       myTD = TD;
     });
     $td.trigger('mouseup');
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
-  it("should not call `onCellMouseDown` callback when clicked on TH", function () {
+  it("should call `onCellMouseDown` callback when clicked on TH", function () {
     var called = false
       , wt = new Walkontable({
         table: $table[0],
@@ -130,7 +126,6 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
         columnHeaders: [function (col, TH) {
@@ -143,36 +138,37 @@ describe('WalkontableEvent', function () {
     wt.draw();
 
     var $th = $table.find('th:first');
+
     $th.trigger('mousedown');
-    expect(called).toEqual(false);
+    expect(called).toEqual(true);
   });
 
-  it("should not call `onCellMouseOver` callback when clicked on TH", function () {
-    var called = false
+  it("should call `onCellMouseOver` callback when clicked on TH", function () {
+    var called
       , wt = new Walkontable({
         table: $table[0],
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
         columnHeaders: [function (col, TH) {
           TH.innerHTML = col + 1;
         }],
         onCellMouseOver: function (event, coords, TD) {
-          called = true
+          called = coords;
         }
       });
     wt.draw();
 
     var $th = $table.find('th:first');
     $th.trigger('mouseover');
-    expect(called).toEqual(false);
+    expect(called.row).toEqual(-1);
+    expect(called.col).toEqual(0);
   });
 
-  it("should not call `onCellDblClick` callback when clicked on TH", function () {
+  it("should call `onCellDblClick` callback when clicked on TH", function () {
     var called = false
       , wt = new Walkontable({
         table: $table[0],
@@ -180,7 +176,6 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
         columnHeaders: [function (col, TH) {
@@ -197,7 +192,7 @@ describe('WalkontableEvent', function () {
     $th.trigger('mouseup');
     $th.trigger('mousedown');
     $th.trigger('mouseup');
-    expect(called).toEqual(false);
+    expect(called).toEqual(true);
   });
 
   it("should not call `onCellDblClick` callback when right-clicked", function () {
@@ -208,7 +203,6 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
         onCellDblClick: function (event, coords, TD) {
@@ -236,7 +230,6 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
         onCellDblClick: function (event, coords, TD) {
@@ -262,33 +255,32 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
-        selections: {
-          current: {
+        selections: [
+          new WalkontableSelection({
             className: 'current',
             border: {
               width: 1,
               color: 'red',
               style: 'solid'
             }
-          }
-        },
+          })
+        ],
         onCellMouseDown: function (event, coords, TD) {
           myCoords = coords;
           myTD = TD;
         }
       });
-    wt.selections.current.add([10, 2]);
+    wt.selections[0].add(new WalkontableCellCoords(1, 1));
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     var $border = $table.parents('.wtHolder').find('.wtBorder:first');
     $border.trigger('mousedown');
 
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
@@ -300,35 +292,34 @@ describe('WalkontableEvent', function () {
         data: getData,
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
-        offsetRow: 10,
-        offsetColumn: 2,
+        offsetRow: 0,
         height: 200,
         width: 100,
-        selections: {
-          current: {
+        selections: [
+          new WalkontableSelection({
             className: 'current',
             border: {
               width: 1,
               color: 'red',
               style: 'solid'
             }
-          }
-        },
+          })
+        ],
         onCellDblClick: function (event, coords, TD) {
           myCoords = coords;
           myTD = TD;
         }
       });
-    wt.selections.current.add([10, 2]);
+    wt.selections[0].add(new WalkontableCellCoords(1, 1));
     wt.draw();
 
-    var $td = $table.find('tbody tr:first td:first');
+    var $td = $table.find('tbody tr:eq(1) td:eq(1)');
     var $border = $table.parents('.wtHolder').find('.wtBorder:first');
     $border.trigger('mousedown');
     $border.trigger('mouseup');
     $border.trigger('mousedown');
     $border.trigger('mouseup');
-    expect(myCoords).toEqual([10, 2]);
+    expect(myCoords).toEqual(new WalkontableCellCoords(1, 1));
     expect(myTD).toEqual($td[0]);
   });
 
@@ -342,24 +333,23 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
-        selections: {
-          current: {
+        selections: [
+          new WalkontableSelection({
             className: 'current',
             border: {
               width: 1,
               color: 'red',
               style: 'solid'
             }
-          }
-        },
+          })
+        ],
         onCellCornerMouseDown: function (event) {
           clicked = true;
         }
       });
-    wt.selections.current.add([10, 2]);
+    wt.selections[0].add(new WalkontableCellCoords(10, 2));
     wt.draw();
 
     var $td = $table.parents('.wtHolder').find('.current.corner');
@@ -375,21 +365,20 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
-        selections: {
-          current: {
+        selections: [
+          new WalkontableSelection({
             className: 'current',
             border: {
               width: 1,
               color: 'red',
               style: 'solid'
             }
-          }
-        }
+          })
+        ]
       });
-    wt.selections.current.add([10, 2]);
+    wt.selections[0].add(new WalkontableCellCoords(10, 2));
     wt.draw();
 
     var $td = $table.parents('.wtHolder').find('.current.corner');
@@ -411,7 +400,6 @@ describe('WalkontableEvent', function () {
         totalRows: getTotalRows,
         totalColumns: getTotalColumns,
         offsetRow: 10,
-        offsetColumn: 2,
         height: 200,
         width: 100,
         onDraw: function () {

@@ -22,10 +22,7 @@ describe('WalkontableScrollbarNative', function () {
       data: getData,
       totalRows: getTotalRows,
       totalColumns: getTotalColumns,
-      offsetRow: 0,
-      offsetColumn: 0,
-      scrollbarModelH: 'native',
-      scrollbarModelV: 'native'
+      offsetRow: 0
     });
     wt.draw();
 
@@ -43,10 +40,7 @@ describe('WalkontableScrollbarNative', function () {
       data: getData,
       totalRows: getTotalRows,
       totalColumns: getTotalColumns,
-      offsetRow: 0,
-      offsetColumn: 0,
-      scrollbarModelH: 'native',
-      scrollbarModelV: 'native'
+      offsetRow: 0
     });
     wt.draw();
 

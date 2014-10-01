@@ -1,207 +1,209 @@
-function HandsontableAutocompleteEditorClass(instance) {
-  this.instance = instance;
-  this.createElements();
-  this.bindEvents();
-  this.emptyStringLabel = '\u00A0\u00A0\u00A0'; //3 non-breaking spaces
-}
+(function (Handsontable) {
+  var AutocompleteEditor = Handsontable.editors.HandsontableEditor.prototype.extend();
 
-Handsontable.helper.inherit(HandsontableAutocompleteEditorClass, HandsontableTextEditorClass);
+  AutocompleteEditor.prototype.init = function () {
+    Handsontable.editors.HandsontableEditor.prototype.init.apply(this, arguments);
 
-/**
- * @see HandsontableTextEditorClass.prototype.createElements
- */
-HandsontableAutocompleteEditorClass.prototype.createElements = function () {
-  HandsontableTextEditorClass.prototype.createElements.call(this);
-
-  this.$textarea.typeahead();
-  this.typeahead = this.$textarea.data('typeahead');
-  this.typeahead._render = this.typeahead.render;
-  this.typeahead.minLength = 0;
-
-  this.typeahead.lookup = function () {
-    var items;
-    this.query = this.$element.val();
-    items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source;
-    return items ? this.process(items) : this;
+    this.query = null;
+    this.choices = [];
   };
 
-  this.typeahead.matcher = function () {
-    return true;
+  AutocompleteEditor.prototype.createElements = function(){
+    Handsontable.editors.HandsontableEditor.prototype.createElements.apply(this, arguments);
+
+    var getSystemSpecificPaddingClass = function () {
+      if(window.navigator.platform.indexOf('Mac') != -1) {
+        return "htMacScroll";
+      } else {
+        return "";
+      }
+    };
+
+    this.$htContainer.addClass('autocompleteEditor');
+    this.$htContainer.addClass(getSystemSpecificPaddingClass());
+
   };
 
-  var _process = this.typeahead.process;
-  var that = this;
-  this.typeahead.process = function (items) {
-    var cloned = false;
-    for (var i = 0, ilen = items.length; i < ilen; i++) {
-      if (items[i] === '') {
-        //this is needed because because of issue #254
-        //empty string ('') is a falsy value and breaks the loop in bootstrap-typeahead.js method `sorter`
-        //best solution would be to change line: `while (item = items.shift()) {`
-        //                                   to: `while ((item = items.shift()) !== void 0) {`
-        if (!cloned) {
-          //need to clone items before applying emptyStringLabel
-          //(otherwise validateChanges fails for empty string)
-          items = $.extend([], items);
-          cloned = true;
+  var skipOne = false;
+  var onBeforeKeyDown = function (event) {
+    skipOne = false;
+    var editor = this.getActiveEditor();
+    var keyCodes = Handsontable.helper.keyCode;
+
+    if (Handsontable.helper.isPrintableChar(event.keyCode) || event.keyCode === keyCodes.BACKSPACE || event.keyCode === keyCodes.DELETE  || event.keyCode === keyCodes.INSERT) {
+      editor.instance._registerTimeout(setTimeout(function () {
+        editor.queryChoices(editor.TEXTAREA.value);
+        skipOne = true;
+      }, 0));
+    }
+  };
+
+  AutocompleteEditor.prototype.prepare = function () {
+    this.instance.addHook('beforeKeyDown', onBeforeKeyDown);
+    Handsontable.editors.HandsontableEditor.prototype.prepare.apply(this, arguments);
+  };
+
+  AutocompleteEditor.prototype.open = function () {
+    Handsontable.editors.HandsontableEditor.prototype.open.apply(this, arguments);
+
+    this.TEXTAREA.style.visibility = 'visible';
+    this.focus();
+
+    var choicesListHot = this.$htContainer.handsontable('getInstance');
+    var that = this;
+
+    choicesListHot.updateSettings({
+      'colWidths': [Handsontable.Dom.outerWidth(this.TEXTAREA) - 2],
+      afterRenderer: function (TD, row, col, prop, value) {
+        var caseSensitive = this.getCellMeta(row, col).filteringCaseSensitive === true;
+        var indexOfMatch =  caseSensitive ? value.indexOf(this.query) : value.toLowerCase().indexOf(that.query.toLowerCase());
+
+        if(indexOfMatch != -1){
+          var match = value.substr(indexOfMatch, that.query.length);
+          TD.innerHTML = value.replace(match, '<strong>' + match + '</strong>');
         }
-        items[i] = that.emptyStringLabel;
       }
+    });
+
+    if(skipOne) {
+      skipOne = false;
     }
-    return _process.call(this, items);
-  };
-};
+    that.instance._registerTimeout(setTimeout(function () {
+      that.queryChoices(that.TEXTAREA.value);
+    }, 0));
 
-/**
- * @see HandsontableTextEditorClass.prototype.bindEvents
- */
-HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
-  var that = this;
-
-  this.$textarea.off('keydown').off('keyup').off('keypress'); //unlisten
-
-  this.$textarea.off('.acEditor').on('keydown.acEditor', function (event) {
-    switch (event.keyCode) {
-      case 38: /* arrow up */
-        that.typeahead.prev();
-        event.stopImmediatePropagation(); //stops TextEditor and core onKeyDown handler
-        break;
-
-      case 40: /* arrow down */
-        that.typeahead.next();
-        event.stopImmediatePropagation(); //stops TextEditor and core onKeyDown handler
-        break;
-
-      case 13: /* enter */
-        event.preventDefault();
-        break;
-    }
-  });
-
-  this.$textarea.on('keyup.acEditor', function (event) {
-    if (Handsontable.helper.isPrintableChar(event.keyCode) || event.keyCode === 113 || event.keyCode === 13 || event.keyCode === 8 || event.keyCode === 46) {
-      that.typeahead.lookup();
-    }
-  });
-
-  this.typeahead.$menu.on('mouseleave', function(){
-    that.typeahead.$menu.find('.active').removeClass('active');
-  });
-
-
-  HandsontableTextEditorClass.prototype.bindEvents.call(this);
-};
-/**
- * @see HandsontableTextEditorClass.prototype.bindTemporaryEvents
- */
-HandsontableAutocompleteEditorClass.prototype.bindTemporaryEvents = function (td, row, col, prop, value, cellProperties) {
-  var that = this
-    , i
-    , j;
-
-  this.typeahead._valueSelected = false;
-
-  this.typeahead.select = function () {
-    var active = this.$menu[0].querySelector('.active');
-    var val = active.getAttribute('data-value');
-    if (val === that.emptyStringLabel) {
-      val = '';
-    }
-    if (typeof cellProperties.onSelect === 'function') {
-      cellProperties.onSelect(row, col, prop, val, that.instance.view.wt.wtDom.index(active));
-    }
-    else {
-      that.TEXTAREA.value = val;
-    }
-
-    this._valueSelected = true;
-
-    this.hide(); //need to hide it before destroyEditor, because destroyEditor checks if menu is expanded
-    that.finishEditing();
-
-    return this;
   };
 
-  this.typeahead.render = function (items) {
-    that.typeahead._render.call(this, items);
-    if (!cellProperties.strict) {
-      var li = this.$menu[0].querySelector('.active');
-      if (li) {
-        that.instance.view.wt.wtDom.removeClass(li, 'active')
-      }
-    }
-    return this;
+  AutocompleteEditor.prototype.close = function () {
+    Handsontable.editors.HandsontableEditor.prototype.close.apply(this, arguments);
   };
 
-  /* overwrite typeahead options and methods (matcher, sorter, highlighter, updater, etc) if provided in cellProperties */
-  for (i in cellProperties) {
-    if (i === 'options') {
-      for (j in cellProperties.options) {
-        this.typeahead.options[j] = cellProperties.options[j];
+  AutocompleteEditor.prototype.queryChoices = function(query){
+    this.query = query;
+
+    if (typeof this.cellProperties.source == 'function'){
+      var that = this;
+
+      this.cellProperties.source(query, function(choices){
+        that.updateChoicesList(choices);
+      });
+
+    } else if (Handsontable.helper.isArray(this.cellProperties.source)) {
+
+      var choices;
+
+      if(!query || this.cellProperties.filter === false){
+        choices = this.cellProperties.source;
+      } else {
+
+        var filteringCaseSensitive = this.cellProperties.filteringCaseSensitive === true;
+        var lowerCaseQuery = query.toLowerCase();
+
+        choices = this.cellProperties.source.filter(function(choice){
+
+          if (filteringCaseSensitive) {
+            return choice.indexOf(query) != -1;
+          } else {
+            return choice.toLowerCase().indexOf(lowerCaseQuery) != -1;
+          }
+
+        });
       }
+
+      this.updateChoicesList(choices);
+
+    } else {
+      this.updateChoicesList([]);
     }
-    else {
-      this.typeahead[i] = cellProperties[i];
+
+  };
+
+  AutocompleteEditor.prototype.updateChoicesList = function (choices) {
+    var pos = Handsontable.Dom.getCaretPosition(this.TEXTAREA),
+        endPos = Handsontable.Dom.getSelectionEndPosition(this.TEXTAREA);
+
+    this.choices = choices;
+
+    this.$htContainer.handsontable('loadData', Handsontable.helper.pivot([choices]));
+    this.$htContainer.handsontable('updateSettings', {height: this.getDropdownHeight()});
+
+    if(this.cellProperties.strict === true) {
+      this.highlightBestMatchingChoice();
     }
-  }
 
-  HandsontableTextEditorClass.prototype.bindTemporaryEvents.call(this, td, row, col, prop, value, cellProperties);
+    this.instance.listen();
+    this.TEXTAREA.focus();
+    Handsontable.Dom.setCaretPosition(this.TEXTAREA, pos, (pos != endPos ? endPos : void 0));
+  };
 
-};
+  AutocompleteEditor.prototype.finishEditing = function (restoreOriginalValue) {
+    if (!restoreOriginalValue) {
+      this.instance.removeHook('beforeKeyDown', onBeforeKeyDown);
+    }
+    Handsontable.editors.HandsontableEditor.prototype.finishEditing.apply(this, arguments);
+  };
 
-HandsontableAutocompleteEditorClass.prototype.beginEditing = function () {
-  HandsontableTextEditorClass.prototype.beginEditing.apply(this, arguments);
+  AutocompleteEditor.prototype.highlightBestMatchingChoice = function () {
+    var bestMatchingChoice = this.findBestMatchingChoice();
 
-  var that = this;
+    if ( typeof bestMatchingChoice == 'undefined' && this.cellProperties.allowInvalid === false){
+      bestMatchingChoice = 0;
+    }
 
-  this.instance.registerTimeout('IE9_align_fix', function () { //otherwise is misaligned in IE9
-    that.typeahead.lookup();
-  }, 1);
-};
-/**
- * @see HandsontableTextEditorClass.prototype.finishEditing
- */
-HandsontableAutocompleteEditorClass.prototype.finishEditing = function (isCancelled, ctrlDown) {
-  if (!isCancelled) {
-    if (this.isMenuExpanded()) {
-      if(this.typeahead.$menu[0].querySelector('.active')){
-        this.typeahead.select();
-        this.state = this.STATE_FINISHED;
-      } else if (this.cellProperties.strict) {
-        this.state = this.STATE_FINISHED;
+    if(typeof bestMatchingChoice == 'undefined'){
+      this.$htContainer.handsontable('deselectCell');
+    } else {
+      this.$htContainer.handsontable('selectCell', bestMatchingChoice, 0);
+    }
+  };
+
+  AutocompleteEditor.prototype.findBestMatchingChoice = function(){
+    var bestMatch = {};
+    var valueLength = this.getValue().length;
+    var currentItem;
+    var indexOfValue;
+    var charsLeft;
+
+
+    for(var i = 0, len = this.choices.length; i < len; i++){
+      currentItem = this.choices[i];
+
+      if(valueLength > 0){
+        indexOfValue = currentItem.indexOf(this.getValue())
+      } else {
+        indexOfValue = currentItem === this.getValue() ? 0 : -1;
       }
+
+      if(indexOfValue == -1) continue;
+
+      charsLeft =  currentItem.length - indexOfValue - valueLength;
+
+      if( typeof bestMatch.indexOfValue == 'undefined'
+        || bestMatch.indexOfValue > indexOfValue
+        || ( bestMatch.indexOfValue == indexOfValue && bestMatch.charsLeft > charsLeft ) ){
+
+        bestMatch.indexOfValue = indexOfValue;
+        bestMatch.charsLeft = charsLeft;
+        bestMatch.index = i;
+
+      }
+
     }
-  }
 
-  HandsontableTextEditorClass.prototype.finishEditing.call(this, isCancelled, ctrlDown);
-};
 
-HandsontableAutocompleteEditorClass.prototype.isMenuExpanded = function () {
-  if (this.instance.view.wt.wtDom.isVisible(this.typeahead.$menu[0])) {
-    return this.typeahead;
-  }
-  else {
-    return false;
-  }
-};
+    return bestMatch.index;
+  };
 
-/**
- * Autocomplete editor
- * @param {Object} instance Handsontable instance
- * @param {Element} td Table cell where to render
- * @param {Number} row
- * @param {Number} col
- * @param {String|Number} prop Row object property name
- * @param value Original value (remember to escape unsafe HTML before inserting to DOM!)
- * @param {Object} cellProperties Cell properites (shared by cell renderer and editor)
- */
-Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, value, cellProperties) {
-  if (!instance.autocompleteEditor) {
-    instance.autocompleteEditor = new HandsontableAutocompleteEditorClass(instance);
-  }
-  instance.autocompleteEditor.bindTemporaryEvents(td, row, col, prop, value, cellProperties);
-  return function (isCancelled) {
-//    var isCancelled = true;
-    instance.autocompleteEditor.finishEditing(isCancelled);
-  }
-};
+  AutocompleteEditor.prototype.getDropdownHeight = function(){
+    var firstRowHeight = this.$htContainer.handsontable('getInstance').getRowHeight(0) || 23;
+    return this.choices.length >= 10 ? 10 * firstRowHeight : this.choices.length * firstRowHeight + 8;
+    //return 10 * this.$htContainer.handsontable('getInstance').getRowHeight(0);
+    //sorry, we can't measure row height before it was rendered. Let's use fixed height for now
+    return 230;
+  };
+
+
+  Handsontable.editors.AutocompleteEditor = AutocompleteEditor;
+  Handsontable.editors.registerEditor('autocomplete', AutocompleteEditor);
+
+})(Handsontable);

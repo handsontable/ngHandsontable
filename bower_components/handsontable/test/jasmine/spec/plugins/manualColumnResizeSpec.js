@@ -98,7 +98,7 @@ describe('manualColumnResize', function () {
 
   it("should resize appropriate columns, even if the column order was changed with manualColumnMove plugin", function () {
     handsontable({
-      colHeaders: true,
+      colHeaders: ["First", "Second", "Third"],
       manualColumnMove: [2, 1, 0, 3],
       manualColumnResize: true
     });
@@ -114,7 +114,7 @@ describe('manualColumnResize', function () {
 
     var $resizedTh = $columnHeaders.eq(0);
 
-    expect($resizedTh.text()).toEqual('C');
+    expect($resizedTh.text()).toEqual('Third');
     expect($resizedTh.outerWidth()).toEqual(100);
 
     //Sizes of remaining columns should stay the same
@@ -139,7 +139,7 @@ describe('manualColumnResize', function () {
 
     resizeColumn(0, 100);
 
-    expect(afterColumnResizeCallback).toHaveBeenCalledWith(0, 100, void 0, void 0, void 0);
+    expect(afterColumnResizeCallback).toHaveBeenCalledWith(0, 100, void 0, void 0, void 0, void 0);
     expect(colWidth(this.$container, 0)).toEqual(100);
 
   });
@@ -234,8 +234,8 @@ describe('manualColumnResize', function () {
       expect(afterColumnResizeCallback.calls[0].args[0]).toEqual(0);
 
       //All modern browsers returns width = 25px, but IE8 seems to compute width differently and returns 24px
-      expect(afterColumnResizeCallback.calls[0].args[1]).toBeInArray(24, 25);
-      expect(colWidth(this.$container, 0)).toBeInArray(24, 25);
+      expect(afterColumnResizeCallback.calls[0].args[1]).toBeInArray([24, 25]);
+      expect(colWidth(this.$container, 0)).toBeInArray([24, 25]);
     });
 
   });
@@ -254,11 +254,12 @@ describe('manualColumnResize', function () {
 
     this.$container.find('thead th:eq(0)').mouseenter();
 
-    var resizer = this.$container.find('.manualColumnResizer');
-    var handle = resizer.find('.manualColumnResizerHandle');
+    var handle = this.$container.find('.manualColumnResizer');
+    var handleBox = handle[0].getBoundingClientRect();
     var th0 = this.$container.find('thead th:eq(0)');
+    var thBox = th0[0].getBoundingClientRect();
 
-    expect(resizer.offset().left + handle.outerWidth()).toEqual(th0.offset().left + th0.outerWidth() - 1);
+    expect(handleBox.left + handleBox.width).toEqual(thBox.left + thBox.width - 1);
 
     maxed = true;
 
@@ -266,8 +267,34 @@ describe('manualColumnResize', function () {
 
     this.$container.find('thead th:eq(0)').mouseenter();
 
-    expect(resizer.offset().left + handle.outerWidth()).toEqual(th0.offset().left + th0.outerWidth() - 1);
+    handleBox = handle[0].getBoundingClientRect();
+    thBox = th0[0].getBoundingClientRect();
+    expect(handleBox.left + handleBox.width).toEqual(thBox.left + thBox.width - 1);
+  });
 
+  it("should display the resize handle in the correct place after the table has been scrolled", function () {
+    handsontable({
+      data: createSpreadsheetData(10, 20),
+      colHeaders: true,
+      manualColumnResize: true,
+      height: 100,
+      width: 200
+    });
 
+    var $colHeader = this.$container.find('.ht_clone_top thead tr:eq(0) th:eq(2)');
+    $colHeader.trigger("mouseenter");
+    var $handle = this.$container.find('.manualColumnResizer');
+    $handle[0].style.background = "red";
+
+    expect($colHeader.offset().left + $colHeader.width() - 5).toEqual($handle.offset().left);
+    expect($colHeader.offset().top).toEqual($handle.offset().top);
+
+    this.$container.scrollLeft(200);
+    this.$container.scroll();
+
+    $colHeader = this.$container.find('.ht_clone_top thead tr:eq(0) th:eq(5)');
+    $colHeader.trigger("mouseenter");
+    expect($colHeader.offset().left + $colHeader.width() - 5).toEqual($handle.offset().left);
+    expect($colHeader.offset().top).toEqual($handle.offset().top);
   });
 });

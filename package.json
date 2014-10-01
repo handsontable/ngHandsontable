@@ -1,6 +1,6 @@
 {
   "name": "ngHandsontable",
-  "description": "Angular directive for Handsontable. Enables creation of data grid applications in AngularJS",
+  "description": "AngularJS directive for Handsontable",
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "bugs": {
     "url": "https://github.com/handsontable/ngHandsontable"

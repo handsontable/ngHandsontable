@@ -5,7 +5,7 @@
   "bugs": {
     "url": "https://github.com/handsontable/ngHandsontable"
   },
-  "author": "Marcin Warpechowski <marcin@nextgen.pl>",
+  "author": "Marcin Warpechowski <hello@handsontable.com>",
   "version": "0.3.17",
   "devDependencies": {
     "grunt": "~0.4.5",

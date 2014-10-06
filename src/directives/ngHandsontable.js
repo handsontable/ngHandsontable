@@ -138,7 +138,7 @@ angular.module('ngHandsontable.directives', [])
 							optionList.property = match[1];
 							optionList.object = match[2];
 						} else {
-							optionList.object = options;
+							optionList.object = options.split(',');
 						}
 						$scope.column['optionList'] = optionList;
 					}

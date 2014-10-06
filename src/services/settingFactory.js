@@ -99,26 +99,31 @@ angular.module('ngHandsontable.services', [])
 							hotInstance = container.data('handsontable'),
 							row = hotInstance.getSelected()[0];
 
+						var source = [];
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
 							if(options.object) {
-								var objKeys = options.object.split('.')
-									,paramObject = data;
+								if (angular.isArray(options.object)) {
+									source = options.object;
+								} else {
+									var objKeys = options.object.split('.')
+										,paramObject = data;
 
-								while(objKeys.length > 0) {
-									var key = objKeys.shift();
-									paramObject = paramObject[key];
-								}
-
-								var source = [];
-								if (propertyOnly) {
-									for(var i = 0, length = paramObject.length; i < length; i++) {
-										source.push(paramObject[i][options.property]);
+									while(objKeys.length > 0) {
+										var key = objKeys.shift();
+										paramObject = paramObject[key];
 									}
-								} else{
-									source = paramObject;
+
+									if (propertyOnly) {
+										for(var i = 0, length = paramObject.length; i < length; i++) {
+											source.push(paramObject[i][options.property]);
+										}
+									} else{
+										source = paramObject;
+									}
 								}
+
 								process(source);
 							}
 						}

@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Oct 01 2014 23:36:56 GMT+0200 (CEST)
+ * Date: Mon Oct 06 2014 11:31:08 GMT+0200 (Środkowoeuropejski czas letni)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -119,26 +119,31 @@ angular.module('ngHandsontable.services', [])
 							hotInstance = container.data('handsontable'),
 							row = hotInstance.getSelected()[0];
 
+						var source = [];
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
 							if(options.object) {
-								var objKeys = options.object.split('.')
-									,paramObject = data;
+								if (angular.isArray(options.object)) {
+									source = options.object;
+								} else {
+									var objKeys = options.object.split('.')
+										,paramObject = data;
 
-								while(objKeys.length > 0) {
-									var key = objKeys.shift();
-									paramObject = paramObject[key];
-								}
-
-								var source = [];
-								if (propertyOnly) {
-									for(var i = 0, length = paramObject.length; i < length; i++) {
-										source.push(paramObject[i][options.property]);
+									while(objKeys.length > 0) {
+										var key = objKeys.shift();
+										paramObject = paramObject[key];
 									}
-								} else{
-									source = paramObject;
+
+									if (propertyOnly) {
+										for(var i = 0, length = paramObject.length; i < length; i++) {
+											source.push(paramObject[i][options.property]);
+										}
+									} else{
+										source = paramObject;
+									}
 								}
+
 								process(source);
 							}
 						}
@@ -287,7 +292,7 @@ angular.module('ngHandsontable.directives', [])
 							optionList.property = match[1];
 							optionList.object = match[2];
 						} else {
-							optionList.object = options;
+							optionList.object = options.split(',');
 						}
 						$scope.column['optionList'] = optionList;
 					}

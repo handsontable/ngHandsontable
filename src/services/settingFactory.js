@@ -89,8 +89,10 @@ angular.module('ngHandsontable.services', [])
  */
 	.factory(
 	'autoCompleteFactory',
-
+	[
+		'settingFactory',
 		function (settingFactory) {
+
 			return {
 				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
 
@@ -126,4 +128,5 @@ angular.module('ngHandsontable.services', [])
 				}
 			}
 		}
+	]
 );

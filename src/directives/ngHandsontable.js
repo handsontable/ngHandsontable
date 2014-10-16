@@ -16,17 +16,20 @@ angular.module('ngHandsontable.directives', [])
 			return {
 				restrict: 'EA',
 				scope: settingFactory.getScopeDefinition(htOptions),
-				controller: function ($scope) {
-					this.setColumnSetting = function (column) {
-						if (!$scope.htSettings) {
-							$scope.htSettings = {};
+				controller: [
+					'$scope',
+					function ($scope) {
+						this.setColumnSetting = function (column) {
+							if (!$scope.htSettings) {
+								$scope.htSettings = {};
+							}
+							if (!$scope.htSettings['columns']) {
+								$scope.htSettings.columns = [];
+							}
+							$scope.htSettings['columns'].push(column);
 						}
-						if (!$scope.htSettings['columns']) {
-							$scope.htSettings.columns = [];
-						}
-						$scope.htSettings['columns'].push(column);
 					}
-				},
+				],
 				link: function (scope, element, attrs) {
 					if (!scope.htSettings) {
 						scope.htSettings = {};
@@ -126,23 +129,26 @@ angular.module('ngHandsontable.directives', [])
 				restrict: 'E',
 				require:'^hotTable',
 				scope:{},
-				controller: function ($scope) {
-					this.setColumnOptionList = function (options) {
-						if (!$scope.column) {
-							$scope.column = {}
-						}
+				controller: [
+					'$scope',
+					function ($scope) {
+						this.setColumnOptionList = function (options) {
+							if (!$scope.column) {
+								$scope.column = {}
+							}
 
-						var optionList = {};
-						var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
-						if (match) {
-							optionList.property = match[1];
-							optionList.object = match[2];
-						} else {
-							optionList.object = options;
+							var optionList = {};
+							var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+							if (match) {
+								optionList.property = match[1];
+								optionList.object = match[2];
+							} else {
+								optionList.object = options;
+							}
+							$scope.column['optionList'] = optionList;
 						}
-						$scope.column['optionList'] = optionList;
 					}
-				},
+				],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
 

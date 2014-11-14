@@ -16,7 +16,7 @@ angular.module('ngHandsontable.directives', [])
 			return {
 				restrict: 'EA',
 				scope: settingFactory.getScopeDefinition(htOptions),
-				controller: function ($scope) {
+				controller: ['$scope', function ($scope) {
 					this.setColumnSetting = function (column) {
 						if (!$scope.htSettings) {
 							$scope.htSettings = {};
@@ -26,7 +26,7 @@ angular.module('ngHandsontable.directives', [])
 						}
 						$scope.htSettings['columns'].push(column);
 					}
-				},
+				}],
 				link: function (scope, element, attrs) {
 					if (!scope.htSettings) {
 						scope.htSettings = {};
@@ -126,7 +126,7 @@ angular.module('ngHandsontable.directives', [])
 				restrict: 'E',
 				require:'^hotTable',
 				scope:{},
-				controller: function ($scope) {
+				controller: ['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
 							$scope.column = {}
@@ -142,7 +142,7 @@ angular.module('ngHandsontable.directives', [])
 						}
 						$scope.column['optionList'] = optionList;
 					}
-				},
+				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
 

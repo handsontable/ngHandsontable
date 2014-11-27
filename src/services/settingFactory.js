@@ -17,7 +17,7 @@ angular.module('ngHandsontable.services', [])
 				 * @param htSettings
 				 */
 				initializeHandsontable: function (element, htSettings) {
-					var container = $('<div class="'+ this.containerClassName +'"></div>');
+					var container = $('<div class="' + this.containerClassName + '"></div>');
 					element.append(container);
 					container.handsontable(htSettings);
 				},
@@ -89,7 +89,8 @@ angular.module('ngHandsontable.services', [])
  */
 	.factory(
 	'autoCompleteFactory',
-
+	[
+		'settingFactory',
 		function (settingFactory) {
 			return {
 				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
@@ -103,23 +104,23 @@ angular.module('ngHandsontable.services', [])
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
-							if(options.object) {
+							if (options.object) {
 								if (angular.isArray(options.object)) {
 									source = options.object;
 								} else {
 									var objKeys = options.object.split('.')
-										,paramObject = data;
+										, paramObject = data;
 
-									while(objKeys.length > 0) {
+									while (objKeys.length > 0) {
 										var key = objKeys.shift();
 										paramObject = paramObject[key];
 									}
 
 									if (propertyOnly) {
-										for(var i = 0, length = paramObject.length; i < length; i++) {
+										for (var i = 0, length = paramObject.length; i < length; i++) {
 											source.push(paramObject[i][options.property]);
 										}
-									} else{
+									} else {
 										source = paramObject;
 									}
 								}
@@ -131,4 +132,5 @@ angular.module('ngHandsontable.services', [])
 				}
 			}
 		}
+	]
 );

@@ -46,8 +46,7 @@ module.exports = function (grunt) {
 
 		uglify: {
       options: {
-        banner: myBanner,
-        mangle: false
+        banner: myBanner
       },
 			"dist/ngHandsontable.min.js": ["dist/ngHandsontable.js"]
     },

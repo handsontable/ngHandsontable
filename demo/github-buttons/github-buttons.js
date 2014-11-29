@@ -30,6 +30,10 @@ function callback(obj) {
   }
 }
 
-$(function () {
+contentLoaded(window, function () {
   jsonp('https://api.github.com/repos/' + user + '/' + repo);
 });
+
+//$(function () {
+//  jsonp('https://api.github.com/repos/' + user + '/' + repo);
+//});

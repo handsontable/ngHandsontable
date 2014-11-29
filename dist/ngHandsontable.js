@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Mon Oct 06 2014 11:31:08 GMT+0200 (Środkowoeuropejski czas letni)
+ * Date: Sat Nov 29 2014 15:50:36 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -37,28 +37,33 @@ angular.module('ngHandsontable.services', [])
 				 * @param htSettings
 				 */
 				initializeHandsontable: function (element, htSettings) {
-					var container = $('<div class="'+ this.containerClassName +'"></div>');
-					element.append(container);
-					container.handsontable(htSettings);
+					var container = document.createElement('DIV');
+					container.className = this.containerClassName;
+					element[0].appendChild(container);
+
+					return new Handsontable(container, htSettings);
 				},
 
 				/***
 				 * Set new settings to handsontable instance
-				 * @param element
+				 * @param instance
 				 * @param settings
 				 */
-				updateHandsontableSettings: function (element, settings) {
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('updateSettings', settings);
+				updateHandsontableSettings: function (instance, settings) {
+					if (instance){
+						instance.updateSettings(settings);
+					}
+
 				},
 
 				/***
 				 * Render handsontable instance inside element
-				 * @param element
+				 * @param instance
 				 */
-				renderHandsontable: function (element) {
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('render');
+				renderHandsontable: function (instance) {
+					if (instance){
+						instance.render();
+					}
 				},
 
 				/***
@@ -109,41 +114,36 @@ angular.module('ngHandsontable.services', [])
  */
 	.factory(
 	'autoCompleteFactory',
-
-		function (settingFactory) {
+	[
+		function () {
 			return {
-				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
-
+				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
 					column.source = function (query, process) {
-						var container = $(element).find('.' + settingFactory.containerClassName),
-							hotInstance = container.data('handsontable'),
-							row = hotInstance.getSelected()[0];
-
+						var	row = instance.getSelected()[0];
 						var source = [];
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
-							if(options.object) {
+							if (options.object) {
 								if (angular.isArray(options.object)) {
 									source = options.object;
 								} else {
 									var objKeys = options.object.split('.')
-										,paramObject = data;
+										, paramObject = data;
 
-									while(objKeys.length > 0) {
+									while (objKeys.length > 0) {
 										var key = objKeys.shift();
 										paramObject = paramObject[key];
 									}
 
 									if (propertyOnly) {
-										for(var i = 0, length = paramObject.length; i < length; i++) {
+										for (var i = 0, length = paramObject.length; i < length; i++) {
 											source.push(paramObject[i][options.property]);
 										}
-									} else{
+									} else {
 										source = paramObject;
 									}
 								}
-
 								process(source);
 							}
 						}
@@ -151,6 +151,7 @@ angular.module('ngHandsontable.services', [])
 				}
 			}
 		}
+	]
 );
 angular.module('ngHandsontable.directives', [])
 /***
@@ -170,7 +171,7 @@ angular.module('ngHandsontable.directives', [])
 			return {
 				restrict: 'EA',
 				scope: settingFactory.getScopeDefinition(htOptions),
-				controller: function ($scope) {
+				controller:['$scope', function ($scope) {
 					this.setColumnSetting = function (column) {
 						if (!$scope.htSettings) {
 							$scope.htSettings = {};
@@ -180,7 +181,7 @@ angular.module('ngHandsontable.directives', [])
 						}
 						$scope.htSettings['columns'].push(column);
 					}
-				},
+				}],
 				link: function (scope, element, attrs) {
 					if (!scope.htSettings) {
 						scope.htSettings = {};
@@ -188,6 +189,8 @@ angular.module('ngHandsontable.directives', [])
 					scope.htSettings['data'] = scope.datarows;
 
 					angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
+
+					scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 
 					if(scope.htSettings.columns) {
 						for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
@@ -200,14 +203,15 @@ angular.module('ngHandsontable.directives', [])
 										optionList.property = match[1];
 										optionList.object = match[2];
 									} else {
-										optionList.object = options;
+										optionList.object = optionList;
 									}
 									scope.htSettings.columns[i].optionList = optionList;
 								}
 
-								autoCompleteFactory.parseAutoComplete(element, scope.htSettings.columns[i], scope.datarows, true);
+								autoCompleteFactory.parseAutoComplete(scope.hotInstance, scope.htSettings.columns[i], scope.datarows, true);
 							}
 						}
+						scope.hotInstance.updateSettings(scope.htSettings);
 					}
 
 					scope.htSettings.afterChange = function () {
@@ -239,7 +243,8 @@ angular.module('ngHandsontable.directives', [])
 						},
 						function () {
 							angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope.$parent));
-							settingFactory.updateHandsontableSettings(element, scope.htSettings);
+							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
+
 						}
 					);
 
@@ -260,10 +265,11 @@ angular.module('ngHandsontable.directives', [])
 							return angular.toJson([objToCheck]);
 						},
 						function () {
-							settingFactory.renderHandsontable(element);
-						});
+							settingFactory.renderHandsontable(scope.hotInstance);
+						}
+					);
 
-					settingFactory.initializeHandsontable(element, scope.htSettings);
+					//scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
 		}
@@ -280,7 +286,7 @@ angular.module('ngHandsontable.directives', [])
 				restrict: 'E',
 				require:'^hotTable',
 				scope:{},
-				controller: function ($scope) {
+				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
 							$scope.column = {}
@@ -296,7 +302,7 @@ angular.module('ngHandsontable.directives', [])
 						}
 						$scope.column['optionList'] = optionList;
 					}
-				},
+				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
 

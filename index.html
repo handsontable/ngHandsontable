@@ -7,10 +7,9 @@
 	<!--
 	Loading Handsontable (full distribution that includes all dependencies apart from jQuery)
 	-->
-	<link data-jsfiddle="common" rel="stylesheet" media="screen" href="bower_components/handsontable/dist/jquery.handsontable.full.css">
+	<link data-jsfiddle="common" rel="stylesheet" media="screen" href="bower_components/handsontable/dist/handsontable.full.css">
 	<script data-jsfiddle="common" src="bower_components/angular/angular.js"></script>
-	<script data-jsfiddle="common" src="bower_components/jquery/jquery.min.js"></script>
-	<script data-jsfiddle="common" src="bower_components/handsontable/dist/jquery.handsontable.full.js"></script>
+	<script data-jsfiddle="common" src="bower_components/handsontable/dist/handsontable.full.js"></script>
   <script data-jsfiddle="common" src="dist/ngHandsontable.js"></script>
   <script data-jsfiddle="common" src="demo/js/ngHandsontableDemo.js"></script>
 
@@ -119,7 +118,7 @@
 							<hot-column data="name.last"           title="'Last Name'"   type="grayedOut"  readOnly></hot-column>
 							<hot-column data="address"             title="'Address'" width="150"></hot-column>
 							<hot-column data="product.description" title="'Favorite food'" type="'autocomplete'">
-								<hot-autocomplete datarows="1,2,3,4,5"></hot-autocomplete>
+								<hot-autocomplete datarows="description in product.options"></hot-autocomplete>
 							</hot-column>
 							<hot-column data="price"               title="'Price'"     type="'numeric'"  width="80"  format="'$ 0,0.00'" ></hot-column>
 							<hot-column data="isActive"            title="'Is active'" type="'checkbox'" width="65"  checkedTemplate="'Yes'" uncheckedTemplate="'No'"></hot-column>
@@ -144,18 +143,6 @@
 				</div>
 			</div>
 		</div>
-
-
-		<script type="text/javascript">
-			$('.show-source').click(function (event) {
-				event.preventDefault();
-
-				$(this).toggleClass('shown');
-				$('pre.javascript').toggle();
-				$('.codeLayout').toggleClass('codeLayoutExpanded');
-
-			});
-		</script>
 
 		<div class="footer-text">ngHandsontable &copy; 2012-2014 Marcin Warpechowski and contributors.<br> Code and documentation
 			licensed under the The MIT License.

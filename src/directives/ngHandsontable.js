@@ -35,6 +35,8 @@ angular.module('ngHandsontable.directives', [])
 
 					angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
 
+					scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
+
 					if(scope.htSettings.columns) {
 						for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
 
@@ -46,14 +48,15 @@ angular.module('ngHandsontable.directives', [])
 										optionList.property = match[1];
 										optionList.object = match[2];
 									} else {
-										optionList.object = options;
+										optionList.object = optionList;
 									}
 									scope.htSettings.columns[i].optionList = optionList;
 								}
 
-								autoCompleteFactory.parseAutoComplete(element, scope.htSettings.columns[i], scope.datarows, true);
+								autoCompleteFactory.parseAutoComplete(scope.hotInstance, scope.htSettings.columns[i], scope.datarows, true);
 							}
 						}
+						scope.hotInstance.updateSettings(scope.htSettings);
 					}
 
 					scope.htSettings.afterChange = function () {
@@ -85,7 +88,8 @@ angular.module('ngHandsontable.directives', [])
 						},
 						function () {
 							angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope.$parent));
-							settingFactory.updateHandsontableSettings(element, scope.htSettings);
+							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
+
 						}
 					);
 
@@ -106,10 +110,11 @@ angular.module('ngHandsontable.directives', [])
 							return angular.toJson([objToCheck]);
 						},
 						function () {
-							settingFactory.renderHandsontable(element);
-						});
+							settingFactory.renderHandsontable(scope.hotInstance);
+						}
+					);
 
-					settingFactory.initializeHandsontable(element, scope.htSettings);
+					//scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
 		}

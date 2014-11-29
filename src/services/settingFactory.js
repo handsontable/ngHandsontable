@@ -17,28 +17,33 @@ angular.module('ngHandsontable.services', [])
 				 * @param htSettings
 				 */
 				initializeHandsontable: function (element, htSettings) {
-					var container = $('<div class="' + this.containerClassName + '"></div>');
-					element.append(container);
-					container.handsontable(htSettings);
+					var container = document.createElement('DIV');
+					container.className = this.containerClassName;
+					element[0].appendChild(container);
+
+					return new Handsontable(container, htSettings);
 				},
 
 				/***
 				 * Set new settings to handsontable instance
-				 * @param element
+				 * @param instance
 				 * @param settings
 				 */
-				updateHandsontableSettings: function (element, settings) {
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('updateSettings', settings);
+				updateHandsontableSettings: function (instance, settings) {
+					if (instance){
+						instance.updateSettings(settings);
+					}
+
 				},
 
 				/***
 				 * Render handsontable instance inside element
-				 * @param element
+				 * @param instance
 				 */
-				renderHandsontable: function (element) {
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('render');
+				renderHandsontable: function (instance) {
+					if (instance){
+						instance.render();
+					}
 				},
 
 				/***
@@ -90,16 +95,11 @@ angular.module('ngHandsontable.services', [])
 	.factory(
 	'autoCompleteFactory',
 	[
-		'settingFactory',
-		function (settingFactory) {
+		function () {
 			return {
-				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
-
+				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
 					column.source = function (query, process) {
-						var container = $(element).find('.' + settingFactory.containerClassName),
-							hotInstance = container.data('handsontable'),
-							row = hotInstance.getSelected()[0];
-
+						var	row = instance.getSelected()[0];
 						var source = [];
 						var data = dataSet[row];
 						if (data) {
@@ -124,7 +124,6 @@ angular.module('ngHandsontable.services', [])
 										source = paramObject;
 									}
 								}
-
 								process(source);
 							}
 						}

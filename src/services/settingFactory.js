@@ -17,29 +17,33 @@ angular.module('ngHandsontable.services', [])
 				 * @param htSettings
 				 */
 				initializeHandsontable: function (element, htSettings) {
-					var container = $('<div class="'+ this.containerClassName +'"></div>');
-					element.append(container);
-					container.handsontable(htSettings);
+					var container = document.createElement('DIV');
+					container.className = this.containerClassName;
+					element[0].appendChild(container);
+
+					return new Handsontable(container, htSettings);
 				},
 
 				/***
 				 * Set new settings to handsontable instance
-				 * @param element
+				 * @param instance
 				 * @param settings
 				 */
-				updateHandsontableSettings: function (element, settings) {
-					console.log(settings.afterChange);
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('updateSettings', settings);
+				updateHandsontableSettings: function (instance, settings) {
+					if (instance){
+						instance.updateSettings(settings);
+					}
+
 				},
 
 				/***
 				 * Render handsontable instance inside element
-				 * @param element
+				 * @param instance
 				 */
-				renderHandsontable: function (element) {
-					var container = $(element).find('.' + this.containerClassName);
-					container.handsontable('render');
+				renderHandsontable: function (instance) {
+					if (instance){
+						instance.render();
+					}
 				},
 
 				/***
@@ -90,35 +94,35 @@ angular.module('ngHandsontable.services', [])
  */
 	.factory(
 	'autoCompleteFactory',
-
-		function (settingFactory) {
+	[
+		function () {
 			return {
-				parseAutoComplete: function (element, column, dataSet, propertyOnly) {
-
+				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
 					column.source = function (query, process) {
-						var container = $(element).find('.' + settingFactory.containerClassName),
-							hotInstance = container.data('handsontable'),
-							row = hotInstance.getSelected()[0];
-
+						var	row = instance.getSelected()[0];
+						var source = [];
 						var data = dataSet[row];
 						if (data) {
 							var options = column.optionList;
-							if(options.object) {
-								var objKeys = options.object.split('.')
-									,paramObject = data;
+							if (options.object) {
+								if (angular.isArray(options.object)) {
+									source = options.object;
+								} else {
+									var objKeys = options.object.split('.')
+										, paramObject = data;
 
-								while(objKeys.length > 0) {
-									var key = objKeys.shift();
-									paramObject = paramObject[key];
-								}
-
-								var source = [];
-								if (propertyOnly) {
-									for(var i = 0, length = paramObject.length; i < length; i++) {
-										source.push(paramObject[i][options.property]);
+									while (objKeys.length > 0) {
+										var key = objKeys.shift();
+										paramObject = paramObject[key];
 									}
-								} else{
-									source = paramObject;
+
+									if (propertyOnly) {
+										for (var i = 0, length = paramObject.length; i < length; i++) {
+											source.push(paramObject[i][options.property]);
+										}
+									} else {
+										source = paramObject;
+									}
 								}
 								process(source);
 							}
@@ -127,4 +131,5 @@ angular.module('ngHandsontable.services', [])
 				}
 			}
 		}
+	]
 );

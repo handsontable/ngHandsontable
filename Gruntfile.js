@@ -1,5 +1,5 @@
 /**
- * This file is used to build Angular UI Handsontable from `src/*`
+ * This file is used to build ngHandsontable from `src/*`
  *
  * Installation:
  * 1. Install Grunt CLI (`npm install -g grunt-cli`)
@@ -10,24 +10,26 @@
  * To execute automatically after each change, execute `grunt --force default watch`
  *
  * Result:
- * building Angular UI Handsontable will create files:
- *  - dist/angular-ui-handsontable.full.js
- *  - dist/angular-ui-handsontable.full.css
- *  - dist/angular-ui-handsontable.full.min.js
- *  - dist/angular-ui-handsontable.full.min.css
+ * building ngHandsontable will create files:
+ *  - dist/ngHandsontable.js
+ *  - dist/ngHandsontable.min.js
  *
  * See http://gruntjs.com/getting-started for more information about Grunt
  */
 module.exports = function (grunt) {
   var myBanner = '/**\n' +
     ' * <%= pkg.name %> <%= pkg.version %>\n' +
+    ' * \n' +
+    ' * Copyright 2012-2014 Marcin Warpechowski\n' +
+    ' * Licensed under the MIT license.\n' +
+    ' * https://github.com/handsontable/ngHandsontable\n' +
     ' * Date: <%= (new Date()).toString() %>\n' +
     '*/\n\n';
 
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
+
+		concat: {
       options: {
         banner: myBanner
       },
@@ -39,47 +41,28 @@ module.exports = function (grunt) {
 					'src/directives/*.js'
 				],
 				dest: 'dist/ngHandsontable.js'
-			},
-      full_js: {
-        src: [
-          'src/ie-shim.js',
-          'src/angular-ui-handsontable.js',
-          'bower_components/handsontable/dist/jquery.handsontable.full.js'
-        ],
-        dest: 'dist/angular-ui-handsontable.full.js'
-      },
-      full_css: {
-        src: [
-          'bower_components/handsontable/dist/jquery.handsontable.full.css'
-        ],
-        dest: 'dist/angular-ui-handsontable.full.css'
-      }
+			}
     },
-    uglify: {
+
+		uglify: {
       options: {
         banner: myBanner
       },
-      "dist/angular-ui-handsontable.full.min.js": ["dist/angular-ui-handsontable.full.js" ],
 			"dist/ngHandsontable.min.js": ["dist/ngHandsontable.js"]
     },
-    cssmin: {
-      options: {
-        banner: myBanner
-      },
-      "dist/angular-ui-handsontable.full.min.css": ["dist/angular-ui-handsontable.full.css" ]
-    },
-    watch: {
+
+		watch: {
       files: ['src/**/*', 'bower_components/**/*'],
-      tasks: ['concat', 'uglify', 'cssmin']
+      tasks: ['concat', 'uglify']
     }
   });
 
   // Default task.
-  grunt.registerTask('default', ['concat', 'uglify', 'cssmin']);
+//  grunt.registerTask('default', ['concat', 'uglify', 'cssmin']);
 
-  grunt.loadNpmTasks('grunt-css');
+	grunt.registerTask('default', ['concat', 'uglify']);
+
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
 };

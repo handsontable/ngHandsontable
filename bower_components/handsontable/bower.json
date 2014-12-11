@@ -1,13 +1,22 @@
 {
   "name": "handsontable",
-  "version": "0.9.19",
-  "main": ["./dist/jquery.handsontable.full.js", "./dist/jquery.handsontable.full.css"],
+  "description": "Spreadsheet-like data grid editor that provides copy/paste functionality compatible with Excel/Google Docs",
+  "version": "0.12.0",
+  "main": ["./dist/handsontable.full.js", "./dist/handsontable.full.css"],
   "ignore": [
     "**/.*",
+    "components",
+    "demo",
+    "lib",
+    "plugins",
     "node_modules",
-    "components"
+    "src",
+    "test"
   ],
   "dependencies": {
-    "jquery": ">=1.9.0"
+    "zeroclipboard": ">=2.1.6"
+  },
+  "devDependencies": {
+    "chroma-js": "~0.5.6"
   }
 }

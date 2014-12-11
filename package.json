@@ -1,17 +1,15 @@
 {
   "name": "ngHandsontable",
-  "description": "Angular directive for Handsontable. Enables creation of data grid applications in AngularJS",
-  "homepage": "https://github.com/warpech/angular-ui-handsontable",
+  "description": "AngularJS directive for Handsontable",
+  "homepage": "https://github.com/handsontable/ngHandsontable",
   "bugs": {
-    "url": "https://github.com/warpech/angular-ui-handsontable/issues"
+    "url": "https://github.com/handsontable/ngHandsontable"
   },
-  "author": "Marcin Warpechowski <marcin@nextgen.pl>",
-  "version": "0.3.17",
+  "author": "Marcin Warpechowski <hello@handsontable.com>",
+  "version": "0.5.0",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-css": "~0.5.4",
     "grunt-contrib-uglify": "~0.5.1",
-    "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-concat": "~0.5.0",
     "grunt-contrib-watch": "~0.6.1"
   }

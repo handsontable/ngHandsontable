@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Sat Nov 29 2014 15:50:36 GMT+0100 (CET)
+ * Date: Thu Dec 11 2014 16:16:28 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower

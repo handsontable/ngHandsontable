@@ -1,2 +1,4 @@
 .idea
+*.swo
+*.swp
 node_modules

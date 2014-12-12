@@ -65,11 +65,19 @@ angular.module('ngHandsontable.directives', [])
 						}
 					};
 
+					/***
+					 * Merges in new settings, and updates handsontable settings
+					 */
+          var applySettings = function(){
+            angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
+						settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
+          };
+
 
 					var columnSetting = attrs.columns;
-
+          
 					/***
-					 * Check if settings has been changed
+					 * Check if columns have been changed
 					 */
 					scope.$parent.$watch(
 						function () {
@@ -86,13 +94,13 @@ angular.module('ngHandsontable.directives', [])
 							}
 
 						},
-						function () {
-							angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope.$parent));
-							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
-
-						}
+            applySettings
 					);
 
+					/***
+					 * Check if settings have been changed
+					 */
+          scope.$watchCollection('settings', applySettings);
 
 					/***
 					 * Check if data has been changed

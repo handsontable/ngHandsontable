@@ -110,6 +110,8 @@ angular.module('ngHandsontable.directives', [])
 							return angular.toJson([objToCheck]);
 						},
 						function () {
+							scope.htSettings['data'] = scope.datarows;
+							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
 							settingFactory.renderHandsontable(scope.hotInstance);
 						}
 					);

@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Dec 11 2014 16:16:28 GMT+0100 (CET)
+ * Date: Mon Jan 05 2015 12:51:57 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -163,7 +163,8 @@ angular.module('ngHandsontable.directives', [])
 		'settingFactory',
 		'autoCompleteFactory',
 		'$rootScope',
-		function (settingFactory, autoCompleteFactory, $rootScope) {
+		'$parse',
+		function (settingFactory, autoCompleteFactory, $rootScope, $parse) {
 			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
 				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
 				htOptions = publicProperties.concat(publicHooks);
@@ -232,12 +233,13 @@ angular.module('ngHandsontable.directives', [])
 							var settingToCheck = scope.$parent;
 
 							if (columnSetting) {
-								var settingKeys = columnSetting.split('.');
-								while (settingKeys.length > 0) {
-									var key = settingKeys.shift();
-									settingToCheck = settingToCheck[key];
-								}
-								return angular.toJson([settingToCheck]);
+								//var settingKeys = columnSetting.split('.');
+								//while (settingKeys.length > 0) {
+								//	var key = settingKeys.shift();
+								//	settingToCheck = settingToCheck[key];
+								//}
+								//return angular.toJson([settingToCheck]);
+								return angular.toJson($parse(columnSetting)(settingToCheck));
 							}
 
 						},
@@ -257,19 +259,20 @@ angular.module('ngHandsontable.directives', [])
 							var objKeys = attrs.datarows.split('.'),
 								objToCheck = scope.$parent;
 
-							while(objKeys.length > 0) {
-								var key = objKeys.shift();
-								objToCheck = objToCheck[key];
-							}
+                            //while(objKeys.length > 0) {
+							//	var key = objKeys.shift();
+							//	objToCheck = objToCheck[key];
+							//}
 
-							return angular.toJson([objToCheck]);
+                            //return angular.toJson([objToCheck]);
+							return angular.toJson($parse(attrs.datarows)(objToCheck));
 						},
 						function () {
+							settingFactory.htSettings['data'] = scope.datarows;
+							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
 							settingFactory.renderHandsontable(scope.hotInstance);
 						}
 					);
-
-					//scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 				}
 			}
 		}

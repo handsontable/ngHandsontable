@@ -85,7 +85,7 @@ angular.module('ngHandsontable.services', [])
 
 					return scopeDefinition;
 				}
-			}
+			};
 		}
 	]
 )
@@ -129,7 +129,7 @@ angular.module('ngHandsontable.services', [])
 						}
 					};
 				}
-			}
+			};
 		}
 	]
 );

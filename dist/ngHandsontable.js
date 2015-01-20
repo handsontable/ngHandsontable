@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Jan 14 2015 19:26:21 GMT+0100 (CET)
+ * Date: Tue Jan 20 2015 14:30:58 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -105,7 +105,7 @@ angular.module('ngHandsontable.services', [])
 
 					return scopeDefinition;
 				}
-			}
+			};
 		}
 	]
 )
@@ -149,7 +149,7 @@ angular.module('ngHandsontable.services', [])
 						}
 					};
 				}
-			}
+			};
 		}
 	]
 );
@@ -181,7 +181,7 @@ angular.module('ngHandsontable.directives', [])
 							$scope.htSettings.columns = [];
 						}
 						$scope.htSettings['columns'].push(column);
-					}
+					};
 				}],
 				link: function (scope, element, attrs) {
 					if (!scope.htSettings) {
@@ -268,7 +268,7 @@ angular.module('ngHandsontable.directives', [])
 						}
 					});
 				}
-			}
+			};
 		}
 	]
 )
@@ -286,7 +286,7 @@ angular.module('ngHandsontable.directives', [])
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
-							$scope.column = {}
+							$scope.column = {};
 						}
 
 						var optionList = {};
@@ -298,7 +298,7 @@ angular.module('ngHandsontable.directives', [])
 							optionList.object = options.split(',');
 						}
 						$scope.column['optionList'] = optionList;
-					}
+					};
 				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
@@ -338,7 +338,7 @@ angular.module('ngHandsontable.directives', [])
 					angular.extend(scope.column, column);
 					controllerInstance.setColumnSetting(scope.column);
 				}
-			}
+			};
 		}
 	]
 )
@@ -357,7 +357,7 @@ angular.module('ngHandsontable.directives', [])
 					var options = attrs.datarows;
 					controllerInstance.setColumnOptionList(options);
 				}
-			}
+			};
 		}
 	]
 )

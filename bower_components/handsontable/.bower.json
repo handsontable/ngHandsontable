@@ -1,7 +1,7 @@
 {
   "name": "handsontable",
   "description": "Spreadsheet-like data grid editor that provides copy/paste functionality compatible with Excel/Google Docs",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "main": [
     "./dist/handsontable.full.js",
     "./dist/handsontable.full.css"
@@ -23,13 +23,13 @@
     "chroma-js": "~0.5.6"
   },
   "homepage": "https://github.com/handsontable/handsontable",
-  "_release": "0.12.2",
+  "_release": "0.12.3",
   "_resolution": {
     "type": "version",
-    "tag": "0.12.2",
-    "commit": "6d06ec908afff79947ed6e7f6da59f1aaaa51963"
+    "tag": "0.12.3",
+    "commit": "a7a48eae3e932a9d13ca1418ce92d570001ab1a6"
   },
   "_source": "git://github.com/handsontable/handsontable.git",
-  "_target": "~0.12",
+  "_target": "~0.12.3",
   "_originalSource": "handsontable"
 }

@@ -105,10 +105,11 @@
             or in separated attributes, e.g. <code>minSpareRows="minSpareRows"</code>, <code>rowHeaders="false"</code>.
           </p>
 
+          			<input type="search" ng-model='filter'/>
 					<div id="example1">
 						<hot-table
 							settings="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'], afterChange: afterChange }"
-							rowHeaders="false"
+							rowHeaders="false" hot-filter="filter"
 							minSpareRows="minSpareRows"
 							datarows="db.items"
 							height="300"

@@ -37,6 +37,18 @@ angular.module('ngHandsontable.services', [])
 				},
 
 				/***
+				 *	Reset the settings and rerender the handsontable instance inside element
+				 * @param instance
+				 * @param settings
+				 */
+				invalidateTable: function(instance, settings){
+					if (instance){
+						this.updateHandsontableSettings(instance,settings);
+						instance.render();
+					}
+				},
+
+				/***
 				 * Render handsontable instance inside element
 				 * @param instance
 				 */

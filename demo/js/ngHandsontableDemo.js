@@ -33,7 +33,7 @@ angular.module('ngHandsontableDemo',
 
 				$scope.minSpareRows = 1;
 				$scope.colHeaders = true;
-
+				$scope.filter = "";
 				$scope.db = {};
 				$scope.db.items = [];
 				for (var i = 0; i < 10; i++) {

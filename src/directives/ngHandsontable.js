@@ -27,13 +27,17 @@ angular.module('ngHandsontable.directives', [])
 						}
 						$scope.htSettings['columns'].push(column);
 					};
+					this.filter = function(data){
+						$scope.htSettings.filterBackup = $scope.htSettings.data;
+						$scope.htSettings.data = data;
+					};
 				}],
 				link: function (scope, element, attrs) {
 					if (!scope.htSettings) {
 						scope.htSettings = {};
 					}
 					scope.htSettings['data'] = scope.datarows;
-
+					scope.htSettings['filterBackup'] = scope.datarows;
 					angular.extend(scope.htSettings, settingFactory.setHandsontableSettingsFromScope(htOptions, scope));
 
 					scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
@@ -96,6 +100,11 @@ angular.module('ngHandsontable.directives', [])
 					scope.$parent.$watch(
 						function () {
 							var objToCheck = scope.$parent;
+
+							if (scope.htSettings.data.length !== scope.htSettings.filterBackup.length){
+								settingFactory.invalidateTable(scope.hotInstance, scope.htSettings);
+							}
+
 							return angular.toJson($parse(attrs.datarows)(objToCheck));
 						},
 						function () {
@@ -143,6 +152,11 @@ angular.module('ngHandsontable.directives', [])
 							optionList.object = options.split(',');
 						}
 						$scope.column['optionList'] = optionList;
+					};
+
+					this.filter = function(data){
+						$scope.$filterBackup = $scope.htSettings.data;
+						$scope.htSettings.data = data;
 					};
 				}],
 				link: function (scope, element, attributes, controllerInstance) {
@@ -206,4 +220,89 @@ angular.module('ngHandsontable.directives', [])
 		}
 	]
 )
-;
+	.directive(
+	'hotFilter',
+	[ 'settingFactory',
+		'autoCompleteFactory',
+		'$rootScope',
+		'$parse',
+		function (settingFactory, autoCompleteFactory, $rootScope, $parse) {
+			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
+				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				htOptions = publicProperties.concat(publicHooks);
+
+			return {
+				restrict : 'A',
+				require: '^hotTable',
+				link: function (scope, element, attrs, controllerInstance) {
+
+				    var getValuesInSearchQuery = function(dataset, query){
+				        var matchingRows = [];
+				        var regex = new RegExp(query,"i");
+				        for (var i = 0; i < dataset.length; i++){
+				            var item = dataset[i];
+				            var items = [];
+				            items.push(item); 
+				            var found = false;
+				            var res = "";
+				            while (items.length > 0 && found !== true)
+				            {
+				                var it = items[0];
+				                items.shift();
+				                for (var property in it) {
+				                    if (it.hasOwnProperty(property)) {
+				                    var prop = it[property];
+				                        if (typeof prop === "object"){
+				                           items.push(prop);
+				                        }
+				                        else if (typeof prop === "function"){
+				                            try{
+				                                res = prop();
+				                                while (typeof res === "function"){
+				                                    res = res();
+				                                }
+				                                if (typeof res === "object"){
+				                                    items.push(prop);
+				                                }
+				                                if (regex.test(prop)){
+				                                    found = true;
+				                                    break;
+				                                }
+				                                
+				                            }
+				                            catch(e){}
+				                        }
+				                        else{
+				                            if (regex.test(prop)){
+				                                    found = true;
+				                                    break;
+				                             }
+				                       }
+				                    }
+				                }
+				            }
+				            if (found){
+				                matchingRows.push(item);
+				            }
+				        }
+				        return matchingRows;
+				       
+					};
+
+					
+					scope.$watch(attrs.hotFilter, function(newValue, oldValue) {
+						var val = $parse(attrs.datarows)(scope);
+						if (val === undefined){
+								return;
+						}
+						controllerInstance.filter(getValuesInSearchQuery(val,newValue));
+
+
+					}, true);
+
+					
+				}
+			};
+		}
+	]
+	);

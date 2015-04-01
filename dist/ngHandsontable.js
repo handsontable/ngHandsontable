@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Apr 01 2015 10:27:19 GMT-0700 (Pacific Daylight Time)
+ * Date: Wed Apr 01 2015 15:02:59 GMT-0700 (Pacific Daylight Time)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -268,7 +268,7 @@ angular.module('ngHandsontable.directives', [])
 						function () {
 							var objToCheck = scope.$parent;
 
-							if (scope.htSettings.data.length !== scope.htSettings.filterBackup.length){
+							if (!scope.htSettings.filterBackup || scope.htSettings.data.length !== scope.htSettings.filterBackup.length){
 								settingFactory.invalidateTable(scope.hotInstance, scope.htSettings);
 							}
 

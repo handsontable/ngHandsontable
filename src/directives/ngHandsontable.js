@@ -101,7 +101,7 @@ angular.module('ngHandsontable.directives', [])
 						function () {
 							var objToCheck = scope.$parent;
 
-							if (scope.htSettings.data.length !== scope.htSettings.filterBackup.length){
+							if (!scope.htSettings.filterBackup || scope.htSettings.data.length !== scope.htSettings.filterBackup.length){
 								settingFactory.invalidateTable(scope.hotInstance, scope.htSettings);
 							}
 

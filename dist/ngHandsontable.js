@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Apr 01 2015 15:02:59 GMT-0700 (Pacific Daylight Time)
+ * Date: Fri Apr 03 2015 10:51:49 GMT-0700 (Pacific Daylight Time)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -130,6 +130,10 @@ angular.module('ngHandsontable.services', [])
 		function () {
 			return {
 				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
+					//don't override existing source functions if they exist already.
+					if (typeof column.source === "function"){
+						return;
+					}
 					column.source = function (query, process) {
 						var	row = instance.getSelected()[0];
 						var source = [];

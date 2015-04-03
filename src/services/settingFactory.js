@@ -110,6 +110,10 @@ angular.module('ngHandsontable.services', [])
 		function () {
 			return {
 				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
+					//don't override existing source functions if they exist already.
+					if (typeof column.source === "function"){
+						return;
+					}
 					column.source = function (query, process) {
 						var	row = instance.getSelected()[0];
 						var source = [];

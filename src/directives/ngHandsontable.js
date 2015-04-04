@@ -123,11 +123,16 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'hotColumn',
 	[
-		function () {
+		'settingFactory',
+		function (settingFactory) {
+			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
+				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				htOptions = publicProperties.concat(publicHooks);
+
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: settingFactory.getScopeDefinition(htOptions),
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {

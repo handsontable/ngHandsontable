@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Tue Jan 20 2015 14:51:24 GMT+0100 (CET)
+ * Date: Sun Apr 05 2015 12:54:54 GMT+0100 (BST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -91,17 +91,19 @@ angular.module('ngHandsontable.services', [])
 				/***
 				 *
 				 * @param options
-				 * @return {{datarows: String("="), settings: String("=")}}
+				 * @return {{datarows: String("="), settings: String("="), validator: String("=")}}
 				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
 						datarows: '=',
-						settings: '='
+						settings: '=',
+						validator: '='
 					};
-
-					for (var i = 0, length = options.length; i < length; i++) {
-						scopeDefinition[options[i]] = '=' + options[i].toLowerCase();
-					}
+					options.forEach(function(option) { 
+						if (!scopeDefinition.hasOwnProperty(option.toLowerCase())) {
+							scopeDefinition[option] = '=' + option.toLowerCase();
+						}
+					});
 
 					return scopeDefinition;
 				}
@@ -278,11 +280,16 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'hotColumn',
 	[
-		function () {
+		'settingFactory',
+		function (settingFactory) {
+			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
+				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				htOptions = publicProperties.concat(publicHooks);
+
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: settingFactory.getScopeDefinition(htOptions),
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {

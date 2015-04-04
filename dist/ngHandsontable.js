@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Tue Jan 20 2015 14:51:24 GMT+0100 (CET)
+ * Date: Sat Apr 04 2015 17:44:17 GMT+0100 (BST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -278,11 +278,16 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'hotColumn',
 	[
-		function () {
+		'settingFactory',
+		function (settingFactory) {
+			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
+				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				htOptions = publicProperties.concat(publicHooks);
+
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: settingFactory.getScopeDefinition(htOptions),
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {

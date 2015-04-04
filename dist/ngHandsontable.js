@@ -1,7 +1,7 @@
 /**
  * ngHandsontable 0.5.2
  * 
- * Copyright 2012-2015 Marcin Warpechowski
+ * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
  * Date: Wed Apr 08 2015 16:48:57 GMT+0200 (Środkowoeuropejski czas letni)
@@ -91,17 +91,19 @@ angular.module('ngHandsontable.services', [])
 				/***
 				 *
 				 * @param options
-				 * @return {{datarows: String("="), settings: String("=")}}
+				 * @return {{datarows: String("="), settings: String("="), validator: String("=")}}
 				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
 						datarows: '=',
-						settings: '='
+						settings: '=',
+						validator: '='
 					};
-
-					for (var i = 0, length = options.length; i < length; i++) {
-						scopeDefinition[options[i]] = '=' + options[i].toLowerCase();
-					}
+					options.forEach(function(option) { 
+						if (!scopeDefinition.hasOwnProperty(option.toLowerCase())) {
+							scopeDefinition[option] = '=' + option.toLowerCase();
+						}
+					});
 
 					return scopeDefinition;
 				}

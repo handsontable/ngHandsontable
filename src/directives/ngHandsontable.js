@@ -124,10 +124,11 @@ angular.module('ngHandsontable.directives', [])
 	'hotColumn',
 	[
 		function () {
+			var scopeDefinition = {validator: '='};
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: scopeDefinition,
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
@@ -147,14 +148,14 @@ angular.module('ngHandsontable.directives', [])
 				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
-
 					for (var i in attributes) {
 						if (attributes.hasOwnProperty(i)) {
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
 								if (i === 'data') {
 									column['data'] = attributes[i];
-								}
-								else {
+								} else if (scopeDefinition.hasOwnProperty(i)) {
+									column[i] = scope.$eval(i);
+								} else {
 									column[i] = scope.$eval(attributes[i]);
 								}
 							}

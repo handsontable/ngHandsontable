@@ -1,10 +1,10 @@
 /**
- * ngHandsontable 0.5.2
+ * ngHandsontable 0.5.1
  * 
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Apr 08 2015 16:48:57 GMT+0200 (Środkowoeuropejski czas letni)
+ * Date: Sun Apr 05 2015 12:54:54 GMT+0100 (BST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -280,11 +280,16 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'hotColumn',
 	[
-		function () {
+		'settingFactory',
+		function (settingFactory) {
+			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
+				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				htOptions = publicProperties.concat(publicHooks);
+
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: settingFactory.getScopeDefinition(htOptions),
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {

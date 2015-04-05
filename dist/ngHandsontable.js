@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Sun Apr 05 2015 12:54:54 GMT+0100 (BST)
+ * Date: Sun Apr 05 2015 13:42:04 GMT+0100 (BST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -91,19 +91,17 @@ angular.module('ngHandsontable.services', [])
 				/***
 				 *
 				 * @param options
-				 * @return {{datarows: String("="), settings: String("="), validator: String("=")}}
+				 * @return {{datarows: String("="), settings: String("=")}}
 				 */
 				getScopeDefinition: function (options) {
 					var scopeDefinition = {
 						datarows: '=',
-						settings: '=',
-						validator: '='
+						settings: '='
 					};
-					options.forEach(function(option) { 
-						if (!scopeDefinition.hasOwnProperty(option.toLowerCase())) {
-							scopeDefinition[option] = '=' + option.toLowerCase();
-						}
-					});
+
+					for (var i = 0, length = options.length; i < length; i++) {
+						scopeDefinition[options[i]] = '=' + options[i].toLowerCase();
+					}
 
 					return scopeDefinition;
 				}
@@ -280,16 +278,12 @@ angular.module('ngHandsontable.directives', [])
 	.directive(
 	'hotColumn',
 	[
-		'settingFactory',
-		function (settingFactory) {
-			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
-				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
-				htOptions = publicProperties.concat(publicHooks);
-
+		function () {
+			var scopeDefinition = {validator: '='};
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope: settingFactory.getScopeDefinition(htOptions),
+				scope: scopeDefinition,
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
@@ -309,14 +303,14 @@ angular.module('ngHandsontable.directives', [])
 				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
-
 					for (var i in attributes) {
 						if (attributes.hasOwnProperty(i)) {
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
 								if (i === 'data') {
 									column['data'] = attributes[i];
-								}
-								else {
+								} else if (scopeDefinition.hasOwnProperty(i)) {
+									column[i] = scope.$eval(i);
+								} else {
 									column[i] = scope.$eval(attributes[i]);
 								}
 							}

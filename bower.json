@@ -3,7 +3,7 @@
   "version": "0.5.1",
   "dependencies": {
     "angular": "~1.3.8",
-    "handsontable": "~0.12.3"
+    "handsontable": "https://github.com/wmelani/handsontable.git"
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [

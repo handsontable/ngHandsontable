@@ -107,7 +107,9 @@ angular.module('ngHandsontable.services', [])
 	.factory(
 	'autoCompleteFactory',
 	[
-		function () {
+	'$rootScope',
+		'$parse',
+		function ($rootScope, $parse) {
 			return {
 				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
 					//don't override existing source functions if they exist already.
@@ -117,13 +119,19 @@ angular.module('ngHandsontable.services', [])
 					column.source = function (query, process) {
 						var	row = instance.getSelected()[0];
 						var source = [];
-						var data = dataSet[row];
-						if (data) {
 							var options = column.optionList;
 							if (options.object) {
 								if (angular.isArray(options.object)) {
 									source = options.object;
-								} else {
+								}
+								else if (typeof options.object === "object"){
+
+									var val = $parse(options.property)(options.object);
+									for (var i = 0, length = val.length; i < length; i++) {
+										source.push(val[i]);
+									}
+								} 
+								else {
 									var objKeys = options.object.split('.')
 										, paramObject = data;
 
@@ -142,7 +150,6 @@ angular.module('ngHandsontable.services', [])
 								}
 								process(source);
 							}
-						}
 					};
 				}
 			};

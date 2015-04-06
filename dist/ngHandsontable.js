@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Fri Apr 03 2015 10:51:49 GMT-0700 (Pacific Daylight Time)
+ * Date: Sat Apr 04 2015 18:40:24 GMT-0700 (Pacific Daylight Time)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -127,7 +127,9 @@ angular.module('ngHandsontable.services', [])
 	.factory(
 	'autoCompleteFactory',
 	[
-		function () {
+	'$rootScope',
+		'$parse',
+		function ($rootScope, $parse) {
 			return {
 				parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
 					//don't override existing source functions if they exist already.
@@ -137,13 +139,19 @@ angular.module('ngHandsontable.services', [])
 					column.source = function (query, process) {
 						var	row = instance.getSelected()[0];
 						var source = [];
-						var data = dataSet[row];
-						if (data) {
 							var options = column.optionList;
 							if (options.object) {
 								if (angular.isArray(options.object)) {
 									source = options.object;
-								} else {
+								}
+								else if (typeof options.object === "object"){
+
+									var val = $parse(options.property)(options.object);
+									for (var i = 0, length = val.length; i < length; i++) {
+										source.push(val[i]);
+									}
+								} 
+								else {
 									var objKeys = options.object.split('.')
 										, paramObject = data;
 
@@ -162,7 +170,6 @@ angular.module('ngHandsontable.services', [])
 								}
 								process(source);
 							}
-						}
 					};
 				}
 			};
@@ -223,11 +230,17 @@ angular.module('ngHandsontable.directives', [])
 									if (match) {
 										optionList.property = match[1];
 										optionList.object = match[2];
+										scope.$watch(match[2],scope.htSettings.updateHandsontableSettings,true);
 									} else {
-										optionList.object = optionList;
+										optionList.object = scope.$parent;
+										optionList.property = scope.htSettings.columns[i].optionList;
+										scope.$watch(optionList.property,scope.htSettings.updateHandsontableSettings,true);
+
 									}
 									scope.htSettings.columns[i].optionList = optionList;
+									
 								}
+
 
 								autoCompleteFactory.parseAutoComplete(scope.hotInstance, scope.htSettings.columns[i], scope.datarows, true);
 							}
@@ -239,6 +252,10 @@ angular.module('ngHandsontable.directives', [])
 						if (!$rootScope.$$phase){
 							scope.$apply();
 						}
+					};
+
+					scope.htSettings.updateHandsontableSettings = function() {
+						scope.hotInstance.updateSettings(scope.htSettings);
 					};
 
 
@@ -289,6 +306,7 @@ angular.module('ngHandsontable.directives', [])
 					scope.$watch('datarows', function (newValue, oldValue) {
 						if (oldValue.length == scope.htSettings.minSpareRows && newValue.length != scope.htSettings.minSpareRows) {
 							scope.htSettings['data'] = scope.datarows;
+							scope.filterBackup = scope.datarows;
 							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
 						}
 					});
@@ -377,7 +395,8 @@ angular.module('ngHandsontable.directives', [])
  */
 	.directive(
 	'hotAutocomplete',
-	[
+	['$rootScope',
+		'$parse',
 		function () {
 			return {
 				restrict: 'E',

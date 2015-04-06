@@ -7,7 +7,7 @@ angular.module('ngHandsontableDemo',
 			'$scope',
 			function ($scope) {
 
-				var products = [
+				$scope.products = [
 					{
 						"description": "Big Mac",
 						"options": [
@@ -46,8 +46,8 @@ angular.module('ngHandsontableDemo',
 							},
 							address: Math.floor(Math.random() * 100000) + ' ' + address[Math.floor(Math.random() * address.length)],
 							price: Math.floor(Math.random() * 100000) / 100,
-							isActive: Math.floor(Math.random() * products.length) / 2 == 0 ? 'Yes' : 'No',
-							product: angular.extend({}, products[Math.floor(Math.random() * products.length)])
+							isActive: Math.floor(Math.random() * $scope.products.length) / 2 == 0 ? 'Yes' : 'No',
+							product: angular.extend({}, $scope.products[Math.floor(Math.random() * $scope.products.length)])
 						}
 					);
 				}

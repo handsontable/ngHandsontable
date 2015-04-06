@@ -1,9 +1,9 @@
 {
   "name": "ngHandsontable",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "dependencies": {
     "angular": "~1.3.8",
-    "handsontable": "https://github.com/wmelani/handsontable.git"
+    "handsontable": "https://github.com/wmelani/handsontable.git#0.14.0"
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [

@@ -17,7 +17,7 @@
   "laxbreak": false,
   "laxcomma": true, // Should be false
   "loopfunc": false,
-  "maxdepth": 5,
+  "maxdepth": 8,
   "maxlen": 190,
   "maxparams": 9,
   "multistr": false,

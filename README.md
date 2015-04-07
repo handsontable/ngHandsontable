@@ -23,7 +23,7 @@ Template:
 ```html
 <hot-table
     settings="{colHeaders: colHeaders, contextMenu: ['row_above', 'row_below', 'remove_row'], afterChange: afterChange }"
-    rowHeaders="false"
+    rowHeaders="false" hot-filter="filter"
     minSpareRows="minSpareRows"
     datarows="db.items"
     height="300"
@@ -71,6 +71,8 @@ $scope.db.items = [
   },
   //more items go here
 ];
+
+$scope.filterQuery = "";
 ```
   
 ## Directives and attributes specification
@@ -81,6 +83,7 @@ All **Handsontable** options listed [here](https://github.com/handsontable/jquer
  --------------------------------|-----------------------------|-------------
  **&lt;div hot-table&gt;**       |                             | Defines the grid container. Can also be declared as element `<ui-handsontable>`
  &lt;div hot-table&gt;           | datarows                    | Data provider for the grid. Usage like `item in items` (similar to ngRepeat). Creates new scope for each row
+  &lt;div hot-table&gt;          | hot-filter                  | bind to property that should filter the list.
  &lt;div hot-table&gt;           | settings                    | jquery-handsontable settings. For list of options, see: [handsontable/jquery-handsontable](https://github.com/handsontable/jquery-handsontable)
  &lt;div hot-table&gt;           | selectedIndex               | Allows to bind a scope variable to get/set selected row index
  **&lt;hot-column&gt;**          |                             | Defines a column in the grid

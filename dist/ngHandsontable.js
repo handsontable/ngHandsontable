@@ -4,7 +4,7 @@
  * Copyright 2012-2014 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Tue Jan 20 2015 14:51:24 GMT+0100 (CET)
+ * Date: Wed Apr 08 2015 16:38:50 GMT+0200 (Środkowoeuropejski czas letni)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower

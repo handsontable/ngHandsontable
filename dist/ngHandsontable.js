@@ -4,7 +4,7 @@
  * Copyright 2012-2015 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Apr 08 2015 16:48:57 GMT+0200 (Środkowoeuropejski czas letni)
+ * Date: Thu Apr 09 2015 22:15:29 GMT+0100 (BST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -279,10 +279,11 @@ angular.module('ngHandsontable.directives', [])
 	'hotColumn',
 	[
 		function () {
+			var scopeDefinition = {validator: '='};
 			return {
 				restrict: 'E',
 				require:'^hotTable',
-				scope:{},
+				scope: scopeDefinition,
 				controller:['$scope', function ($scope) {
 					this.setColumnOptionList = function (options) {
 						if (!$scope.column) {
@@ -308,8 +309,9 @@ angular.module('ngHandsontable.directives', [])
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
 								if (i === 'data') {
 									column['data'] = attributes[i];
-								}
-								else {
+								} else if (scopeDefinition.hasOwnProperty(i)) {
+									column[i] = scope.$eval(i);
+								} else {
 									column[i] = scope.$eval(attributes[i]);
 								}
 							}

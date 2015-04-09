@@ -303,6 +303,7 @@ angular.module('ngHandsontable.directives', [])
 				}],
 				link: function (scope, element, attributes, controllerInstance) {
 					var column = {};
+
 					for (var i in attributes) {
 						if (attributes.hasOwnProperty(i)) {
 							if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {

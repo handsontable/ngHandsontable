@@ -4,7 +4,7 @@
  * Copyright 2012-2015 Marcin Warpechowski
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Apr 08 2015 16:48:57 GMT+0200 (Środkowoeuropejski czas letni)
+ * Date: Thu Apr 23 2015 09:31:06 GMT+0200 (Paris, Madrid (heure d’été))
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -262,7 +262,10 @@ angular.module('ngHandsontable.directives', [])
 					 * INITIALIZE DATA
 					 */
 					scope.$watch('datarows', function (newValue, oldValue) {
-						if (oldValue.length == scope.htSettings.minSpareRows && newValue.length != scope.htSettings.minSpareRows) {
+
+						var initialRowsNb = Math.max(scope.htSettings.minRows, scope.htSettings.minSpareRows);
+
+						if (oldValue.length == initialRowsNb && newValue.length != initialRowsNb) {
 							scope.htSettings['data'] = scope.datarows;
 							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
 						}

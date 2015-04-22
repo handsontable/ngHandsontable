@@ -42,6 +42,7 @@ angular.module('ngHandsontable.directives', [])
 						for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
 
 							if (scope.htSettings.columns[i].type == 'autocomplete') {
+
 								if(typeof scope.htSettings.columns[i].optionList === 'string'){
 									var optionList = {};
 									var match = scope.htSettings.columns[i].optionList.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
@@ -135,13 +136,9 @@ angular.module('ngHandsontable.directives', [])
 						}
 
 						var optionList = {};
-						var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
-						if (match) {
-							optionList.property = match[1];
-							optionList.object = match[2];
-						} else {
-							optionList.object = options.split(',');
-						}
+
+						optionList.object = options.split(',');
+
 						$scope.column['optionList'] = optionList;
 					};
 				}],
@@ -199,11 +196,24 @@ angular.module('ngHandsontable.directives', [])
 				scope: true,
 				require:'^hotColumn',
 				link: function (scope, element, attrs, controllerInstance) {
-					var options = attrs.datarows;
-					controllerInstance.setColumnOptionList(options);
+
+					var options = [];
+					var match = attrs.datarows.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+
+					if(match){
+						scope.$watch('$parent.' + match[2], function(optionArray){
+							if(optionArray){
+								options = optionArray.length ?
+									optionArray.map(function(eachOption){ return eachOption[match[1]]}) : [];
+							}
+							controllerInstance.setColumnOptionList(options.join(','));
+						}, true);
+					}
+					else{
+						controllerInstance.setColumnOptionList(attrs.datarows);
+					}
 				}
 			};
 		}
 	]
 )
-;

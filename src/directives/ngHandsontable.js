@@ -107,7 +107,10 @@ angular.module('ngHandsontable.directives', [])
 					 * INITIALIZE DATA
 					 */
 					scope.$watch('datarows', function (newValue, oldValue) {
-						if (oldValue.length == scope.htSettings.minSpareRows && newValue.length != scope.htSettings.minSpareRows) {
+
+						var initialRowsNb = Math.max(scope.htSettings.minRows, scope.htSettings.minSpareRows);
+
+						if (oldValue.length == initialRowsNb && newValue.length != initialRowsNb) {
 							scope.htSettings['data'] = scope.datarows;
 							settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
 						}

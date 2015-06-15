@@ -11,7 +11,7 @@ angular.module('ngHandsontable.directives', [])
 		'$parse',
 		function (settingFactory, autoCompleteFactory, $rootScope, $parse) {
 			var publicProperties = Object.keys(Handsontable.DefaultSettings.prototype),
-				publicHooks = Object.keys(Handsontable.PluginHooks.hooks),
+				publicHooks = Handsontable.hooks.getRegistered(),
 				htOptions = publicProperties.concat(publicHooks);
 
 			return {

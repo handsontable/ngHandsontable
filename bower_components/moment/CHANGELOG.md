@@ -1,6 +1,24 @@
 Changelog
 =========
 
+### 2.10.3 [See full changelog](https://gist.github.com/ichernev/f264b9bed5b00f8b1b7f)
+
+* add `moment.fn.to` and `moment.fn.toNow` (similar to `from` and `fromNow`)
+* new locales (Sinhalese (si), Montenegrin (me), Javanese (ja))
+* performance improvements
+
+### 2.10.2
+
+* fixed moment-with-locales in browser env caused by esperanto change
+
+### 2.10.1
+
+* regression: Add moment.duration.fn back
+
+### 2.10.0
+
+Ported code to es6 modules.
+
 ### 2.9.0 [See full changelog](https://gist.github.com/ichernev/0c9a9b49951111a27ce7)
 
 languages:

@@ -47,6 +47,6 @@
     "commit": "039fb799c916d3730fbc898c2f5ef24581c7e9b7"
   },
   "_source": "git://github.com/zeroclipboard/zeroclipboard.git",
-  "_target": ">=2.1.6",
+  "_target": "^2.2.0",
   "_originalSource": "zeroclipboard"
 }

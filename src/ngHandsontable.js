@@ -1,5 +1,4 @@
-angular.module('ngHandsontable',
-	[
-		'ngHandsontable.services',
-		'ngHandsontable.directives'
-	]);
+angular.module('ngHandsontable', [
+    'ngHandsontable.services',
+    'ngHandsontable.directives'
+  ]);

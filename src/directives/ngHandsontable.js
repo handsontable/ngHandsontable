@@ -125,7 +125,7 @@ angular.module('ngHandsontable.directives', [])
 	[
 		function () {
 			return {
-				restrict: 'E',
+				restrict: 'EA',
 				require:'^hotTable',
 				scope:{},
 				controller:['$scope', function ($scope) {
@@ -195,7 +195,7 @@ angular.module('ngHandsontable.directives', [])
 	[
 		function () {
 			return {
-				restrict: 'E',
+				restrict: 'EA',
 				scope: true,
 				require:'^hotColumn',
 				link: function (scope, element, attrs, controllerInstance) {

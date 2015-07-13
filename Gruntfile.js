@@ -21,6 +21,7 @@ module.exports = function (grunt) {
     ' * <%= pkg.name %> <%= pkg.version %>\n' +
     ' * \n' +
     ' * Copyright 2012-2015 Marcin Warpechowski\n' +
+    ' * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>\n' +
     ' * Licensed under the MIT license.\n' +
     ' * https://github.com/handsontable/ngHandsontable\n' +
     ' * Date: <%= (new Date()).toString() %>\n' +
@@ -29,26 +30,26 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-		concat: {
+    concat: {
       options: {
         banner: myBanner
       },
-			new: {
-				src: [
-					'src/ie-shim.js',
-					'src/ngHandsontable.js',
-					'src/services/*.js',
-					'src/directives/*.js'
-				],
-				dest: 'dist/ngHandsontable.js'
-			}
+      new: {
+        src: [
+          'src/ie-shim.js',
+          'src/ngHandsontable.js',
+          'src/services/*.js',
+          'src/directives/*.js'
+        ],
+        dest: 'dist/ngHandsontable.js'
+      }
     },
 
-		uglify: {
+    uglify: {
       options: {
         banner: myBanner
       },
-			"dist/ngHandsontable.min.js": ["dist/ngHandsontable.js"]
+      "dist/ngHandsontable.min.js": ["dist/ngHandsontable.js"]
     },
 
     jshint: {
@@ -58,13 +59,13 @@ module.exports = function (grunt) {
       files:['src/**/*.js', 'src/*.js']
     },
 
-		watch: {
+    watch: {
       files: ['src/**/*', 'bower_components/**/*'],
       tasks: ['concat', 'uglify']
     }
   });
 
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');

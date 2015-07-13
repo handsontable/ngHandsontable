@@ -2,8 +2,7 @@ angular.module('ngHandsontableDemo',
   [
     'ngHandsontable'
   ])
-  .controller(
-  'DemoCtrl', [
+  .controller('DemoCtrl', [
     '$scope',
     function ($scope) {
 

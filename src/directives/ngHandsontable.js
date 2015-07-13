@@ -2,9 +2,7 @@ angular.module('ngHandsontable.directives', [])
   /**
    * Main Angular Handsontable directive
    */
-  .directive(
-  'hotTable',
-  [
+  .directive('hotTable', [
     'settingFactory',
     'autoCompleteFactory',
     '$rootScope',
@@ -119,10 +117,7 @@ angular.module('ngHandsontable.directives', [])
 /**
  * Angular Handsontable directive for single column settings
  */
-  .directive(
-  'hotColumn',
-  [
-    function () {
+  .directive('hotColumn', [function () {
       return {
         restrict: 'E',
         require:'^hotTable',
@@ -189,10 +184,7 @@ angular.module('ngHandsontable.directives', [])
   /**
    * Angular Handsontable directive for autocomplete settings
    */
-  .directive(
-  'hotAutocomplete',
-  [
-    function () {
+  .directive('hotAutocomplete', [function () {
       return {
         restrict: 'E',
         scope: true,

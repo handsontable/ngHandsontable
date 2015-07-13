@@ -1,6 +1,5 @@
 angular.module('ngHandsontable.services', [])
-  .factory(
-  'settingFactory', [
+  .factory('settingFactory', [
     function () {
       return {
         containerClassName: 'handsontable-container',
@@ -84,9 +83,7 @@ angular.module('ngHandsontable.services', [])
     }
   ]
 )
-  .factory(
-  'autoCompleteFactory',
-  [
+  .factory('autoCompleteFactory', [
     function () {
       return {
         parseAutoComplete: function (instance, column, dataSet, propertyOnly) {

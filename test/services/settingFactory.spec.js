@@ -11,6 +11,7 @@ describe('settingFactory', function() {
     var element = [{appendChild: jasmine.createSpy('appendChild')}];
     var hotSettings = {colHeaders: [1, 2], width: 200, columns: [{width: 100}]};
     var hotInstance = {};
+    window.HandsontableOrg = Handsontable;
     window.Handsontable = function(element, settings) {
       hotInstance.element = element;
       hotInstance.settings = settings;
@@ -22,6 +23,8 @@ describe('settingFactory', function() {
     expect(element[0].appendChild.calls.argsFor(0)[0].nodeName).toBe('DIV');
     expect(hotInstance.element.nodeName).toBe('DIV');
     expect(hotInstance.settings).toBe(hotSettings);
+
+    window.Handsontable = HandsontableOrg;
   }));
 
   it('should update Handsontable settings', inject(function(settingFactory) {
@@ -50,11 +53,31 @@ describe('settingFactory', function() {
   }));
 
   it('should returns Handsontable settings from scope', inject(function(settingFactory) {
-    var hotOptions = {
-      colHeaders: [1, 2]
+    var availableOptions = ['data', 'colHeaders'];
+    var externalOptions = {
+      colHeaders: [1],
+      manualColumnResize: true,
+      settings: {
+        data: [{id: 1}, {id: 2}]
+      }
     };
 
-    settingFactory.setHandsontableSettingsFromScope(hotOptions, {});
+    var settings = settingFactory.setHandsontableSettingsFromScope(availableOptions, externalOptions);
 
+    expect(settings.colHeaders).toEqual([1]);
+    expect(settings.data).toEqual([{id: 1}, {id: 2}]);
+    expect(settings.manualColumnResize).not.toBeDefined();
+  }));
+
+  it('should returns valid scope definition for directives', inject(function(settingFactory) {
+    var options = ['foo', 'bar', 'fooBar'];
+
+    var scopeDefinition = settingFactory.getScopeDefinition(options);
+
+    expect(scopeDefinition.datarows).toBe('=');
+    expect(scopeDefinition.settings).toBe('=');
+    expect(scopeDefinition.foo).toBe('=foo');
+    expect(scopeDefinition.bar).toBe('=bar');
+    expect(scopeDefinition.fooBar).toBe('=foobar');
   }));
 });

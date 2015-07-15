@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test/phantom-polyfill.js',
-      'bower_components/handsontable/dist/handsontable.full.js',
+      'node_modules/handsontable/dist/handsontable.full.js',
       'src/*.js',
       'src/**/*.js',
       'test/*.spec.js',

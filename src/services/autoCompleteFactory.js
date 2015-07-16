@@ -1,9 +1,9 @@
 (function() {
   function autoCompleteFactory() {
     return {
-      parseAutoComplete: function(instance, column, dataSet, propertyOnly) {
+      parseAutoComplete: function(column, dataSet, propertyOnly) {
         column.source = function(query, process) {
-          var row = instance.getSelected()[0];
+          var row = this.instance.getSelected()[0];
           var source = [];
           var data = dataSet[row];
 

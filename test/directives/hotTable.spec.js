@@ -33,7 +33,7 @@ describe('hotTable', function() {
 
   it('should create table with `dataSchema` attribute', function() {
     rootScope.value = {id: null};
-    var scope = angular.element(compile('<hot-table dataschema="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table data-schema="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 

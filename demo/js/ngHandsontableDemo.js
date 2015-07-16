@@ -1,7 +1,4 @@
-angular.module('ngHandsontableDemo',
-  [
-    'ngHandsontable'
-  ])
+angular.module('ngHandsontableDemo', ['ngHandsontable'])
   .controller('DemoCtrl', [
     '$scope',
     function ($scope) {
@@ -32,6 +29,7 @@ angular.module('ngHandsontableDemo',
 
       $scope.minSpareRows = 1;
       $scope.colHeaders = true;
+      $scope.rowHeader = true;
 
       $scope.db = {};
       $scope.db.items = [];
@@ -52,39 +50,39 @@ angular.module('ngHandsontableDemo',
         );
       }
 
-      $scope.db.dynamicColumns = [
-        {
-          data: 'id',
-          title: 'ID'},
-        {
-          data: 'name.first',
-          title: 'First Name',
-          readOnly: true
-        },
-        {
-          data: 'name.last',
-          title: 'Last Name',
-          readOnly: true
-        },
-        {data: 'address', title: 'Address', width: 150},
-        {data: 'product.description', type: 'autocomplete', title: 'Favorite food', width: 150, optionList: 'description in product.options'},
-        {data: 'price', title:'Price', type: 'numeric', width: 80, format: '$ 0,0.00'},
-        {data: 'isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No', width:65}
-      ];
+      //$scope.db.dynamicColumns = [
+      //  {
+      //    data: 'id',
+      //    title: 'ID'},
+      //  {
+      //    data: 'name.first',
+      //    title: 'First Name',
+      //    readOnly: true
+      //  },
+      //  {
+      //    data: 'name.last',
+      //    title: 'Last Name',
+      //    readOnly: true
+      //  },
+      //  {data: 'address', title: 'Address', width: 150},
+      //  {data: 'product.description', type: 'autocomplete', title: 'Favorite food', width: 150, optionList: 'description in product.options'},
+      //  {data: 'price', title:'Price', type: 'numeric', width: 80, format: '$ 0,0.00'},
+      //  {data: 'isActive', type: 'checkbox', title: 'Is active', checkedTemplate: 'Yes', uncheckedTemplate: 'No', width:65}
+      //];
 
-      setInterval(function () {
-        if( $scope.db.dynamicColumns[0].title == 'ID') {
-          $scope.db.dynamicColumns[3].readOnly = true;
-          $scope.db.dynamicColumns.shift();
-          $scope.afterChange = function () {};
-
-        } else {
-          $scope.db.dynamicColumns[2].readOnly = false;
-          $scope.db.dynamicColumns.unshift({data: 'id', title: 'ID'});
-          $scope.afterChange = function () {};
-        }
-        $scope.$apply();
-      }, 3000);
+      //setInterval(function () {
+      //  if( $scope.db.dynamicColumns[0].title == 'ID') {
+      //    $scope.db.dynamicColumns[3].readOnly = true;
+      //    $scope.db.dynamicColumns.shift();
+      //    $scope.afterChange = function () {};
+      //
+      //  } else {
+      //    $scope.db.dynamicColumns[2].readOnly = false;
+      //    $scope.db.dynamicColumns.unshift({data: 'id', title: 'ID'});
+      //    $scope.afterChange = function () {};
+      //  }
+      //  $scope.$apply();
+      //}, 3000);
     }
   ]
 );

@@ -267,7 +267,7 @@ angular.module('ngHandsontable.directives', [])
       return {
         restrict: 'E',
         require:'^hotTable',
-        scope:{},
+        scope:true,
         controller:['$scope', function ($scope) {
           this.setColumnOptionList = function (options) {
             if (!$scope.column) {

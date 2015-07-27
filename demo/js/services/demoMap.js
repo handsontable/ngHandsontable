@@ -7,62 +7,62 @@
     demos = {
       'intro': {
         'simple-example': {
-          url: getUrl('nudumu/1'),
+          url: getUrl('nudumu/2'),
           title: 'Simple example',
           description: 'Simple example'
         },
         'full-featured-demo': {
-          url: getUrl('xezevi/1'),
+          url: getUrl('xezevi/2'),
           title: 'Full featured demo',
           description: 'Full featured demo'
         }
       },
       'configuration': {
         'configuration-by-object': {
-          url: getUrl('getazu/1'),
+          url: getUrl('getazu/2'),
           title: 'By `settings` object',
           description: 'Configuration by setting `settings` object'
         },
         'configuration-declarative-way': {
-          url: getUrl('jupeme/1'),
+          url: getUrl('jupeme/2'),
           title: 'In declarative way',
           description: 'Configuration in declarative way'
         }
       },
       'columns': {
         'add-remove-column': {
-          url: getUrl('muluto/1'),
+          url: getUrl('muluto/2'),
           title: 'Add/Remove columns (ng-repeat)',
           description: 'Add/Remove columns using ng-repeat'
         }
       },
       'binding': {
         'data-binding': {
-          url: getUrl('lupile/1'),
+          url: getUrl('lupile/3'),
           title: 'Data binding',
           description: 'Data binding'
         },
         'settings-binding': {
-          url: getUrl('xaqasi/1'),
+          url: getUrl('xaqasi/2'),
           title: 'Table settings binding',
           description: 'Table settings binding'
         }
       },
       'callbacks': {
         'callbacks-by-object': {
-          url: getUrl('nayito/3', 'html,js,console,output'),
+          url: getUrl('nayito/4', 'html,js,console,output'),
           title: 'By `settings` object',
           description: 'Listening callbacks using `settings` object'
         },
         'callbacks-declarative-way': {
-          url: getUrl('pucale/1', 'html,js,console,output'),
+          url: getUrl('pucale/2', 'html,js,console,output'),
           title: 'In declarative way',
           description: 'Listening callbacks in declarative way'
         }
       },
       'other': {
         'access-to-instance': {
-          url: getUrl('fovoxu/1', 'html,js,output'),
+          url: getUrl('fovoxu/2', 'html,js,output'),
           title: 'Access to Handsontable instance',
           description: 'Access to Handsontable instance'
         }

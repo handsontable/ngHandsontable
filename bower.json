@@ -7,7 +7,8 @@
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [
-    "Handsoncode", "Handsoncode <hello@handsontable.com>"
+    "Handsoncode",
+    "Handsoncode <hello@handsontable.com>"
   ],
   "description": "AngularJS directive for Handsontable",
   "main": "dist/ngHandsontable.js",
@@ -28,5 +29,8 @@
     "src",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {
+    "angular-ui-router": "~0.2.15"
+  }
 }

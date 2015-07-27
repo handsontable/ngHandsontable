@@ -4,10 +4,10 @@ describe('hotTable', function() {
 
   beforeEach(module('ngHandsontable'));
 
-  beforeEach(inject(function(_$compile_, _$rootScope_, $q) {
+  beforeEach(inject(function(_$compile_, _$rootScope_, $q, hotRegisterer) {
     rootScope = _$rootScope_;
     compile = _$compile_;
-    q = $q;
+    _hotRegisterer = hotRegisterer;
   }));
 
   afterEach(function() {
@@ -22,6 +22,44 @@ describe('hotTable', function() {
     expect(scope.hotInstance).toBeDefined();
   });
 
+  it('should re-render table after datarows change', function(done) {
+    var afterRenderSpy = jasmine.createSpyObj('afterRender', ['callback']);
+    rootScope.value = [['foo']];
+    var element = angular.element(compile('<hot-table hot-id="hot" datarows="value"></hot-table>')(rootScope));
+
+    angular.element(document.body).append(element);
+    rootScope.$digest();
+
+    _hotRegisterer.getInstance('hot').addHook('afterRender', afterRenderSpy.callback);
+
+    setTimeout(function() {
+      rootScope.value[0][0] = 'bar';
+      rootScope.$digest();
+
+      expect(afterRenderSpy.callback).toHaveBeenCalled();
+      done();
+    }, 100);
+  });
+
+  it('should re-render table after columns change', function(done) {
+    var afterRenderSpy = jasmine.createSpyObj('callback', ['callback']);
+    rootScope.value = [{width: 10, type: 'date'}, {type: 'numeric', format: '$0'}];
+    var element = angular.element(compile('<hot-table hot-id="hot" datarows="value"></hot-table>')(rootScope));
+
+    angular.element(document.body).append(element);
+    rootScope.$digest();
+
+    _hotRegisterer.getInstance('hot').addHook('afterRender', afterRenderSpy.callback);
+
+    setTimeout(function() {
+      rootScope.value.push({type: 'text'});
+      rootScope.$digest();
+
+      expect(afterRenderSpy.callback).toHaveBeenCalled();
+      done();
+    }, 100);
+  });
+
   it('should create table with `datarows` attribute', function() {
     rootScope.value = [[]];
     var scope = angular.element(compile('<hot-table datarows="value"></hot-table>')(rootScope)).isolateScope();
@@ -33,7 +71,7 @@ describe('hotTable', function() {
 
   it('should create table with `dataSchema` attribute', function() {
     rootScope.value = {id: null};
-    var scope = angular.element(compile('<hot-table data-schema="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table dataschema="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -60,7 +98,7 @@ describe('hotTable', function() {
 
   it('should create table with `startRows` attribute', function() {
     rootScope.value = 12;
-    var scope = angular.element(compile('<hot-table startrows="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table start-rows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -69,7 +107,7 @@ describe('hotTable', function() {
 
   it('should create table with `startCols` attribute', function() {
     rootScope.value = 12;
-    var scope = angular.element(compile('<hot-table startcols="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table start-cols="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -78,7 +116,7 @@ describe('hotTable', function() {
 
   it('should create table with `rowHeaders` attribute', function() {
     rootScope.value = function(index){return index + 'A'};
-    var scope = angular.element(compile('<hot-table rowheaders="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table row-headers="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -87,7 +125,7 @@ describe('hotTable', function() {
 
   it('should create table with `colHeaders` attribute', function() {
     rootScope.value = 'AAA';
-    var scope = angular.element(compile('<hot-table colheaders="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table col-headers="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -96,7 +134,7 @@ describe('hotTable', function() {
 
   it('should create table with `colWidths` attribute', function() {
     rootScope.value = [10, 20, 30];
-    var scope = angular.element(compile('<hot-table colwidths="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table col-widths="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -148,7 +186,7 @@ describe('hotTable', function() {
       top: {},
       bottom: {}
     }];
-    var scope = angular.element(compile('<hot-table customborders="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table custom-borders="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -157,7 +195,7 @@ describe('hotTable', function() {
 
   it('should create table with `minRows` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table minrows="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table min-rows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -166,7 +204,7 @@ describe('hotTable', function() {
 
   it('should create table with `minCols` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table mincols="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table min-cols="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -175,7 +213,7 @@ describe('hotTable', function() {
 
   it('should create table with `maxRows` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table maxrows="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table max-rows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -184,7 +222,7 @@ describe('hotTable', function() {
 
   it('should create table with `maxCols` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table maxcols="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table max-cols="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -193,7 +231,7 @@ describe('hotTable', function() {
 
   it('should create table with `minSpareRows` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table minsparerows="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table min-spare-rows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -202,7 +240,7 @@ describe('hotTable', function() {
 
   it('should create table with `minSpareCols` attribute', function() {
     rootScope.value = 16;
-    var scope = angular.element(compile('<hot-table minsparecols="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table min-spare-cols="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -211,7 +249,7 @@ describe('hotTable', function() {
 
   it('should create table with `allowInsertRow` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table allowinsertrow="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table allow-insert-row="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -220,7 +258,7 @@ describe('hotTable', function() {
 
   it('should create table with `allowInsertColumn` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table allowinsertcolumn="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table allow-insert-column="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -229,7 +267,7 @@ describe('hotTable', function() {
 
   it('should create table with `allowRemoveRow` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table allowremoverow="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table allow-remove-row="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -238,7 +276,7 @@ describe('hotTable', function() {
 
   it('should create table with `allowRemoveColumn` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table allowremovecolumn="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table allow-remove-column="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -247,7 +285,7 @@ describe('hotTable', function() {
 
   it('should create table with `multiSelect` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table multiselect="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table multi-select="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -256,7 +294,7 @@ describe('hotTable', function() {
 
   it('should create table with `multiSelect` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table multiselect="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table multi-select="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -265,7 +303,7 @@ describe('hotTable', function() {
 
   it('should create table with `fillHandle` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table fillhandle="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table fill-handle="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -274,7 +312,7 @@ describe('hotTable', function() {
 
   it('should create table with `fixedRowsTop` attribute', function() {
     rootScope.value = 12;
-    var scope = angular.element(compile('<hot-table fixedrowstop="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table fixed-rows-top="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -283,7 +321,7 @@ describe('hotTable', function() {
 
   it('should create table with `fixedColumnsLeft` attribute', function() {
     rootScope.value = 12;
-    var scope = angular.element(compile('<hot-table fixedcolumnsleft="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table fixed-columns-left="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -292,7 +330,7 @@ describe('hotTable', function() {
 
   it('should create table with `outsideClickDeselects` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table outsideclickdeselects="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table outside-click-deselects="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -301,7 +339,7 @@ describe('hotTable', function() {
 
   it('should create table with `enterBeginsEditing` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table enterbeginsediting="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table enter-begins-editing="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -310,7 +348,7 @@ describe('hotTable', function() {
 
   it('should create table with `enterMoves` attribute', function() {
     rootScope.value = {row: 3, col: 2};
-    var scope = angular.element(compile('<hot-table entermoves="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table enter-moves="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -319,7 +357,7 @@ describe('hotTable', function() {
 
   it('should create table with `tabMoves` attribute', function() {
     rootScope.value = {row: 3, col: 2};
-    var scope = angular.element(compile('<hot-table tabmoves="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table tab-moves="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -328,7 +366,7 @@ describe('hotTable', function() {
 
   it('should create table with `autoWrapRow` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table autowraprow="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table auto-wrap-row="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -337,7 +375,7 @@ describe('hotTable', function() {
 
   it('should create table with `autoWrapCol` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table autowrapcol="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table auto-wrap-col="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -346,7 +384,7 @@ describe('hotTable', function() {
 
   it('should create table with `copyRowsLimit` attribute', function() {
     rootScope.value = 563;
-    var scope = angular.element(compile('<hot-table copyrowslimit="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table copy-rows-limit="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -355,7 +393,7 @@ describe('hotTable', function() {
 
   it('should create table with `copyColsLimit` attribute', function() {
     rootScope.value = 563;
-    var scope = angular.element(compile('<hot-table copycolslimit="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table copy-cols-limit="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -364,7 +402,7 @@ describe('hotTable', function() {
 
   it('should create table with `pasteMode` attribute', function() {
     rootScope.value = 'test';
-    var scope = angular.element(compile('<hot-table pastemode="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table paste-mode="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -373,7 +411,7 @@ describe('hotTable', function() {
 
   it('should create table with `persistentState` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table persistentstate="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table persistent-state="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -382,7 +420,7 @@ describe('hotTable', function() {
 
   it('should create table with `currentRowClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table currentrowclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table current-row-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -391,7 +429,7 @@ describe('hotTable', function() {
 
   it('should create table with `currentColClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table currentcolclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table current-col-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -400,7 +438,7 @@ describe('hotTable', function() {
 
   it('should create table with `stretchH` attribute', function() {
     rootScope.value = 'all';
-    var scope = angular.element(compile('<hot-table stretchh="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table stretch-h="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -409,7 +447,7 @@ describe('hotTable', function() {
 
   it('should create table with `isEmptyRow` attribute', function() {
     rootScope.value = function(a) {return a;};
-    var scope = angular.element(compile('<hot-table isemptyrow="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table is-empty-row="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -418,7 +456,7 @@ describe('hotTable', function() {
 
   it('should create table with `isEmptyCol` attribute', function() {
     rootScope.value = function(a) {return a;};
-    var scope = angular.element(compile('<hot-table isemptycol="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table is-empty-col="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -427,7 +465,7 @@ describe('hotTable', function() {
 
   it('should create table with `observeDOMVisibility` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table observedomvisibility="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table observe-dom-visibility="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -436,7 +474,7 @@ describe('hotTable', function() {
 
   it('should create table with `allowInvalid` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table allowinvalid="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table allow-invalid="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -445,7 +483,7 @@ describe('hotTable', function() {
 
   it('should create table with `invalidCellClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table invalidcellclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table invalid-cell-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -463,7 +501,7 @@ describe('hotTable', function() {
 
   it('should create table with `placeholderCellClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table placeholdercellclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table placeholder-cell-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -472,7 +510,7 @@ describe('hotTable', function() {
 
   it('should create table with `readOnlyCellClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table readonlycellclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table read-only-cell-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -490,7 +528,7 @@ describe('hotTable', function() {
 
   it('should create table with `commentedCellClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table commentedcellclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table commented-cell-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -499,7 +537,7 @@ describe('hotTable', function() {
 
   it('should create table with `fragmentSelection` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table fragmentselection="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table fragment-selection="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -508,7 +546,7 @@ describe('hotTable', function() {
 
   it('should create table with `readOnly` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table readonly="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table read-only="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -553,7 +591,7 @@ describe('hotTable', function() {
 
   it('should create table with `autoComplete` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table autocomplete="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table auto-complete="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -571,7 +609,7 @@ describe('hotTable', function() {
 
   it('should create table with `wordWrap` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table wordwrap="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table word-wrap="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -580,7 +618,7 @@ describe('hotTable', function() {
 
   it('should create table with `noWordWrapClassName` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table nowordwrapclassname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table no-word-wrap-class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -589,7 +627,7 @@ describe('hotTable', function() {
 
   it('should create table with `contextMenu` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table contextmenu="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table context-menu="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -607,7 +645,7 @@ describe('hotTable', function() {
 
   it('should create table with `columnSorting` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table columnsorting="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table column-sorting="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -616,7 +654,7 @@ describe('hotTable', function() {
 
   it('should create table with `manualColumnMove` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table manualcolumnmove="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table manual-column-move="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -625,7 +663,7 @@ describe('hotTable', function() {
 
   it('should create table with `manualColumnResize` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table manualcolumnresize="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table manual-column-resize="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -634,7 +672,7 @@ describe('hotTable', function() {
 
   it('should create table with `manualRowMove` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table manualrowmove="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table manual-row-move="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -643,7 +681,7 @@ describe('hotTable', function() {
 
   it('should create table with `manualRowResize` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table manualrowresize="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table manual-row-resize="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -652,7 +690,7 @@ describe('hotTable', function() {
 
   it('should create table with `mergeCells` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table mergecells="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table merge-cells="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -661,7 +699,7 @@ describe('hotTable', function() {
 
   it('should create table with `viewportRowRenderingOffset` attribute', function() {
     rootScope.value = 7;
-    var scope = angular.element(compile('<hot-table viewportrowrenderingoffset="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table viewport-row-rendering-offset="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -670,7 +708,7 @@ describe('hotTable', function() {
 
   it('should create table with `viewportColumnRenderingOffset` attribute', function() {
     rootScope.value = 7;
-    var scope = angular.element(compile('<hot-table viewportcolumnrenderingoffset="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table viewport-column-rendering-offset="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -698,7 +736,7 @@ describe('hotTable', function() {
 
   it('should create table with `disableVisualSelection` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table disablevisualselection="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table disable-visual-selection="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -707,7 +745,7 @@ describe('hotTable', function() {
 
   it('should create table with `sortIndicator` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table sortindicator="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table sort-indicator="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -716,7 +754,7 @@ describe('hotTable', function() {
 
   it('should create table with `manualColumnFreeze` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table manualcolumnfreeze="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table manual-column-freeze="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -725,7 +763,7 @@ describe('hotTable', function() {
 
   it('should create table with `trimWhitespace` attribute', function() {
     rootScope.value = false;
-    var scope = angular.element(compile('<hot-table trimwhitespace="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table trim-whitespace="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -764,7 +802,7 @@ describe('hotTable', function() {
 
   it('should create table with `checkedTemplate` attribute', function() {
     rootScope.value = 1;
-    var scope = angular.element(compile('<hot-table checkedtemplate="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table checked-template="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -773,7 +811,7 @@ describe('hotTable', function() {
 
   it('should create table with `uncheckedTemplate` attribute', function() {
     rootScope.value = -1;
-    var scope = angular.element(compile('<hot-table uncheckedtemplate="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table unchecked-template="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -791,7 +829,7 @@ describe('hotTable', function() {
 
   it('should create table with `className` attribute', function() {
     rootScope.value = 'class-name';
-    var scope = angular.element(compile('<hot-table classname="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table class-name="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -800,7 +838,7 @@ describe('hotTable', function() {
 
   it('should create table with `autoColumnSize` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table autocolumnsize="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table auto-column-size="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
@@ -809,7 +847,7 @@ describe('hotTable', function() {
 
   it('should create table with `autoRowSize` attribute', function() {
     rootScope.value = true;
-    var scope = angular.element(compile('<hot-table autorowsize="value"></hot-table>')(rootScope)).isolateScope();
+    var scope = angular.element(compile('<hot-table auto-row-size="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 

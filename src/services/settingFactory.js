@@ -117,6 +117,24 @@
       },
 
       /**
+       * Trim scope definition according to attrs object from directive.
+       *
+       * @param {Object} scopeDefinition
+       * @param {Object} attrs
+       * @returns {Object}
+       */
+      trimScopeDefinitionAccordingToAttrs: function(scopeDefinition, attrs) {
+        for (var i in scopeDefinition) {
+          if (scopeDefinition.hasOwnProperty(i) && attrs[i] === void 0 &&
+              attrs[scopeDefinition[i].substr(1, scopeDefinition[i].length)] === void 0) {
+            delete scopeDefinition[i];
+          }
+        }
+
+        return scopeDefinition;
+      },
+
+      /**
        * Get isolate scope definition for main handsontable directive.
        *
        * @return {Object}
@@ -125,9 +143,11 @@
         var scopeDefinition = {};
 
         this.applyAvailableSettingsScopeDef(scopeDefinition);
-        //this.applyAvailableHooksScopeDef(scopeDefinition);
+        this.applyAvailableHooksScopeDef(scopeDefinition);
 
         scopeDefinition.datarows = '=';
+        scopeDefinition.dataschema = '=';
+        scopeDefinition.observeDomVisibility = '=';
         scopeDefinition.settings = '=';
 
         return scopeDefinition;
@@ -150,13 +170,12 @@
       /**
        * Apply all available handsontable settings into object which represents scope definition.
        *
-       * @param {Object} scopeDefinition
+       * @param {Object} [scopeDefinition]
        * @returns {Object}
        */
       applyAvailableSettingsScopeDef: function(scopeDefinition) {
         var options, i, length;
 
-        scopeDefinition = scopeDefinition || {};
         options = this.getAvailableSettings();
 
         for (i = 0, length = options.length; i < length; i++) {
@@ -169,17 +188,16 @@
       /**
        * Apply all available handsontable hooks into object which represents scope definition.
        *
-       * @param {Object} scopeDefinition
+       * @param {Object} [scopeDefinition]
        * @returns {Object}
        */
       applyAvailableHooksScopeDef: function(scopeDefinition) {
         var options, i, length;
 
-        scopeDefinition = scopeDefinition || {};
         options = this.getAvailableHooks();
 
         for (i = 0, length = options.length; i < length; i++) {
-          scopeDefinition[options[i]] = '&on' + ucFirst(options[i]);
+          scopeDefinition[options[i]] = '=on' + ucFirst(options[i]);
         }
 
         return scopeDefinition;

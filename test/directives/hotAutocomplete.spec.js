@@ -7,7 +7,6 @@ describe('hotAutocomplete', function() {
   beforeEach(inject(function(_$compile_, _$rootScope_, $q) {
     rootScope = _$rootScope_;
     compile = _$compile_;
-    q = $q;
   }));
 
   afterEach(function() {

@@ -9,9 +9,11 @@
       },
 
       registerInstance: function(id, instance) {
-        if (!this.getInstance(id)) {
-          instances[id] = instance;
-        }
+        instances[id] = instance;
+      },
+
+      removeInstance: function(id) {
+        instances[id] = void 0;
       }
     };
   }

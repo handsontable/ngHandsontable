@@ -35,10 +35,15 @@
       }
     },
     'columns': {
-      'add-remove-column': {
+      'add-remove-column-ng-repeat': {
         url: getUrl('muluto/2'),
-        title: 'Add/Remove columns (ng-repeat)',
+        title: 'Add/Remove (ng-repeat)',
         description: 'Add/Remove columns using ng-repeat'
+      },
+      'add-remove-column-by-attr': {
+        url: getUrl('xayeru/1'),
+        title: 'Add/Remove (`columns` attribute)',
+        description: 'Add/Remove columns using `columns` attribute'
       }
     },
     'binding': {

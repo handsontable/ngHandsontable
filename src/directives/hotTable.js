@@ -87,7 +87,7 @@
             }
           };
 
-          // TODO: Add watch properties descriptor
+          // TODO: Add watch properties descriptor + needs perf test watch equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
             scope.$watch(key, function(newValue) {
               if (newValue === void 0) {

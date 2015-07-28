@@ -171,4 +171,36 @@ describe('hotColumn', function() {
     expect(columns[1].uncheckedTemplate).toBe('No');
     expect(columns[2].uncheckedTemplate).toBe('Stop');
   });
+
+  it('should create table with `renderer` attribute in columns', function() {
+    rootScope.renderer = [function(){}, function(){}];
+    var scope = angular.element(compile(
+        '<hot-table>' +
+          '<hot-column renderer="renderer[0]"></hot-column>' +
+          '<hot-column renderer="renderer[1]"></hot-column>' +
+        '</hot-table>'
+      )(rootScope)).isolateScope();
+
+    scope.$digest();
+    var columns = scope.hotInstance.getSettings().columns;
+
+    expect(columns[0].renderer).toBe(rootScope.renderer[0]);
+    expect(columns[1].renderer).toBe(rootScope.renderer[1]);
+  });
+
+  it('should create table with `validator` attribute in columns', function() {
+    rootScope.validator = [/[0-9]/, function(){return true;}];
+    var scope = angular.element(compile(
+        '<hot-table>' +
+          '<hot-column validator="validator[0]"></hot-column>' +
+          '<hot-column validator="validator[1]"></hot-column>' +
+        '</hot-table>'
+      )(rootScope)).isolateScope();
+
+    scope.$digest();
+    var columns = scope.hotInstance.getSettings().columns;
+
+    expect(columns[0].validator).toBe(rootScope.validator[0]);
+    expect(columns[1].validator()).toBe(true);
+  });
 });

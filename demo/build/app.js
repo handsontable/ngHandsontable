@@ -5,6 +5,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
   var APP_NAME = 'demos-app',
     modules = require('modules'),
     routing = require('routing'),
+    demos = require('demos'),
     unique,
     app;
 
@@ -26,15 +27,18 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     app = angular.module(APP_NAME, Array.prototype.concat(unique(modules.list), [
       'ui.router'
     ]));
+
     function config($sceDelegateProvider, $httpProvider, $stateProvider, $compileProvider, $urlRouterProvider, demoMapProvider) {
       $sceDelegateProvider.resourceUrlWhitelist(['self']);
       $httpProvider.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
       $compileProvider.debugInfoEnabled(false);
 
+      demoMapProvider.setDemos(demos);
       routing($stateProvider, $urlRouterProvider, demoMapProvider);
     }
     config.$inject = ['$sceDelegateProvider', '$httpProvider', '$stateProvider', '$compileProvider', '$urlRouterProvider', 'demoMapProvider'];
 
+    app.constant('version', 'v0.6.0');
     app.config(config);
 
     angular.element(document).ready(function() {
@@ -45,16 +49,17 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
   };
 }());
 
-},{"modules":"modules","routing":"routing"}],2:[function(require,module,exports){
+},{"demos":"demos","modules":"modules","routing":"routing"}],2:[function(require,module,exports){
 (function() {
   'use strict';
 
   var modules = require('modules');
 
-  MainCtrl.$inject = ['$state', 'demoMap'];
+  MainCtrl.$inject = ['$state', 'demoMap', 'version'];
 
 
-  function MainCtrl($state, demoMap) {
+  function MainCtrl($state, demoMap, version) {
+    this.version = version;
     this.allDemos = demoMap.getAll();
     this.selectedDemo = demoMap.get($state.current.name);
   }
@@ -193,79 +198,13 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 (function() {
   var
     modules = require('modules'),
-    DEFAULT_TABS = 'html,js,output',
-    BASE_URL = 'http://jsbin.com/{id}/embed?',
-
-    demos = {
-      'intro': {
-        'simple-example': {
-          url: getUrl('nudumu/1'),
-          title: 'Simple example',
-          description: 'Simple example'
-        },
-        'full-featured-demo': {
-          url: getUrl('xezevi/1'),
-          title: 'Full featured demo',
-          description: 'Full featured demo'
-        }
-      },
-      'configuration': {
-        'configuration-by-object': {
-          url: getUrl('getazu/1'),
-          title: 'By `settings` object',
-          description: 'Configuration by setting `settings` object'
-        },
-        'configuration-declarative-way': {
-          url: getUrl('jupeme/1'),
-          title: 'In declarative way',
-          description: 'Configuration in declarative way'
-        }
-      },
-      'columns': {
-        'add-remove-column': {
-          url: getUrl('muluto/1'),
-          title: 'Add/Remove columns (ng-repeat)',
-          description: 'Add/Remove columns using ng-repeat'
-        }
-      },
-      'binding': {
-        'data-binding': {
-          url: getUrl('lupile/1'),
-          title: 'Data binding',
-          description: 'Data binding'
-        },
-        'settings-binding': {
-          url: getUrl('xaqasi/1'),
-          title: 'Table settings binding',
-          description: 'Table settings binding'
-        }
-      },
-      'callbacks': {
-        'callbacks-by-object': {
-          url: getUrl('nayito/3', 'html,js,console,output'),
-          title: 'By `settings` object',
-          description: 'Listening callbacks using `settings` object'
-        },
-        'callbacks-declarative-way': {
-          url: getUrl('pucale/1', 'html,js,console,output'),
-          title: 'In declarative way',
-          description: 'Listening callbacks in declarative way'
-        }
-      },
-      'other': {
-        'access-to-instance': {
-          url: getUrl('fovoxu/1', 'html,js,output'),
-          title: 'Access to Handsontable instance',
-          description: 'Access to Handsontable instance'
-        }
-      }
-    };
-
-  function getUrl(id, tabs) {
-    return BASE_URL.replace('{id}', id) + (tabs || DEFAULT_TABS);
-  }
+    demos;
 
   function demoMap() {
+    this.setDemos = function(_demos) {
+      demos = _demos;
+    };
+
     this.$get = function() {
       return {
         get: function(id) {
@@ -299,7 +238,102 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
   });
 }());
 
-},{"modules":"modules"}],"modules":[function(require,module,exports){
+},{"modules":"modules"}],"demos":[function(require,module,exports){
+(function() {
+  'use strict';
+
+  var
+    DEFAULT_TABS = 'html,js,output',
+    BASE_URL = 'http://jsbin.com/{id}/embed?';
+
+  function getUrl(id, tabs) {
+    return BASE_URL.replace('{id}', id) + (tabs || DEFAULT_TABS);
+  }
+
+  module.exports = {
+    'intro': {
+      'simple-example': {
+        url: getUrl('nudumu/2'),
+        title: 'Simple example',
+        description: 'Simple example'
+      },
+      'full-featured-demo': {
+        url: getUrl('xezevi/2'),
+        title: 'Full featured demo',
+        description: 'Full featured demo'
+      }
+    },
+    'configuration': {
+      'configuration-by-object': {
+        url: getUrl('getazu/2'),
+        title: 'By `settings` object',
+        description: 'Configuration by setting `settings` object'
+      },
+      'configuration-declarative-way': {
+        url: getUrl('jupeme/2'),
+        title: 'In declarative way',
+        description: 'Configuration in declarative way'
+      }
+    },
+    'columns': {
+      'add-remove-column': {
+        url: getUrl('muluto/2'),
+        title: 'Add/Remove columns (ng-repeat)',
+        description: 'Add/Remove columns using ng-repeat'
+      }
+    },
+    'binding': {
+      'data-binding': {
+        url: getUrl('lupile/3'),
+        title: 'Data binding',
+        description: 'Data binding'
+      },
+      'settings-binding': {
+        url: getUrl('xaqasi/2'),
+        title: 'Table settings binding',
+        description: 'Table settings binding'
+      }
+    },
+    'callbacks': {
+      'callbacks-by-object': {
+        url: getUrl('nayito/4', 'html,js,console,output'),
+        title: 'By `settings` object',
+        description: 'Listening callbacks using `settings` object'
+      },
+      'callbacks-declarative-way': {
+        url: getUrl('pucale/2', 'html,js,console,output'),
+        title: 'In declarative way',
+        description: 'Listening callbacks in declarative way'
+      }
+    },
+    'plugins': {
+      'copy-paste-context-menu': {
+        url: getUrl('zohoge/1'),
+        title: 'Enable copy/paste in context menu',
+        description: 'Enable copy/paste in context menu'
+      }
+    },
+    'other': {
+      'access-to-instance': {
+        url: getUrl('fovoxu/2'),
+        title: 'Access to Handsontable instance',
+        description: 'Access to Handsontable instance'
+      },
+      'custom-validator': {
+        url: getUrl('qoweju/1'),
+        title: 'Custom validator',
+        description: 'Custom validator'
+      },
+      'custom-renderer': {
+        url: getUrl('locome/1'),
+        title: 'Custom renderer',
+        description: 'Custom renderer'
+      }
+    }
+  };
+}());
+
+},{}],"modules":[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -418,4 +452,4 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
   };
 }());
 
-},{}]},{},[1,2,3,4,"modules","routing",5,6]);
+},{}]},{},[1,2,"demos",3,4,"modules","routing",5,6]);

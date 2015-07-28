@@ -3,10 +3,11 @@
 
   var modules = require('modules');
 
-  MainCtrl.$inject = ['$state', 'demoMap'];
+  MainCtrl.$inject = ['$state', 'demoMap', 'version'];
 
 
-  function MainCtrl($state, demoMap) {
+  function MainCtrl($state, demoMap, version) {
+    this.version = version;
     this.allDemos = demoMap.getAll();
     this.selectedDemo = demoMap.get($state.current.name);
   }

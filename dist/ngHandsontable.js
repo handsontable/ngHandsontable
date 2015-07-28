@@ -5,7 +5,7 @@
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Mon Jul 27 2015 22:37:41 GMT+0200 (CEST)
+ * Date: Tue Jul 28 2015 20:49:36 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -305,6 +305,9 @@ angular.module('ngHandsontable', [
       getAvailableSettings: function(hyphenateStyle) {
         var settings = Object.keys(Handsontable.DefaultSettings.prototype);
 
+        if (settings.indexOf('contextMenuCopyPaste') === -1) {
+          settings.push('contextMenuCopyPaste');
+        }
         if (hyphenateStyle) {
           settings = settings.map(hyphenate);
         }

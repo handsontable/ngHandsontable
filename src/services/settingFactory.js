@@ -212,6 +212,9 @@
       getAvailableSettings: function(hyphenateStyle) {
         var settings = Object.keys(Handsontable.DefaultSettings.prototype);
 
+        if (settings.indexOf('contextMenuCopyPaste') === -1) {
+          settings.push('contextMenuCopyPaste');
+        }
         if (hyphenateStyle) {
           settings = settings.map(hyphenate);
         }

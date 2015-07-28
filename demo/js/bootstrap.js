@@ -4,6 +4,7 @@
   var APP_NAME = 'demos-app',
     modules = require('modules'),
     routing = require('routing'),
+    demos = require('demos'),
     unique,
     app;
 
@@ -25,15 +26,18 @@
     app = angular.module(APP_NAME, Array.prototype.concat(unique(modules.list), [
       'ui.router'
     ]));
+
     function config($sceDelegateProvider, $httpProvider, $stateProvider, $compileProvider, $urlRouterProvider, demoMapProvider) {
       $sceDelegateProvider.resourceUrlWhitelist(['self']);
       $httpProvider.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
       $compileProvider.debugInfoEnabled(false);
 
+      demoMapProvider.setDemos(demos);
       routing($stateProvider, $urlRouterProvider, demoMapProvider);
     }
     config.$inject = ['$sceDelegateProvider', '$httpProvider', '$stateProvider', '$compileProvider', '$urlRouterProvider', 'demoMapProvider'];
 
+    app.constant('version', 'v@@version');
     app.config(config);
 
     angular.element(document).ready(function() {

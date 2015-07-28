@@ -72,8 +72,17 @@ module.exports = function (grunt) {
         dest: './demo/build/app.js',
         options: {
           alias: [
+            './demo/js/demos.js:demos',
             './demo/js/modules.js:modules',
             './demo/js/routing.js:routing'
+          ],
+          transform: [
+            ['browserify-replace', {
+              replace: [
+                { from: /@@version/, to: '<%= pkg.version %>' }
+              ]
+            }
+            ]
           ]
         }
       },
@@ -84,6 +93,7 @@ module.exports = function (grunt) {
         dest: './demo/build/app.js',
         options: {
           alias: [
+            './demo/js/demos.js:demos',
             './demo/js/modules.js:modules',
             './demo/js/routing.js:routing'
           ],

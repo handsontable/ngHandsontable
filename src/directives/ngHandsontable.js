@@ -52,7 +52,8 @@ angular.module('ngHandsontable.directives', [])
                   scope.htSettings.columns[i].optionList = optionList;
                 }
 
-                autoCompleteFactory.parseAutoComplete(scope.hotInstance, scope.htSettings.columns[i], scope.datarows, true);
+                // create the autocomplete options
+                autoCompleteFactory.parseAutoComplete(scope, i);
               }
             }
             scope.hotInstance.updateSettings(scope.htSettings);

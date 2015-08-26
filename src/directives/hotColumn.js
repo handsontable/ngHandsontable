@@ -4,7 +4,7 @@
    */
   function hotColumn(settingFactory) {
     return {
-      restrict: 'E',
+      restrict: 'EA',
       require: '^hotTable',
       scope: {},
       controller: ['$scope', function ($scope) {

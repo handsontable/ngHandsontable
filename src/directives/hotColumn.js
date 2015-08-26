@@ -2,13 +2,13 @@
   /**
    * Angular Handsontable directive for single column settings
    */
-  function hotColumn() {
+  function hotColumn(settingFactory) {
     return {
       restrict: 'E',
       require: '^hotTable',
       scope: {},
       controller: ['$scope', function ($scope) {
-        this.setColumnOptionList = function (options) {
+        this.setColumnOptionList = function(options) {
           if (!$scope.column) {
             $scope.column = {};
           }
@@ -24,46 +24,46 @@
           $scope.column['optionList'] = optionList;
         };
       }],
-      link: function (scope, element, attributes, controllerInstance) {
-        var column = {};
+      compile: function(tElement, tAttrs) {
+        var _this = this;
 
-        for (var i in attributes) {
-          if (attributes.hasOwnProperty(i)) {
-            if (i.charAt(0) !== '$' && typeof column[i] === 'undefined') {
-              if (i === 'data') {
-                column.data = attributes[i];
-              }
-              else {
-                column[i] = scope.$eval(attributes[i]);
-              }
+        this.scope = settingFactory.trimScopeDefinitionAccordingToAttrs(settingFactory.getColumnScopeDefinition(), tAttrs);
+        //this.$$isolateBindings = {};
+
+        angular.forEach(Object.keys(this.scope), function(key) {
+          _this.$$isolateBindings[key] = {
+            attrName: key,
+            collection: false,
+            mode: key === 'data' ? '@' : '=',
+            optional: false
+          };
+        });
+
+        return function (scope, element, attributes, controllerInstance) {
+          var column = {};
+
+          // Turn all attributes without value as `true` by default
+          angular.forEach(Object.keys(attributes), function(key) {
+            if (key.charAt(0) !== '$' && attributes[key] === '') {
+              column[key] = true;
             }
+          });
+          settingFactory.mergeSettingsFromScope(column, scope);
+
+          if (!scope.column) {
+            scope.column = {};
           }
-        }
+          angular.extend(scope.column, column);
+          controllerInstance.setColumnSetting(scope.column);
 
-        switch (column.type) {
-          case 'checkbox':
-            if (typeof attributes.checkedtemplate !== 'undefined') {
-              column.checkedTemplate = scope.$eval(attributes.checkedtemplate); //if undefined then defaults to Boolean true
-            }
-            if (typeof attributes.uncheckedtemplate !== 'undefined') {
-              column.uncheckedTemplate = scope.$eval(attributes.uncheckedtemplate); //if undefined then defaults to Boolean true
-            }
-            break;
-        }
-
-        if (typeof attributes.readonly !== 'undefined') {
-          column.readOnly = true;
-        }
-        if (!scope.column) {
-          scope.column = {};
-        }
-
-        angular.extend(scope.column, column);
-        controllerInstance.setColumnSetting(scope.column);
+          scope.$on('$destroy', function() {
+            controllerInstance.removeColumnSetting(scope.column);
+          });
+        };
       }
     };
   }
-  hotColumn.$inject = [];
+  hotColumn.$inject = ['settingFactory'];
 
   angular.module('ngHandsontable.directives').directive('hotColumn', hotColumn);
 }());

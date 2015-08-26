@@ -8,11 +8,10 @@ describe('settingFactory', function() {
   }));
 
   it('should create column source function', inject(function(autoCompleteFactory) {
-    var instance = {getSelected: function() {}};
     var column = {};
     var dataSet = [];
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet);
+    autoCompleteFactory.parseAutoComplete(column, dataSet);
 
     expect(column.source).toBeDefined();
   }));
@@ -24,9 +23,10 @@ describe('settingFactory', function() {
     var column = {optionList: []};
     var dataSet = [];
 
+    column.instance = instance;
     spyOn(instance, 'getSelected').and.returnValue(data);
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet);
+    autoCompleteFactory.parseAutoComplete(column, dataSet);
 
     column.source(null, process);
 
@@ -42,9 +42,10 @@ describe('settingFactory', function() {
     var column = {optionList: columnOptions};
     var dataSet = [{}];
 
+    column.instance = instance;
     spyOn(instance, 'getSelected').and.returnValue(data);
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet);
+    autoCompleteFactory.parseAutoComplete(column, dataSet);
 
     column.source(null, process);
 
@@ -60,9 +61,10 @@ describe('settingFactory', function() {
     var column = {optionList: columnOptions};
     var dataSet = [{}];
 
+    column.instance = instance;
     spyOn(instance, 'getSelected').and.returnValue(data);
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet);
+    autoCompleteFactory.parseAutoComplete(column, dataSet);
 
     column.source(null, process);
 
@@ -78,9 +80,10 @@ describe('settingFactory', function() {
     var column = {optionList: columnOptions};
     var dataSet = [{a: {b: {c: 'test value'}}}];
 
+    column.instance = instance;
     spyOn(instance, 'getSelected').and.returnValue(data);
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet);
+    autoCompleteFactory.parseAutoComplete(column, dataSet);
 
     column.source(null, process);
 
@@ -96,9 +99,10 @@ describe('settingFactory', function() {
     var column = {optionList: columnOptions};
     var dataSet = [{a: {b: {c: [{myProperty: 1}, {myProperty: 'test'}]}}}];
 
+    column.instance = instance;
     spyOn(instance, 'getSelected').and.returnValue(data);
 
-    autoCompleteFactory.parseAutoComplete(instance, column, dataSet, true);
+    autoCompleteFactory.parseAutoComplete(column, dataSet, true);
 
     column.source(null, process);
 

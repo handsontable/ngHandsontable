@@ -71,12 +71,12 @@ $scope.db.items = [
   
 ## Directives and attributes specification
 
-Main directive for creating table is `<hot-table>`. For defining column options you can use object settings with 
+Main directive for creating table is `<hot-table>`. For defining column options you can use settings object with 
 columns property. If you want to describe column behavior in declarative way you can add `<hot-column>` directive 
 as a children of `<hot-table>` element and add all neccessary attributes to describe column options.
 
 All **Handsontable** options listed [here](http://docs.handsontable.com/Options.html) should be supported. 
-Options in camelCase mode should be passed to the directive in hyphenate mode e.q `autoWrapCol: true -> <hot-table auto-wrap-col>`.
+Options in camelCase mode should be passed to the directive in hyphenate mode e.q `autoWrapCol: true` -> `<hot-table auto-wrap-col>`.
 
 ## License
 

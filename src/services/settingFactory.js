@@ -105,20 +105,31 @@ angular.module('ngHandsontable.services', [])
                   // just like $watchCollection - $watchCollection actually uses
                   // $parse behind the scenes.)
                   var parsedExpr = $parse(options.object);
-                  scope.$watch('datarows['+row+']',
-                    function (datarow) {
-                      var collection = parsedExpr(datarow);
-                      var source = [];
-                      if (collection && collection.length) {
-                        for (var j = 0; j < collection.length; j++) {
-                          item = collection[j][options.property];
-                          if (item) {
-                            source.push(item);
-                          }
+
+                  var updateOptions = function (datarow) {
+                    var collection = parsedExpr(datarow);
+                    var source = [];
+                    if (collection && collection.length) {
+                      for (var j = 0; j < collection.length; j++) {
+                        item = collection[j][options.property];
+                        if (item) {
+                          source.push(item);
                         }
                       }
-                      process(source);
-                    },
+                    }
+                    process(source);
+                  };
+
+                  // set initial options
+                  // We have to call this function manually first. If we depend
+                  // on $watch to initialize the options, it will wait until
+                  // the end of the current execution stack to run it and thus
+                  // cause the autocomplete to be rendered without the options
+                  // the first time.
+                  updateOptions(data);
+
+                  scope.$watch('datarows['+row+']',
+                    updateOptions,
                     true // deep watch to pick up changes to options
                   );
                 }

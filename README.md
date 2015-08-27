@@ -1,4 +1,4 @@
-# ngHandsontable - the AngularJS directive for [Handsontable](https://github.com/handsontable/handsontable)
+# ngHandsontable - the AngularJS directive for [Handsontable](https://github.com/handsontable/handsontable) [![Build Status](https://travis-ci.org/handsontable/ngHandsontable.png?branch=master)](https://travis-ci.org/handsontable/ngHandsontable)
 
 Enables creation of data grid applications in AngularJS.
 

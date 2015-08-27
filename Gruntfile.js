@@ -62,13 +62,55 @@ module.exports = function (grunt) {
     watch: {
       files: ['src/**/*', 'bower_components/**/*'],
       tasks: ['concat', 'uglify']
+    },
+
+    browserify: {
+      demoApp: {
+        src: [
+          './demo/js/**/*.js'
+        ],
+        dest: './demo/build/app.js',
+        options: {
+          alias: [
+            './demo/js/demos.js:demos',
+            './demo/js/modules.js:modules',
+            './demo/js/routing.js:routing'
+          ],
+          transform: [
+            ['browserify-replace', {
+              replace: [
+                { from: /@@version/, to: '<%= pkg.version %>' }
+              ]
+            }
+            ]
+          ]
+        }
+      },
+      demoAppWatch: {
+        src: [
+          './demo/js/**/*.js'
+        ],
+        dest: './demo/build/app.js',
+        options: {
+          alias: [
+            './demo/js/demos.js:demos',
+            './demo/js/modules.js:modules',
+            './demo/js/routing.js:routing'
+          ],
+          watch: true,
+          keepAlive: true
+        }
+      }
     }
   });
 
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('watch-demo-app', ['browserify:demoAppWatch']);
+  grunt.registerTask('build-demo-app', ['browserify:demoApp']);
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 };

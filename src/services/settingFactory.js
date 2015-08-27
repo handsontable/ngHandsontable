@@ -1,125 +1,247 @@
-angular.module('ngHandsontable.services', [])
-  .factory('settingFactory', [
-    function () {
-      return {
-        containerClassName: 'handsontable-container',
+(function() {
 
-        /**
-         * Append handsontable container div and initialize handsontable instance inside element
-         *
-         * @param element
-         * @param htSettings
-         */
-        initializeHandsontable: function (element, htSettings) {
-          var container = document.createElement('DIV');
+  function hyphenate(string) {
+    return string.replace(/[A-Z]/g, function(match) {
+      return ('-' + match.charAt(0).toLowerCase());
+    });
+  }
 
-          container.className = this.containerClassName;
-          element[0].appendChild(container);
+  function camelCase(string) {
+    return string.replace(/-\D/g, function(match){
+      return match.charAt(1).toUpperCase();
+    });
+  }
 
-          return new Handsontable(container, htSettings);
-        },
+  function ucFirst(string) {
+    return string.substr(0, 1).toUpperCase() + string.substr(1, string.length - 1);
+  }
 
-        /**
-         * Set new settings to handsontable instance
-         *
-         * @param instance
-         * @param settings
-         */
-        updateHandsontableSettings: function (instance, settings) {
-          if (instance) {
-            instance.updateSettings(settings);
-          }
-        },
+  function settingFactory(hotRegisterer) {
+    return {
+      containerClassName: 'handsontable-container',
 
-        /**
-         * Render handsontable instance inside element
-         *
-         * @param instance
-         */
-        renderHandsontable: function (instance) {
-          if (instance) {
-            instance.render();
-          }
-        },
+      /**
+       * Append handsontable container div and initialize handsontable instance inside element.
+       *
+       * @param {qLite} element
+       * @param {Object} htSettings
+       */
+      initializeHandsontable: function(element, htSettings) {
+        var container = document.createElement('div'),
+          hot;
 
-        /**
-         * @param htOptions
-         * @param scopeOptions
-         * @return {{}}
-         */
-        setHandsontableSettingsFromScope: function (htOptions, scopeOptions) {
-          var i,
-            settings = {},
-            allOptions = angular.extend({}, scopeOptions);
+        container.className = this.containerClassName;
+        element[0].appendChild(container);
+        hot = new Handsontable(container, htSettings);
 
-          angular.extend(allOptions, scopeOptions.settings);
-
-          for (i in htOptions) {
-            if (htOptions.hasOwnProperty(i) && typeof allOptions[htOptions[i]] !== 'undefined') {
-              settings[htOptions[i]] = allOptions[htOptions[i]];
-            }
-          }
-
-          return settings;
-        },
-
-        /**
-         * @param options
-         * @return {{datarows: String("="), settings: String("=")}}
-         */
-        getScopeDefinition: function (options) {
-          var scopeDefinition = {
-            datarows: '=',
-            settings: '='
-          };
-
-          for (var i = 0, length = options.length; i < length; i++) {
-            scopeDefinition[options[i]] = '=' + options[i].toLowerCase();
-          }
-
-          return scopeDefinition;
+        if (htSettings.hotId) {
+          hotRegisterer.registerInstance(htSettings.hotId, hot);
         }
-      };
-    }
-  ]
-)
-  .factory('autoCompleteFactory', [
-    function () {
-      return {
-        parseAutoComplete: function (instance, column, dataSet, propertyOnly) {
-          column.source = function (query, process) {
-            var row = instance.getSelected()[0];
-            var source = [];
-            var data = dataSet[row];
 
-            if (data) {
-              var options = column.optionList;
-              if (options.object) {
-                if (angular.isArray(options.object)) {
-                  source = options.object;
-                } else {
-                  var objKeys = options.object.split('.')
-                    , paramObject = data;
+        return hot;
+      },
 
-                  while (objKeys.length > 0) {
-                    var key = objKeys.shift();
-                    paramObject = paramObject[key];
-                  }
-
-                  if (propertyOnly) {
-                    for (var i = 0, length = paramObject.length; i < length; i++) {
-                      source.push(paramObject[i][options.property]);
-                    }
-                  } else {
-                    source = paramObject;
-                  }
-                }
-                process(source);
-              }
-            }
-          };
+      /**
+       * Set new settings to handsontable instance.
+       *
+       * @param {Handsontable} instance
+       * @param {Object} settings
+       */
+      updateHandsontableSettings: function(instance, settings) {
+        if (instance) {
+          instance.updateSettings(settings);
         }
-      };
-    }
-  ]
-);
+      },
+
+      /**
+       * Render handsontable instance inside element.
+       *
+       * @param {Handsontable} instance
+       */
+      renderHandsontable: function(instance) {
+        if (instance) {
+          instance.render();
+        }
+      },
+
+      /**
+       * Merge original handsontable settings with setting defined in scope.
+       *
+       * @param {Object} settings
+       * @param {Object} scope
+       * @returns {Object}
+       */
+      mergeSettingsFromScope: function(settings, scope) {
+        var
+          scopeOptions = angular.extend({}, scope),
+          htOptions, i, length;
+
+        settings = settings || {};
+        angular.extend(scopeOptions, scope.settings);
+        htOptions = this.getAvailableSettings();
+
+        for (i = 0, length = htOptions.length; i < length; i++) {
+          if (typeof scopeOptions[htOptions[i]] !== 'undefined') {
+            settings[htOptions[i]] = scopeOptions[htOptions[i]];
+          }
+        }
+
+        return settings;
+      },
+
+      /**
+       * Merge original handsontable hooks with hooks defined in scope.
+       *
+       * @param {Object} settings
+       * @param {Object} scope
+       * @returns {Object}
+       */
+      mergeHooksFromScope: function(settings, scope) {
+        var
+          scopeOptions = angular.extend({}, scope),
+          htHooks, i, length, attribute;
+
+        settings = settings || {};
+        angular.extend(scopeOptions, scope.settings);
+        htHooks = this.getAvailableHooks();
+
+        for (i = 0, length = htHooks.length; i < length; i++) {
+          attribute = 'on' + ucFirst(htHooks[i]);
+
+          if (typeof scopeOptions[attribute] !== 'undefined') {
+            settings[htHooks[i]] = scopeOptions[attribute];
+          }
+        }
+
+        return settings;
+      },
+
+      /**
+       * Trim scope definition according to attrs object from directive.
+       *
+       * @param {Object} scopeDefinition
+       * @param {Object} attrs
+       * @returns {Object}
+       */
+      trimScopeDefinitionAccordingToAttrs: function(scopeDefinition, attrs) {
+        for (var i in scopeDefinition) {
+          if (scopeDefinition.hasOwnProperty(i) && attrs[i] === void 0 &&
+              attrs[scopeDefinition[i].substr(1, scopeDefinition[i].length)] === void 0) {
+            delete scopeDefinition[i];
+          }
+        }
+
+        return scopeDefinition;
+      },
+
+      /**
+       * Get isolate scope definition for main handsontable directive.
+       *
+       * @return {Object}
+       */
+      getTableScopeDefinition: function() {
+        var scopeDefinition = {};
+
+        this.applyAvailableSettingsScopeDef(scopeDefinition);
+        this.applyAvailableHooksScopeDef(scopeDefinition);
+
+        scopeDefinition.datarows = '=';
+        scopeDefinition.dataschema = '=';
+        scopeDefinition.observeDomVisibility = '=';
+        scopeDefinition.settings = '=';
+
+        return scopeDefinition;
+      },
+
+      /**
+       * Get isolate scope definition for column directive.
+       *
+       * @return {Object}
+       */
+      getColumnScopeDefinition: function() {
+        var scopeDefinition = {};
+
+        this.applyAvailableSettingsScopeDef(scopeDefinition);
+        scopeDefinition.data = '@';
+
+        return scopeDefinition;
+      },
+
+      /**
+       * Apply all available handsontable settings into object which represents scope definition.
+       *
+       * @param {Object} [scopeDefinition]
+       * @returns {Object}
+       */
+      applyAvailableSettingsScopeDef: function(scopeDefinition) {
+        var options, i, length;
+
+        options = this.getAvailableSettings();
+
+        for (i = 0, length = options.length; i < length; i++) {
+          scopeDefinition[options[i]] = '=';
+        }
+
+        return scopeDefinition;
+      },
+
+      /**
+       * Apply all available handsontable hooks into object which represents scope definition.
+       *
+       * @param {Object} [scopeDefinition]
+       * @returns {Object}
+       */
+      applyAvailableHooksScopeDef: function(scopeDefinition) {
+        var options, i, length;
+
+        options = this.getAvailableHooks();
+
+        for (i = 0, length = options.length; i < length; i++) {
+          scopeDefinition[options[i]] = '=on' + ucFirst(options[i]);
+        }
+
+        return scopeDefinition;
+      },
+
+      /**
+       * Get all available settings from handsontable, returns settings by default in camelCase mode.
+       *
+       * @param {Boolean} [hyphenateStyle=undefined] If `true` then returns options in hyphenate mode (eq. row-header)
+       * @returns {Array}
+       */
+      getAvailableSettings: function(hyphenateStyle) {
+        var settings = Object.keys(Handsontable.DefaultSettings.prototype);
+
+        if (settings.indexOf('contextMenuCopyPaste') === -1) {
+          settings.push('contextMenuCopyPaste');
+        }
+        if (hyphenateStyle) {
+          settings = settings.map(hyphenate);
+        }
+
+        return settings;
+      },
+
+      /**
+       * Get all available hooks from handsontable, returns hooks by default in camelCase mode.
+       *
+       * @param {Boolean} [hyphenateStyle=undefined] If `true` then returns hooks in hyphenate mode (eq. on-after-init)
+       * @returns {Array}
+       */
+      getAvailableHooks: function(hyphenateStyle) {
+        var settings = Handsontable.hooks.getRegistered();
+
+        if (hyphenateStyle) {
+          settings = settings.map(function(hook) {
+            return 'on-' + hyphenate(hook);
+          });
+        }
+
+        return settings;
+      }
+    };
+  }
+  settingFactory.$inject = ['hotRegisterer'];
+
+  angular.module('ngHandsontable.services').factory('settingFactory', settingFactory);
+}());

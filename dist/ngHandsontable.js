@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.6.0
+ * ngHandsontable 0.7.0-beta1
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Tue Jul 28 2015 20:49:36 GMT+0200 (CEST)
+ * Date: Thu Aug 27 2015 15:02:29 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -345,7 +345,7 @@ angular.module('ngHandsontable', [
    */
   function hotAutocomplete() {
     return {
-      restrict: 'E',
+      restrict: 'EA',
       scope: true,
       require: '^hotColumn',
       link: function (scope, element, attrs, controllerInstance) {
@@ -366,7 +366,7 @@ angular.module('ngHandsontable', [
    */
   function hotColumn(settingFactory) {
     return {
-      restrict: 'E',
+      restrict: 'EA',
       require: '^hotTable',
       scope: {},
       controller: ['$scope', function ($scope) {
@@ -519,7 +519,7 @@ angular.module('ngHandsontable', [
             }
           };
 
-          // TODO: Add watch properties descriptor
+          // TODO: Add watch properties descriptor + needs perf test watch equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
             scope.$watch(key, function(newValue) {
               if (newValue === void 0) {

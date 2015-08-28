@@ -39,12 +39,12 @@
           };
         });
 
-        return function (scope, element, attributes, controllerInstance) {
+        return function (scope, element, attrs, controllerInstance) {
           var column = {};
 
           // Turn all attributes without value as `true` by default
-          angular.forEach(Object.keys(attributes), function(key) {
-            if (key.charAt(0) !== '$' && attributes[key] === '') {
+          angular.forEach(Object.keys(attrs), function(key) {
+            if (key.charAt(0) !== '$' && attrs[key] === '') {
               column[key] = true;
             }
           });

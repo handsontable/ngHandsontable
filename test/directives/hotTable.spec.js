@@ -853,4 +853,14 @@ describe('hotTable', function() {
 
     expect(scope.hotInstance.getSettings().autoRowSize).toBe(rootScope.value);
   });
+
+  it('should convert attributes without values as `true`', function() {
+    rootScope.value = true;
+    var scope = angular.element(compile('<hot-table read-only row-headers></hot-table>')(rootScope)).isolateScope();
+
+    scope.$digest();
+
+    expect(scope.hotInstance.getSettings().rowHeaders).toBe(true);
+    expect(scope.hotInstance.getSettings().readOnly).toBe(true);
+  });
 });

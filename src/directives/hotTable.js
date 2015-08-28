@@ -47,6 +47,13 @@
           if (!scope.htSettings) {
             scope.htSettings = {};
           }
+          // Turn all attributes without value as `true` by default
+          angular.forEach(Object.keys(attrs), function(key) {
+            if (key.charAt(0) !== '$' && attrs[key] === '') {
+              scope.htSettings[key] = true;
+            }
+          });
+
           settingFactory.mergeSettingsFromScope(scope.htSettings, scope);
           settingFactory.mergeHooksFromScope(scope.htSettings, scope);
           scope.htSettings.data = scope.datarows;

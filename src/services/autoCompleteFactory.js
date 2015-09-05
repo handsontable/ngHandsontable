@@ -21,10 +21,12 @@
             // Using $parse to evaluate the expression against the row object
             // allows us to support filters like the ngRepeat directive does.
             var paramObject = $parse(options.object)(data);
+
             if (angular.isArray(paramObject)) {
               if (propertyOnly) {
                 for (var i = 0, length = paramObject.length; i < length; i++) {
                   var item = paramObject[i][options.property];
+
                   if (item !== null && item !== undefined) {
                     source.push(item);
                   }
@@ -32,6 +34,8 @@
               } else {
                 source = paramObject;
               }
+            } else {
+              source = paramObject;
             }
           }
           process(source);

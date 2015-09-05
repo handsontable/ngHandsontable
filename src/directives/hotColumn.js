@@ -13,7 +13,7 @@
             $scope.column = {};
           }
           var optionList = {};
-          var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+          var match = options.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
 
           if (match) {
             optionList.property = match[1];

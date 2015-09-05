@@ -68,7 +68,7 @@
               }
               if (typeof scope.htSettings.columns[i].optionList === 'string') {
                 var optionList = {};
-                var match = scope.htSettings.columns[i].optionList.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+                var match = scope.htSettings.columns[i].optionList.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
 
                 if (match) {
                   optionList.property = match[1];

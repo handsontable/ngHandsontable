@@ -1,5 +1,5 @@
 (function() {
-  function autoCompleteFactory() {
+  function autoCompleteFactory($parse) {
     return {
       parseAutoComplete: function(column, dataSet, propertyOnly) {
         column.source = function(query, process) {
@@ -18,21 +18,20 @@
           if (angular.isArray(options.object)) {
             source = options.object;
           } else {
-            var
-              objKeys = options.object.split('.'),
-              paramObject = data;
-
-            while (objKeys.length > 0) {
-              var key = objKeys.shift();
-              paramObject = paramObject[key];
-            }
-
-            if (propertyOnly) {
-              for (var i = 0, length = paramObject.length; i < length; i++) {
-                source.push(paramObject[i][options.property]);
+            // Using $parse to evaluate the expression against the row object
+            // allows us to support filters like the ngRepeat directive does.
+            var paramObject = $parse(options.object)(data);
+            if (angular.isArray(paramObject)) {
+              if (propertyOnly) {
+                for (var i = 0, length = paramObject.length; i < length; i++) {
+                  var item = paramObject[i][options.property];
+                  if (item !== null && item !== undefined) {
+                    source.push(item);
+                  }
+                }
+              } else {
+                source = paramObject;
               }
-            } else {
-              source = paramObject;
             }
           }
           process(source);
@@ -40,7 +39,7 @@
       }
     };
   }
-  autoCompleteFactory.$inject = [];
+  autoCompleteFactory.$inject = ['$parse'];
 
   angular.module('ngHandsontable.services').factory('autoCompleteFactory', autoCompleteFactory);
 }());

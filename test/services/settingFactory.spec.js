@@ -80,9 +80,9 @@ describe('settingFactory', function() {
     var scopeMock = {
       afterInit: fnAfterInit,
       settings: {
-        beforeInit: fnBeforeInit
+        onBeforeInit: fnBeforeInit
       },
-      afterChange: void 0
+      onAfterChange: void 0
     };
     var settings = {
       afterChange: fnAfterChange
@@ -90,8 +90,8 @@ describe('settingFactory', function() {
 
     settingFactory.mergeHooksFromScope(settings, scopeMock);
 
-    expect(settings.afterInit).toBe(fnAfterInit());
-    expect(settings.beforeInit).toBe(fnBeforeInit());
+    expect(settings.afterInit).toBe(fnAfterInit);
+    expect(settings.beforeInit).toBe(fnBeforeInit);
     expect(settings.afterChange).toBe(fnAfterChange);
   }));
 

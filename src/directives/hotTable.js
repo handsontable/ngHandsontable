@@ -81,8 +81,6 @@
               autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.datarows, true);
             }
           }
-          scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
-
           var origAfterChange = scope.htSettings.afterChange;
 
           scope.htSettings.afterChange = function() {
@@ -93,11 +91,12 @@
               scope.$apply();
             }
           };
+          scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 
-          // TODO: Add watch properties descriptor + needs perf test watch equality vs toJson
+          // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
-            scope.$watch(key, function(newValue) {
-              if (newValue === void 0) {
+            scope.$watch(key, function(newValue, oldValue) {
+              if (newValue === void 0 || newValue === oldValue) {
                 return;
               }
               if (key === 'datarows') {
@@ -106,7 +105,7 @@
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }
-            }, ['datarows', 'columns', 'colWidths', 'rowHeaders'].indexOf(key) >= 0);
+            }, ['datarows', 'columns', 'rowHeights', 'colWidths', 'rowHeaders', 'colHeaders'].indexOf(key) >= 0);
           });
 
           /**

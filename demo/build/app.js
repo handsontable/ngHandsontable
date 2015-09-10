@@ -318,6 +318,18 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         description: 'Enable copy/paste in context menu'
       }
     },
+    'pagination': {
+      'rows-pagination': {
+        url: getUrl('fohohenabo/1'),
+        title: 'Paginate rows',
+        description: 'Paginate rows'
+      },
+      'columns-pagination': {
+        url: getUrl('qudufogafu/1'),
+        title: 'Paginate columns',
+        description: 'Paginate columns'
+      },
+    },
     'other': {
       'access-to-instance': {
         url: getUrl('fovoxu/4'),
@@ -333,7 +345,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         url: getUrl('locome/2'),
         title: 'Custom renderer',
         description: 'Custom renderer'
-      }
+      },
     }
   };
 }());

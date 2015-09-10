@@ -100,7 +100,12 @@
                 return;
               }
               if (key === 'datarows') {
-                settingFactory.renderHandsontable(scope.hotInstance);
+                // If reference to data rows is not changed then only re-render table
+                if (scope.hotInstance.getSettings().data === newValue) {
+                  settingFactory.renderHandsontable(scope.hotInstance);
+                } else {
+                  scope.hotInstance.loadData(newValue);
+                }
               } else {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);

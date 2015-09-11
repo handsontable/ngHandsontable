@@ -77,7 +77,7 @@
           htOptions, i, length;
 
         settings = settings || {};
-        angular.extend(scopeOptions, scope.settings);
+        angular.extend(scopeOptions, scope.settings || {});
         htOptions = this.getAvailableSettings();
 
         for (i = 0, length = htOptions.length; i < length; i++) {
@@ -102,14 +102,14 @@
           htHooks, i, length, attribute;
 
         settings = settings || {};
-        angular.extend(scopeOptions, scope.settings);
+        angular.extend(scopeOptions, scope.settings || {});
         htHooks = this.getAvailableHooks();
 
         for (i = 0, length = htHooks.length; i < length; i++) {
           attribute = 'on' + ucFirst(htHooks[i]);
 
-          if (typeof scopeOptions[attribute] !== 'undefined') {
-            settings[htHooks[i]] = scopeOptions[attribute];
+          if (typeof scopeOptions[htHooks[i]] === 'function' || typeof scopeOptions[attribute] === 'function') {
+            settings[htHooks[i]] = scopeOptions[htHooks[i]] || scopeOptions[attribute];
           }
         }
 

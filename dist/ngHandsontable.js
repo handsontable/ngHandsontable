@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.7.0-beta1
+ * ngHandsontable 0.7.0-beta2
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Aug 27 2015 15:02:29 GMT+0200 (CEST)
+ * Date: Fri Sep 11 2015 09:12:32 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -20,8 +20,13 @@ angular.module('ngHandsontable', [
     'ngHandsontable.directives'
   ]);
 
+
+Handsontable.hooks.add('afterContextMenuShow', function() {
+  Handsontable.eventManager.isHotTableEnv = false;
+});
+
 (function() {
-  function autoCompleteFactory() {
+  function autoCompleteFactory($parse) {
     return {
       parseAutoComplete: function(column, dataSet, propertyOnly) {
         column.source = function(query, process) {
@@ -40,18 +45,21 @@ angular.module('ngHandsontable', [
           if (angular.isArray(options.object)) {
             source = options.object;
           } else {
-            var
-              objKeys = options.object.split('.'),
-              paramObject = data;
+            // Using $parse to evaluate the expression against the row object
+            // allows us to support filters like the ngRepeat directive does.
+            var paramObject = $parse(options.object)(data);
 
-            while (objKeys.length > 0) {
-              var key = objKeys.shift();
-              paramObject = paramObject[key];
-            }
+            if (angular.isArray(paramObject)) {
+              if (propertyOnly) {
+                for (var i = 0, length = paramObject.length; i < length; i++) {
+                  var item = paramObject[i][options.property];
 
-            if (propertyOnly) {
-              for (var i = 0, length = paramObject.length; i < length; i++) {
-                source.push(paramObject[i][options.property]);
+                  if (item !== null && item !== undefined) {
+                    source.push(item);
+                  }
+                }
+              } else {
+                source = paramObject;
               }
             } else {
               source = paramObject;
@@ -62,7 +70,7 @@ angular.module('ngHandsontable', [
       }
     };
   }
-  autoCompleteFactory.$inject = [];
+  autoCompleteFactory.$inject = ['$parse'];
 
   angular.module('ngHandsontable.services').factory('autoCompleteFactory', autoCompleteFactory);
 }());
@@ -170,7 +178,7 @@ angular.module('ngHandsontable', [
           htOptions, i, length;
 
         settings = settings || {};
-        angular.extend(scopeOptions, scope.settings);
+        angular.extend(scopeOptions, scope.settings || {});
         htOptions = this.getAvailableSettings();
 
         for (i = 0, length = htOptions.length; i < length; i++) {
@@ -195,14 +203,14 @@ angular.module('ngHandsontable', [
           htHooks, i, length, attribute;
 
         settings = settings || {};
-        angular.extend(scopeOptions, scope.settings);
+        angular.extend(scopeOptions, scope.settings || {});
         htHooks = this.getAvailableHooks();
 
         for (i = 0, length = htHooks.length; i < length; i++) {
           attribute = 'on' + ucFirst(htHooks[i]);
 
-          if (typeof scopeOptions[attribute] !== 'undefined') {
-            settings[htHooks[i]] = scopeOptions[attribute];
+          if (typeof scopeOptions[htHooks[i]] === 'function' || typeof scopeOptions[attribute] === 'function') {
+            settings[htHooks[i]] = scopeOptions[htHooks[i]] || scopeOptions[attribute];
           }
         }
 
@@ -375,7 +383,7 @@ angular.module('ngHandsontable', [
             $scope.column = {};
           }
           var optionList = {};
-          var match = options.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+          var match = options.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
 
           if (match) {
             optionList.property = match[1];
@@ -401,12 +409,12 @@ angular.module('ngHandsontable', [
           };
         });
 
-        return function (scope, element, attributes, controllerInstance) {
+        return function (scope, element, attrs, controllerInstance) {
           var column = {};
 
           // Turn all attributes without value as `true` by default
-          angular.forEach(Object.keys(attributes), function(key) {
-            if (key.charAt(0) !== '$' && attributes[key] === '') {
+          angular.forEach(Object.keys(attrs), function(key) {
+            if (key.charAt(0) !== '$' && attrs[key] === '') {
               column[key] = true;
             }
           });
@@ -479,6 +487,13 @@ angular.module('ngHandsontable', [
           if (!scope.htSettings) {
             scope.htSettings = {};
           }
+          // Turn all attributes without value as `true` by default
+          angular.forEach(Object.keys(attrs), function(key) {
+            if (key.charAt(0) !== '$' && attrs[key] === '') {
+              scope.htSettings[key] = true;
+            }
+          });
+
           settingFactory.mergeSettingsFromScope(scope.htSettings, scope);
           settingFactory.mergeHooksFromScope(scope.htSettings, scope);
           scope.htSettings.data = scope.datarows;
@@ -493,7 +508,7 @@ angular.module('ngHandsontable', [
               }
               if (typeof scope.htSettings.columns[i].optionList === 'string') {
                 var optionList = {};
-                var match = scope.htSettings.columns[i].optionList.match(/^\s*(.+)\s+in\s+(.*)\s*$/);
+                var match = scope.htSettings.columns[i].optionList.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
 
                 if (match) {
                   optionList.property = match[1];
@@ -506,8 +521,6 @@ angular.module('ngHandsontable', [
               autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.datarows, true);
             }
           }
-          scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
-
           var origAfterChange = scope.htSettings.afterChange;
 
           scope.htSettings.afterChange = function() {
@@ -518,20 +531,26 @@ angular.module('ngHandsontable', [
               scope.$apply();
             }
           };
+          scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 
-          // TODO: Add watch properties descriptor + needs perf test watch equality vs toJson
+          // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
-            scope.$watch(key, function(newValue) {
-              if (newValue === void 0) {
+            scope.$watch(key, function(newValue, oldValue) {
+              if (newValue === void 0 || newValue === oldValue) {
                 return;
               }
               if (key === 'datarows') {
-                settingFactory.renderHandsontable(scope.hotInstance);
+                // If reference to data rows is not changed then only re-render table
+                if (scope.hotInstance.getSettings().data === newValue) {
+                  settingFactory.renderHandsontable(scope.hotInstance);
+                } else {
+                  scope.hotInstance.loadData(newValue);
+                }
               } else {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }
-            }, ['datarows', 'columns', 'colWidths', 'rowHeaders'].indexOf(key) >= 0);
+            }, ['datarows', 'columns', 'rowHeights', 'colWidths', 'rowHeaders', 'colHeaders'].indexOf(key) >= 0);
           });
 
           /**

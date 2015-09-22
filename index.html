@@ -140,7 +140,7 @@
         this.minSpareRows = 1;
         this.rowHeaders = false;
 
-        this.db = {items: dataFactory.generateArrayOfObjects()};
+        this.db = {items: dataFactory.generateArrayOfObjects(10)};
         this.settings = {colHeaders: true, contextMenu: ['row_above', 'row_below', 'remove_row']};
       }
       MainCtrl.$inject = ['$scope', 'dataFactory'];

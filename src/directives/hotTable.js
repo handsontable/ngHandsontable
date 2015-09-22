@@ -35,9 +35,10 @@
 
         angular.forEach(bindingsKeys, function(key) {
           var mode = _this.scope[key].charAt(0);
+
           _this.$$isolateBindings[key] = {
             attrName: _this.scope[key].length > 1 ? _this.scope[key].substr(1, _this.scope[key].length) : key,
-            collection: false,
+            collection: key === 'datarows',
             mode: mode,
             optional: false
           };

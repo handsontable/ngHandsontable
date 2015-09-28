@@ -7,7 +7,7 @@
   }
 
   function camelCase(string) {
-    return string.replace(/-\D/g, function(match){
+    return string.replace(/-\D/g, function(match) {
       return match.charAt(1).toUpperCase();
     });
   }

@@ -12,7 +12,7 @@
           }
           var options = column.optionList;
 
-          if (!options.object) {
+          if (!options || !options.object) {
             return;
           }
           if (angular.isArray(options.object)) {

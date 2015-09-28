@@ -59,6 +59,19 @@ module.exports = function (grunt) {
       files:['src/**/*.js', 'src/*.js']
     },
 
+    jscs: {
+      main: {
+        files: {
+          src: ['src/**/*.js', 'src/*.js']
+        }
+      },
+      options: {
+        config: '.jscsrc',
+        esnext: true,
+        verbose: true
+      }
+    },
+
     watch: {
       files: ['src/**/*', 'bower_components/**/*'],
       tasks: ['concat', 'uglify']
@@ -104,7 +117,7 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jscs', 'jshint', 'concat', 'uglify']);
   grunt.registerTask('watch-demo-app', ['browserify:demoAppWatch']);
   grunt.registerTask('build-demo-app', ['browserify:demoApp']);
 
@@ -113,4 +126,5 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-jscs');
 };

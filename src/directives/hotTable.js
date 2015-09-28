@@ -57,19 +57,27 @@
 
           settingFactory.mergeSettingsFromScope(scope.htSettings, scope);
           settingFactory.mergeHooksFromScope(scope.htSettings, scope);
-          scope.htSettings.data = scope.datarows;
+
+          if (!scope.htSettings.data) {
+            scope.htSettings.data = scope.datarows;
+          }
           scope.htSettings.dataSchema = scope.dataschema;
           scope.htSettings.hotId = attrs.hotId;
           scope.htSettings.observeDOMVisibility = scope.observeDomVisibility;
 
           if (scope.htSettings.columns) {
             for (var i = 0, length = scope.htSettings.columns.length; i < length; i++) {
-              if (scope.htSettings.columns[i].type !== 'autocomplete') {
+              var column = scope.htSettings.columns[i];
+
+              if (column.type !== 'autocomplete') {
                 continue;
               }
-              if (typeof scope.htSettings.columns[i].optionList === 'string') {
+              if (!column.optionList) {
+                continue;
+              }
+              if (typeof column.optionList === 'string') {
                 var optionList = {};
-                var match = scope.htSettings.columns[i].optionList.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
+                var match = column.optionList.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)\s*$/);
 
                 if (match) {
                   optionList.property = match[1];
@@ -77,9 +85,9 @@
                 } else {
                   optionList.object = optionList;
                 }
-                scope.htSettings.columns[i].optionList = optionList;
+                column.optionList = optionList;
               }
-              autoCompleteFactory.parseAutoComplete(scope.htSettings.columns[i], scope.datarows, true);
+              autoCompleteFactory.parseAutoComplete(column, scope.datarows, true);
             }
           }
           var origAfterChange = scope.htSettings.afterChange;

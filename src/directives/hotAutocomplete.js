@@ -7,7 +7,7 @@
       restrict: 'EA',
       scope: true,
       require: '^hotColumn',
-      link: function (scope, element, attrs, controllerInstance) {
+      link: function(scope, element, attrs, controllerInstance) {
         var options = attrs.datarows;
 
         controllerInstance.setColumnOptionList(options);

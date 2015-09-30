@@ -96,7 +96,7 @@
           // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
             scope.$watch(key, function(newValue, oldValue) {
-              if (newValue === void 0 || newValue === oldValue) {
+              if (newValue === void 0) {
                 return;
               }
               if (key === 'datarows') {
@@ -106,7 +106,7 @@
                 } else {
                   scope.hotInstance.loadData(newValue);
                 }
-              } else {
+              } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }

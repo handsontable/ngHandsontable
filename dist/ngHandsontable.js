@@ -5,7 +5,7 @@
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Fri Sep 11 2015 09:12:32 GMT+0200 (CEST)
+ * Date: Wed Sep 30 2015 23:30:24 GMT+0100 (GMT Summer Time)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -536,7 +536,7 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
           // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
             scope.$watch(key, function(newValue, oldValue) {
-              if (newValue === void 0 || newValue === oldValue) {
+              if (newValue === void 0) {
                 return;
               }
               if (key === 'datarows') {
@@ -546,7 +546,7 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
                 } else {
                   scope.hotInstance.loadData(newValue);
                 }
-              } else {
+              } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }

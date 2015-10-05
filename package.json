@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/ngHandsontable/issues"
   },
   "author": "Marcin Warpechowski <hello@handsontable.com>",
-  "version": "0.7.0-beta2",
+  "version": "0.7.0-beta3",
   "devDependencies": {
     "angular": "^1.4.2",
     "angular-mocks": "^1.4.2",
@@ -21,6 +21,7 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-uglify": "~0.5.1",
     "grunt-contrib-watch": "~0.6.1",
+    "grunt-jscs": "^2.1.0",
     "handsontable": "git://github.com/handsontable/handsontable",
     "jasmine-core": "^2.3.4",
     "karma": "^0.12.37",

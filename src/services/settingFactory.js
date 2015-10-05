@@ -7,7 +7,7 @@
   }
 
   function camelCase(string) {
-    return string.replace(/-\D/g, function(match){
+    return string.replace(/-\D/g, function(match) {
       return match.charAt(1).toUpperCase();
     });
   }
@@ -148,7 +148,7 @@
         scopeDefinition.datarows = '=';
         scopeDefinition.dataschema = '=';
         scopeDefinition.observeDomVisibility = '=';
-        scopeDefinition.settings = '=';
+        //scopeDefinition.settings = '=';
 
         return scopeDefinition;
       },
@@ -214,6 +214,12 @@
 
         if (settings.indexOf('contextMenuCopyPaste') === -1) {
           settings.push('contextMenuCopyPaste');
+        }
+        if (settings.indexOf('handsontable') === -1) {
+          settings.push('handsontable');
+        }
+        if (settings.indexOf('settings') >= 0) {
+          settings.splice(settings.indexOf('settings'), 1);
         }
         if (hyphenateStyle) {
           settings = settings.map(hyphenate);

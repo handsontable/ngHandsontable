@@ -189,4 +189,18 @@ describe('hotColumn', function() {
     expect(columns[0].validator).toBe(rootScope.validator[0]);
     expect(columns[1].validator()).toBe(true);
   });
+
+  it('should create table with `handsontable` attribute in columns', function() {
+    rootScope.handsontable = {foo: 'bar'};
+    var scope = angular.element(compile(
+        '<hot-table>' +
+          '<hot-column handsontable="handsontable"></hot-column>' +
+        '</hot-table>'
+      )(rootScope)).isolateScope();
+
+    scope.$digest();
+    var columns = scope.hotInstance.getSettings().columns;
+
+    expect(columns[0].handsontable).toBe(rootScope.handsontable);
+  });
 });

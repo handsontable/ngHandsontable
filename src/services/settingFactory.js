@@ -148,7 +148,7 @@
         scopeDefinition.datarows = '=';
         scopeDefinition.dataschema = '=';
         scopeDefinition.observeDomVisibility = '=';
-        scopeDefinition.settings = '=';
+        //scopeDefinition.settings = '=';
 
         return scopeDefinition;
       },
@@ -217,6 +217,9 @@
         }
         if (settings.indexOf('handsontable') === -1) {
           settings.push('handsontable');
+        }
+        if (settings.indexOf('settings') >= 0) {
+          settings.splice(settings.indexOf('settings'), 1);
         }
         if (hyphenateStyle) {
           settings = settings.map(hyphenate);

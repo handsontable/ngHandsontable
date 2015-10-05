@@ -73,7 +73,7 @@ module.exports = function (grunt) {
     },
 
     watch: {
-      files: ['src/**/*', 'bower_components/**/*'],
+      files: ['src/**/*.js'],
       tasks: ['concat', 'uglify']
     },
 

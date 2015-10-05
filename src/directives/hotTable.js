@@ -2,7 +2,7 @@
   /**
    * Main Angular Handsontable directive
    */
-  function hotTable(settingFactory, autoCompleteFactory, $rootScope) {
+  function hotTable(settingFactory, autoCompleteFactory, $rootScope, $parse) {
     return {
       restrict: 'EA',
       scope: {},
@@ -45,6 +45,8 @@
         });
 
         return function(scope, element, attrs) {
+          scope.settings = $parse(attrs.settings)(scope.$parent);
+
           if (!scope.htSettings) {
             scope.htSettings = {};
           }
@@ -135,7 +137,7 @@
       }
     };
   }
-  hotTable.$inject = ['settingFactory', 'autoCompleteFactory', '$rootScope'];
+  hotTable.$inject = ['settingFactory', 'autoCompleteFactory', '$rootScope', '$parse'];
 
   angular.module('ngHandsontable.directives').directive('hotTable', hotTable);
 }());

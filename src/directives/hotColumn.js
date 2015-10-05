@@ -7,7 +7,7 @@
       restrict: 'EA',
       require: '^hotTable',
       scope: {},
-      controller: ['$scope', function ($scope) {
+      controller: ['$scope', function($scope) {
         this.setColumnOptionList = function(options) {
           if (!$scope.column) {
             $scope.column = {};
@@ -21,7 +21,7 @@
           } else {
             optionList.object = options.split(',');
           }
-          $scope.column['optionList'] = optionList;
+          $scope.column.optionList = optionList;
         };
       }],
       compile: function(tElement, tAttrs) {
@@ -39,7 +39,7 @@
           };
         });
 
-        return function (scope, element, attrs, controllerInstance) {
+        return function(scope, element, attrs, controllerInstance) {
           var column = {};
 
           // Turn all attributes without value as `true` by default

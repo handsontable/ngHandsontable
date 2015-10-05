@@ -127,7 +127,7 @@ describe('settingFactory', function() {
     expect(settings.datarows).toBe('=');
     expect(settings.dataschema).toBe('=');
     expect(settings.observeDomVisibility).toBe('=');
-    expect(settings.settings).toBe('=');
+    expect(settings.settings).toBeUndefined();
   }));
 
   it('should return scope definition for hot-column directive (getColumnScopeDefinition)', inject(function(settingFactory) {

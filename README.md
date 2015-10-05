@@ -78,6 +78,9 @@ as a children of `<hot-table>` element and add all neccessary attributes to desc
 All **Handsontable** options listed [here](http://docs.handsontable.com/Options.html) should be supported. 
 Options in camelCase mode should be passed to the directive in hyphenate mode e.q `autoWrapCol: true` -> `<hot-table auto-wrap-col>`.
 
+It's recommended to put all your settings in one big object (`settings="ctrl.settings"`).
+Settings attribute unlike any other attributes is not watched so using this can be helpful to achieve higher performance.
+
 ## License
 
 The MIT License (see the [LICENSE](https://github.com/handsontable/ngHandsontable/blob/master/LICENSE) file for the full text)

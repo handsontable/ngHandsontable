@@ -817,4 +817,18 @@ describe('hotTable - Watching options', function() {
     expect(scope.hotInstance.getSettings().rowHeaders).toBe(true);
     expect(scope.hotInstance.getSettings().readOnly).toBe(true);
   });
+
+  it('shouldn\'t observe `settings` object changes', function() {
+    rootScope.settings = {className: 'foo', rowHeaders: true, data: [[1]]};
+    var scope = angular.element(compile('<hot-table settings="settings"></hot-table>')(rootScope)).isolateScope();
+
+    rootScope.settings.rowHeaders = false;
+    rootScope.settings.className = 'bar';
+    rootScope.settings.data = [[2]];
+    scope.$digest();
+
+    expect(scope.hotInstance.getSettings().rowHeaders).toBe(true);
+    expect(scope.hotInstance.getSettings().className).toBe('foo');
+    expect(scope.hotInstance.getSettings().data).toEqual([[1]]);
+  });
 });

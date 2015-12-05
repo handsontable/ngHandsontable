@@ -107,10 +107,10 @@
           var dataRowsRefresh = function(scope, newValue) {
             // If reference to data rows is not changed then only re-render table
             if (scope.hotInstance.getSettings().data === newValue) {
-                  settingFactory.renderHandsontable(scope.hotInstance);
-                } else {
-                  scope.hotInstance.loadData(newValue);
-                }
+              settingFactory.renderHandsontable(scope.hotInstance);
+            } else {
+              scope.hotInstance.loadData(newValue);
+            }
           }
 
           // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
@@ -120,6 +120,7 @@
                 return;
               }
               if (key === 'datarows') {
+                // If reference to data rows is not changed then only re-render table
                 dataRowsRefresh(scope, newValue);
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;

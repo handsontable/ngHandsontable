@@ -15,31 +15,32 @@ describe('hotTable - Watching options', function() {
   });
 
   it('should create table with `datarows` attribute', function() {
-    rootScope.value = [[null]];
+    rootScope.value = [[]];
     var scope = angular.element(compile('<hot-table datarows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
-    expect(scope.hotInstance.getData()).toEqual(rootScope.value);
+    expect(scope.hotInstance.getSettings().data).toBe(rootScope.value);
   });
   
-  it('should ensure a copy of `datarows` is made when the reference is changed but it has the same value', function() {
-    rootScope.value = [[null]];
+  it('should ensure a new copy of `datarows` is made when the reference is changed but it has the same value', function() {
+    rootScope.value = [[1,2,3,4]];
     var scope = angular.element(compile('<hot-table datarows="value"></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
-    expect(scope.hotInstance.getData()).toEqual(rootScope.value);
-    
-    scope.value = [[null]];
-    
+    expect(scope.hotInstance.getSettings().data).toBe(rootScope.value);
+
+    rootScope.value = [[1, 2, 3, 4]];
+
+    rootScope.$digest();
+
+    expect(scope.hotInstance.getSettings().data).toBe(rootScope.value);
+
+    rootScope.value.push([[5, 6, 7, 8]]);
     scope.$digest();
-    
-    expect(scope.hotInstance.getData()).toEqual(rootScope.value);
-    
-    rootScope.value.push([null]);
-    
-    expect(scope.hotInstance.getData()).toEqual(rootScope.value);
+
+    expect(scope.hotInstance.getSettings().data).toBe(rootScope.value);
   });
   
   it('should create table with `dataSchema` attribute', function() {

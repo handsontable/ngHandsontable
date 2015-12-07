@@ -129,6 +129,9 @@
            * TODO: must the remaining bindingsKeys need to be added also if their reference changes
            */
           scope.$watch('datarows', function(newValue) {
+            if (newValue === void 0) {
+              return;
+            }
             if (scope.hotInstance.getSettings().data !== newValue) {
               scope.hotInstance.loadData(newValue);
             }

@@ -104,15 +104,6 @@
           };
           scope.hotInstance = settingFactory.initializeHandsontable(element, scope.htSettings);
 
-          var dataRowsRefresh = function(scope, newValue) {
-            // If reference to data rows is not changed then only re-render table
-            if (scope.hotInstance.getSettings().data === newValue) {
-                  settingFactory.renderHandsontable(scope.hotInstance);
-                } else {
-                  scope.hotInstance.loadData(newValue);
-                }
-          }
-
           // TODO: Add watch properties descriptor + needs perf test. Watch full equality vs toJson
           angular.forEach(bindingsKeys, function(key) {
             scope.$watch(key, function(newValue, oldValue) {
@@ -120,7 +111,12 @@
                 return;
               }
               if (key === 'datarows') {
-                dataRowsRefresh(scope, newValue);
+                  // If reference to data rows is not changed then only re-render table
+                  if (scope.hotInstance.getSettings().data === newValue) {
+                      settingFactory.renderHandsontable(scope.hotInstance);
+                  } else {
+                      scope.hotInstance.loadData(newValue);
+                  }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
@@ -133,10 +129,9 @@
            * TODO: must the remaining bindingsKeys need to be added also if their reference changes
            */
           scope.$watch('datarows', function(newValue) {
-            if (newValue === void 0) {
-              return;
+            if (scope.hotInstance.getSettings().data !== newValue) {
+              scope.hotInstance.loadData(newValue);
             }
-            dataRowsRefresh(scope, newValue);
           });
 
           /**

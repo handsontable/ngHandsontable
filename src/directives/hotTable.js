@@ -116,6 +116,8 @@
                   settingFactory.renderHandsontable(scope.hotInstance);
                 } else {
                   scope.hotInstance.loadData(newValue);
+                  scope.htSettings.data = newValue;
+
                 }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;

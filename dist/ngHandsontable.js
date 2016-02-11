@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.7.0
+ * ngHandsontable 0.8.0
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Oct 15 2015 12:36:18 GMT+0200 (CEST)
+ * Date: Thu Feb 11 2016 16:39:03 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -562,6 +562,8 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
                   settingFactory.renderHandsontable(scope.hotInstance);
                 } else {
                   scope.hotInstance.loadData(newValue);
+                  scope.htSettings.data = newValue;
+
                 }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;

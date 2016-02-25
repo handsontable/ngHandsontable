@@ -111,12 +111,13 @@
                 return;
               }
               if (key === 'datarows') {
-                  // If reference to data rows is not changed then only re-render table
-                  if (scope.hotInstance.getSettings().data === newValue) {
-                      settingFactory.renderHandsontable(scope.hotInstance);
-                  } else {
-                      scope.hotInstance.loadData(newValue);
-                  }
+                // If reference to data rows is not changed then only re-render table
+                if (scope.hotInstance.getSettings().data === newValue) {
+                  settingFactory.renderHandsontable(scope.hotInstance);
+                } else {
+                  scope.hotInstance.loadData(newValue);
+                  scope.htSettings.data = newValue;
+                }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);

@@ -117,7 +117,8 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('default', ['jscs', 'jshint', 'concat', 'uglify']);
+  grunt.registerTask('build', ['jscs', 'jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['build']);
   grunt.registerTask('watch-demo-app', ['browserify:demoAppWatch']);
   grunt.registerTask('build-demo-app', ['browserify:demoApp']);
 

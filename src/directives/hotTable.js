@@ -117,13 +117,25 @@
                 } else {
                   scope.hotInstance.loadData(newValue);
                   scope.htSettings.data = newValue;
-
                 }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }
             }, ['datarows', 'columns', 'rowHeights', 'colWidths', 'rowHeaders', 'colHeaders'].indexOf(key) >= 0);
+          });
+          
+          /**
+           * Check for reference equality changes for datarows
+           * TODO: must the remaining bindingsKeys need to be added also if their reference changes
+           */
+          scope.$watch('datarows', function(newValue) {
+            if (newValue === void 0) {
+              return;
+            }
+            if (scope.hotInstance.getSettings().data !== newValue) {
+              scope.hotInstance.loadData(newValue);
+            }
           });
 
           /**

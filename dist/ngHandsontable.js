@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.8.0
+ * ngHandsontable 0.9.0
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Feb 11 2016 16:39:03 GMT+0100 (CET)
+ * Date: Thu Mar 03 2016 16:35:01 GMT+0100 (CET)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower

@@ -38,7 +38,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
     config.$inject = ['$sceDelegateProvider', '$httpProvider', '$stateProvider', '$compileProvider', '$urlRouterProvider', 'demoMapProvider'];
 
-    app.constant('version', 'v0.8.0');
+    app.constant('version', 'v0.9.0');
     app.config(config);
 
     angular.element(document).ready(function() {
@@ -346,7 +346,34 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         title: 'Custom renderer',
         description: 'Custom renderer'
       },
-    }
+    },
+    'PRO': {
+      'collapsing-columns-with-nested-headers': {
+        url: getUrl('wilani/3'),
+        title: 'Collapsing columns with nested headers',
+        description: 'Create a nested, hierarchical structure of headers with expandable and collapsible columns'
+      },
+      'filtering-simple': {
+        url: getUrl('fijida/3'),
+        title: 'Data filtering (simple example)',
+        description: 'Display rows that meet your criteria and hide the rest'
+      },
+      'filtering-external-inputs': {
+        url: getUrl('rewefa/9'),
+        title: 'Data filtering (external inputs)',
+        description: 'Display rows that meet your criteria and hide the rest'
+      },
+      'hiding-columns': {
+        url: getUrl('wapufa/2'),
+        title: 'Hiding columns',
+        description: 'Hide specific columns and show the rest'
+      },
+      'hiding-rows': {
+        url: getUrl('roximi/3'),
+        title: 'Hiding rows',
+        description: 'Hide specific rows and show the rest'
+      },
+    },
   };
 }());
 

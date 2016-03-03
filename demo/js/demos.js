@@ -105,6 +105,33 @@
         title: 'Custom renderer',
         description: 'Custom renderer'
       },
-    }
+    },
+    'PRO': {
+      'collapsing-columns-with-nested-headers': {
+        url: getUrl('wilani/3'),
+        title: 'Collapsing columns with nested headers',
+        description: 'Create a nested, hierarchical structure of headers with expandable and collapsible columns'
+      },
+      'filtering-simple': {
+        url: getUrl('fijida/3'),
+        title: 'Data filtering (simple example)',
+        description: 'Display rows that meet your criteria and hide the rest'
+      },
+      'filtering-external-inputs': {
+        url: getUrl('rewefa/9'),
+        title: 'Data filtering (external inputs)',
+        description: 'Display rows that meet your criteria and hide the rest'
+      },
+      'hiding-columns': {
+        url: getUrl('wapufa/2'),
+        title: 'Hiding columns',
+        description: 'Hide specific columns and show the rest'
+      },
+      'hiding-rows': {
+        url: getUrl('roximi/3'),
+        title: 'Hiding rows',
+        description: 'Hide specific rows and show the rest'
+      },
+    },
   };
 }());

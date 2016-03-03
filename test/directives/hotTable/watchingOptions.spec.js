@@ -20,7 +20,8 @@ describe('hotTable - Watching options', function() {
 
     scope.$digest();
 
-    expect(scope.hotInstance.getData()).toBe(rootScope.value);
+    expect(scope.hotInstance.getSourceData()).toBe(rootScope.value);
+    expect(scope.hotInstance.getData()).toEqual([[null]]);
   });
 
   it('should create table with `dataSchema` attribute', function() {

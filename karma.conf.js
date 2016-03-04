@@ -17,9 +17,7 @@ module.exports = function(config) {
     files: [
       'test/phantom-polyfill.js',
       'node_modules/handsontable/dist/handsontable.full.js',
-      'src/*.js',
-      'src/**/*.js',
-      'test/*.spec.js',
+      'dist/*.js',
       'test/**/*.spec.js'
     ],
 
@@ -71,4 +69,4 @@ module.exports = function(config) {
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: false
   });
-}
+};

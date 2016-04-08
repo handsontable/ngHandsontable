@@ -17,6 +17,12 @@ Include the library files:
 <script src="dist/ngHandsontable.js"></script>
 ```
 
+Include component to your app:
+
+```js
+angular.module('my-app', ['ngHandsontable']);
+```
+
 Template:
 
 ```html

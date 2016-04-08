@@ -11,6 +11,7 @@ describe('settingFactory', function() {
     var element = [{appendChild: jasmine.createSpy('appendChild')}];
     var hotSettings = {colHeaders: [1, 2], width: 200, columns: [{width: 100}]};
     var hotInstance = {};
+
     window.HandsontableOrg = Handsontable;
     window.Handsontable = function(element, settings) {
       hotInstance.element = element;
@@ -23,6 +24,26 @@ describe('settingFactory', function() {
     expect(element[0].appendChild.calls.argsFor(0)[0].nodeName).toBe('DIV');
     expect(hotInstance.element.nodeName).toBe('DIV');
     expect(hotInstance.settings).toBe(hotSettings);
+
+    window.Handsontable = HandsontableOrg;
+  }));
+
+  it('should create new div element with "id" defined from hot-id attribute', inject(function(settingFactory) {
+    var element = [{appendChild: jasmine.createSpy('appendChild')}];
+    var hotSettings = {hotId: 'my-table', colHeaders: [1, 2], width: 200, columns: [{width: 100}]};
+    var hotInstance = {};
+
+    window.HandsontableOrg = Handsontable;
+    window.Handsontable = function(element, settings) {
+      hotInstance.element = element;
+      hotInstance.settings = settings;
+    };
+
+    settingFactory.initializeHandsontable(element, hotSettings);
+
+    expect(element[0].appendChild).toHaveBeenCalled();
+    expect(element[0].appendChild.calls.argsFor(0)[0].nodeName).toBe('DIV');
+    expect(hotInstance.element.id).toBe('my-table');
 
     window.Handsontable = HandsontableOrg;
   }));

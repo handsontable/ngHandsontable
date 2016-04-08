@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.9.0
+ * ngHandsontable 0.10.0
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Mar 03 2016 16:35:01 GMT+0100 (CET)
+ * Date: Fri Apr 08 2016 16:20:06 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -132,6 +132,10 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
           hot;
 
         container.className = this.containerClassName;
+
+        if (!container.id && htSettings.hotId) {
+          container.id = htSettings.hotId;
+        }
         element[0].appendChild(container);
         hot = new Handsontable(container, htSettings);
 

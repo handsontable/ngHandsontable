@@ -31,7 +31,7 @@
           hot;
 
         container.className = this.containerClassName;
-        
+
         if (!container.id && htSettings.hotId) {
           container.id = htSettings.hotId;
         }

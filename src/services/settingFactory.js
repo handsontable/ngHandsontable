@@ -31,7 +31,10 @@
           hot;
 
         container.className = this.containerClassName;
-        container.id = htSettings.hotId;
+        
+        if (!container.id && htSettings.hotId) {
+          container.id = htSettings.hotId;
+        }
         element[0].appendChild(container);
         hot = new Handsontable(container, htSettings);
 

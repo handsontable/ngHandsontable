@@ -4,7 +4,7 @@ Enables creation of data grid applications in AngularJS.
 
 ## Demo
 
-See the demo at http://handsontable.github.io/ngHandsontable
+See the demo at http://handsontable.github.io/ngHandsontable.
 
 ## Usage
 

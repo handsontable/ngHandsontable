@@ -121,6 +121,7 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['build']);
   grunt.registerTask('watch-demo-app', ['browserify:demoAppWatch']);
   grunt.registerTask('build-demo-app', ['browserify:demoApp']);
+  grunt.registerTask('build-release', ['build', 'build-demo-app']);
 
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-concat');

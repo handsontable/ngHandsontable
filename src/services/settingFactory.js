@@ -32,7 +32,7 @@
 
         container.className = this.containerClassName;
 
-        if (!container.id && htSettings.hotId) {
+        if (htSettings.hotId) {
           container.id = htSettings.hotId;
         }
         element[0].appendChild(container);

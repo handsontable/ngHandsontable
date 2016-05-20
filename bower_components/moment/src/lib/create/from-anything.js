@@ -6,6 +6,7 @@ import { Moment, isMoment } from '../moment/constructor';
 import { getLocale } from '../locale/locales';
 import { hooks } from '../utils/hooks';
 import checkOverflow from './check-overflow';
+import { isValid } from './valid';
 
 import { configFromStringAndArray }  from './from-string-and-array';
 import { configFromStringAndFormat } from './from-string-and-format';
@@ -50,15 +51,19 @@ export function prepareConfig (config) {
         configFromInput(config);
     }
 
+    if (!isValid(config)) {
+        config._d = null;
+    }
+
     return config;
 }
 
 function configFromInput(config) {
     var input = config._i;
     if (input === undefined) {
-        config._d = new Date();
+        config._d = new Date(hooks.now());
     } else if (isDate(input)) {
-        config._d = new Date(+input);
+        config._d = new Date(input.valueOf());
     } else if (typeof input === 'string') {
         configFromString(config);
     } else if (isArray(input)) {

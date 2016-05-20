@@ -30,14 +30,20 @@ proto.set             = set;
 import {
     localeMonthsParse,
     defaultLocaleMonths,      localeMonths,
-    defaultLocaleMonthsShort, localeMonthsShort
+    defaultLocaleMonthsShort, localeMonthsShort,
+    defaultMonthsRegex,       monthsRegex,
+    defaultMonthsShortRegex,  monthsShortRegex
 } from '../units/month';
 
-proto.months       =        localeMonths;
-proto._months      = defaultLocaleMonths;
-proto.monthsShort  =        localeMonthsShort;
-proto._monthsShort = defaultLocaleMonthsShort;
-proto.monthsParse  =        localeMonthsParse;
+proto.months            =        localeMonths;
+proto._months           = defaultLocaleMonths;
+proto.monthsShort       =        localeMonthsShort;
+proto._monthsShort      = defaultLocaleMonthsShort;
+proto.monthsParse       =        localeMonthsParse;
+proto._monthsRegex      = defaultMonthsRegex;
+proto.monthsRegex       = monthsRegex;
+proto._monthsShortRegex = defaultMonthsShortRegex;
+proto.monthsShortRegex  = monthsShortRegex;
 
 // Week
 import { localeWeek, defaultLocaleWeek, localeFirstDayOfYear, localeFirstDayOfWeek } from '../units/week';
@@ -51,7 +57,11 @@ import {
     localeWeekdaysParse,
     defaultLocaleWeekdays,      localeWeekdays,
     defaultLocaleWeekdaysMin,   localeWeekdaysMin,
-    defaultLocaleWeekdaysShort, localeWeekdaysShort
+    defaultLocaleWeekdaysShort, localeWeekdaysShort,
+
+    defaultWeekdaysRegex, weekdaysRegex,
+    defaultWeekdaysShortRegex, weekdaysShortRegex,
+    defaultWeekdaysMinRegex, weekdaysMinRegex
 } from '../units/day-of-week';
 
 proto.weekdays       =        localeWeekdays;
@@ -61,6 +71,13 @@ proto._weekdaysMin   = defaultLocaleWeekdaysMin;
 proto.weekdaysShort  =        localeWeekdaysShort;
 proto._weekdaysShort = defaultLocaleWeekdaysShort;
 proto.weekdaysParse  =        localeWeekdaysParse;
+
+proto._weekdaysRegex      = defaultWeekdaysRegex;
+proto.weekdaysRegex       =        weekdaysRegex;
+proto._weekdaysShortRegex = defaultWeekdaysShortRegex;
+proto.weekdaysShortRegex  =        weekdaysShortRegex;
+proto._weekdaysMinRegex   = defaultWeekdaysMinRegex;
+proto.weekdaysMinRegex    =        weekdaysMinRegex;
 
 // Hours
 import { localeIsPM, defaultLocaleMeridiemParse, localeMeridiem } from '../units/hour';

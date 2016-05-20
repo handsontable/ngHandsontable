@@ -28,7 +28,7 @@ describe('settingFactory', function() {
     window.Handsontable = HandsontableOrg;
   }));
 
-  it('should create new div element with "id" defined from hot-id attribute', inject(function(settingFactory) {
+  it('should set "id" attribute of wrapper element when "hot-id" attribute is defined', inject(function(settingFactory) {
     var element = [{appendChild: jasmine.createSpy('appendChild')}];
     var hotSettings = {hotId: 'my-table', colHeaders: [1, 2], width: 200, columns: [{width: 100}]};
     var hotInstance = {};
@@ -41,9 +41,7 @@ describe('settingFactory', function() {
 
     settingFactory.initializeHandsontable(element, hotSettings);
 
-    expect(element[0].appendChild).toHaveBeenCalled();
-    expect(element[0].appendChild.calls.argsFor(0)[0].nodeName).toBe('DIV');
-    expect(hotInstance.element.id).toBe('my-table');
+    expect(element[0].appendChild.calls.argsFor(0)[0].id).toBe('my-table');
 
     window.Handsontable = HandsontableOrg;
   }));

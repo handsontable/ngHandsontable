@@ -1,11 +1,11 @@
 /**
- * ngHandsontable 0.10.0
+ * ngHandsontable 0.11.1
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Fri Apr 08 2016 16:20:06 GMT+0200 (CEST)
+ * Date: Fri May 20 2016 09:23:23 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -133,7 +133,7 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
 
         container.className = this.containerClassName;
 
-        if (!container.id && htSettings.hotId) {
+        if (htSettings.hotId) {
           container.id = htSettings.hotId;
         }
         element[0].appendChild(container);
@@ -567,13 +567,25 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
                 } else {
                   scope.hotInstance.loadData(newValue);
                   scope.htSettings.data = newValue;
-
                 }
               } else if (newValue !== oldValue) {
                 scope.htSettings[key] = newValue;
                 settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
               }
             }, ['datarows', 'columns', 'rowHeights', 'colWidths', 'rowHeaders', 'colHeaders'].indexOf(key) >= 0);
+          });
+
+          /**
+           * Check for reference equality changes for datarows
+           * TODO: must the remaining bindingsKeys need to be added also if their reference changes
+           */
+          scope.$watch('datarows', function(newValue) {
+            if (newValue === void 0) {
+              return;
+            }
+            if (scope.hotInstance.getSettings().data !== newValue) {
+              scope.hotInstance.loadData(newValue);
+            }
           });
 
           /**

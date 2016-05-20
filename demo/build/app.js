@@ -38,7 +38,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
     config.$inject = ['$sceDelegateProvider', '$httpProvider', '$stateProvider', '$compileProvider', '$urlRouterProvider', 'demoMapProvider'];
 
-    app.constant('version', 'v0.10.0');
+    app.constant('version', 'v0.11.1');
     app.config(config);
 
     angular.element(document).ready(function() {

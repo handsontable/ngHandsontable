@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/ngHandsontable/issues"
   },
   "author": "Marcin Warpechowski <hello@handsontable.com>",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "devDependencies": {
     "angular": "^1.5.0",
     "angular-mocks": "^1.5.0",

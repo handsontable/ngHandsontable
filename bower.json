@@ -3,7 +3,7 @@
   "dependencies": {
     "angular": "~1.4",
     "angular-ui-router": "~0.2.15",
-    "handsontable": "~0.24.0"
+    "handsontable": "~0.25.0"
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [

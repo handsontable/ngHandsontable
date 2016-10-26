@@ -14,7 +14,7 @@
     "npm publish"
   ],
   "files_to_commit": [
-    "./dist/**/*"
+    "./dist/**/*",
     "./demo/**/*"
   ]
 }

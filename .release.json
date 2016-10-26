@@ -10,9 +10,7 @@
     "npm run test"
   ],
   "post_commit_commands": [],
-  "post_complete_commands": [
-    "npm publish"
-  ],
+  "post_complete_commands": [],
   "files_to_commit": [
     "./dist/**/*"
   ]

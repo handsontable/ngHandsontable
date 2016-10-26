@@ -13,5 +13,6 @@
   "post_complete_commands": [],
   "files_to_commit": [
     "./dist/**/*"
+    "./demo/**/*"
   ]
 }

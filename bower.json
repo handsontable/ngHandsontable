@@ -1,8 +1,8 @@
 {
   "name": "ngHandsontable",
   "dependencies": {
-    "angular": "~1.4",
-    "handsontable": "~0.25.0"
+    "angular": "~1.5.0",
+    "handsontable": "~0.28.4"
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [
@@ -28,8 +28,5 @@
     "src",
     "test",
     "tests"
-  ],
-  "devDependencies": {
-    "angular-ui-router": "~0.2.15"
-  }
+  ]
 }

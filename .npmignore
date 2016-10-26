@@ -1,0 +1,24 @@
+# Editor conf
+.idea
+dump.rdb
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+coverage
+node_modules
+bower_components
+
+# Common
+tmp
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+lib-cov
+dev.html

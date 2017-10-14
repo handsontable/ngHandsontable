@@ -356,33 +356,6 @@ describe('hotTable - Watching options', function() {
     expect(scope.hotInstance.getSettings().autoWrapCol).toBe(rootScope.value);
   });
 
-  it('should create table with `copyRowsLimit` attribute', function() {
-    rootScope.value = 563;
-    var scope = angular.element(compile('<hot-table copy-rows-limit="value"></hot-table>')(rootScope)).isolateScope();
-
-    scope.$digest();
-
-    expect(scope.hotInstance.getSettings().copyRowsLimit).toBe(rootScope.value);
-  });
-
-  it('should create table with `copyColsLimit` attribute', function() {
-    rootScope.value = 563;
-    var scope = angular.element(compile('<hot-table copy-cols-limit="value"></hot-table>')(rootScope)).isolateScope();
-
-    scope.$digest();
-
-    expect(scope.hotInstance.getSettings().copyColsLimit).toBe(rootScope.value);
-  });
-
-  it('should create table with `pasteMode` attribute', function() {
-    rootScope.value = 'test';
-    var scope = angular.element(compile('<hot-table paste-mode="value"></hot-table>')(rootScope)).isolateScope();
-
-    scope.$digest();
-
-    expect(scope.hotInstance.getSettings().pasteMode).toBe(rootScope.value);
-  });
-
   it('should create table with `persistentState` attribute', function() {
     rootScope.value = true;
     var scope = angular.element(compile('<hot-table persistent-state="value"></hot-table>')(rootScope)).isolateScope();

@@ -13,7 +13,7 @@
   "version": "0.13.0",
   "dependencies": {
     "angular": "^1.5.0",
-    "handsontable": "^0.28.0"
+    "handsontable": "^5.0.2"
   },
   "devDependencies": {
     "angular": "^1.5.0",
@@ -21,7 +21,7 @@
     "angular-ui-router": "^0.2.15",
     "browserify-replace": "^0.9.0",
     "generate-release": "^0.10.2",
-    "grunt": "~0.4.5",
+    "grunt": "1.0.3",
     "grunt-browserify": "^4.0.0",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",

@@ -13,7 +13,7 @@
   "version": "0.13.0",
   "dependencies": {
     "angular": "^1.5.0",
-    "handsontable": "^0.28.0"
+    "handsontable": "6.1.1"
   },
   "devDependencies": {
     "angular": "^1.5.0",

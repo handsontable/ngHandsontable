@@ -2,7 +2,7 @@
   "name": "ngHandsontable",
   "dependencies": {
     "angular": "~1.5.0",
-    "handsontable": "~0.28.4"
+    "handsontable": "7.2.2"
   },
   "homepage": "https://github.com/handsontable/ngHandsontable",
   "authors": [

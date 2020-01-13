@@ -20,7 +20,7 @@
     "angular-mocks": "^1.5.0",
     "angular-ui-router": "^0.2.15",
     "browserify-replace": "^0.9.0",
-    "generate-release": "^0.10.2",
+    "generate-release": "^1.1.1",
     "grunt": "~0.4.5",
     "grunt-browserify": "^4.0.0",
     "grunt-contrib-concat": "^1.0.0",

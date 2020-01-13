@@ -27,7 +27,7 @@
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-jscs": "^2.8.0",
+    "grunt-jscs": "^3.0.1",
     "jasmine-core": "^2.4.0",
     "karma": "^0.13.0",
     "karma-angular": "^0.0.6",

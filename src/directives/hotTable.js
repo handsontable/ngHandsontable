@@ -20,6 +20,10 @@
           settingFactory.updateHandsontableSettings($scope.hotInstance, $scope.htSettings);
         };
         this.removeColumnSetting = function(column) {
+          if (!$scope.hotInstance) {
+            return;
+          }
+
           if ($scope.htSettings.columns.indexOf(column) > -1) {
             $scope.htSettings.columns.splice($scope.htSettings.columns.indexOf(column), 1);
             settingFactory.updateHandsontableSettings($scope.hotInstance, $scope.htSettings);
@@ -146,6 +150,24 @@
               scope.htSettings.data = scope.datarows;
               settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
             }
+          });
+
+          function destroyInstance() {
+            if (scope.hotInstance) {
+              scope.hotInstance.destroy();
+              scope.hotInstance = null;
+              scope.htSettings = {};
+            }
+          }
+
+          // Destroy triggered by controller or scope destroying
+          scope.$on('$destroy', function() {
+            destroyInstance();
+          });
+
+          // Destroy triggered by DOM element removing
+          element.on('$destroy', function() {
+            destroyInstance();
           });
         };
       }

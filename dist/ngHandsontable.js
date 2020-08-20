@@ -1,11 +1,11 @@
 /**
- * ng-handsontable 0.13.0
+ * ng-handsontable 0.13.1
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Wed Oct 26 2016 10:00:05 GMT+0200 (CEST)
+ * Date: Thu Aug 20 2020 11:07:09 GMT+0200 (CEST)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -470,6 +470,10 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
           settingFactory.updateHandsontableSettings($scope.hotInstance, $scope.htSettings);
         };
         this.removeColumnSetting = function(column) {
+          if (!$scope.hotInstance) {
+            return;
+          }
+
           if ($scope.htSettings.columns.indexOf(column) > -1) {
             $scope.htSettings.columns.splice($scope.htSettings.columns.indexOf(column), 1);
             settingFactory.updateHandsontableSettings($scope.hotInstance, $scope.htSettings);
@@ -596,6 +600,24 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
               scope.htSettings.data = scope.datarows;
               settingFactory.updateHandsontableSettings(scope.hotInstance, scope.htSettings);
             }
+          });
+
+          function destroyInstance() {
+            if (scope.hotInstance) {
+              scope.hotInstance.destroy();
+              scope.hotInstance = null;
+              scope.htSettings = {};
+            }
+          }
+
+          // Destroy triggered by controller or scope destroying
+          scope.$on('$destroy', function() {
+            destroyInstance();
+          });
+
+          // Destroy triggered by DOM element removing
+          element.on('$destroy', function() {
+            destroyInstance();
           });
         };
       }

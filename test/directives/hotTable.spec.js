@@ -14,12 +14,29 @@ describe('hotTable', function() {
     angular.element(document.querySelector('hot-table')).remove();
   });
 
-  it('should create Handsontable table', function() {
+  it('should create the Handsontable table', function() {
     var scope = angular.element(compile('<hot-table></hot-table>')(rootScope)).isolateScope();
 
     scope.$digest();
 
     expect(scope.hotInstance).toBeDefined();
+  });
+
+  it('should destroy the Handsontable table when the scope is destroyed', function() {
+    var scope = angular.element(compile('<hot-table></hot-table>')(rootScope)).isolateScope();
+
+    scope.$destroy();
+
+    expect(scope.hotInstance).toBeNull();
+  });
+
+  it('should destroy the Handsontable table when the DOM element is removed', function() {
+    var element = angular.element(compile('<hot-table></hot-table>')(rootScope));
+    var scope = element.isolateScope();
+
+    element.remove();
+
+    expect(scope.hotInstance).toBeNull();
   });
 
   it('should re-render table after datarows change', function(done) {

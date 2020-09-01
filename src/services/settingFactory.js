@@ -214,7 +214,14 @@
        * @returns {Array}
        */
       getAvailableSettings: function(hyphenateStyle) {
-        var settings = Object.keys(Handsontable.DefaultSettings.prototype);
+        var defaultSettings = Handsontable.DefaultSettings.prototype;
+
+        // For Handsontable v8 the prototype is `undefined`.
+        if (defaultSettings === void 0) {
+          defaultSettings = Handsontable.DefaultSettings;
+        }
+
+        var settings = Object.keys(defaultSettings);
 
         if (settings.indexOf('contextMenuCopyPaste') === -1) {
           settings.push('contextMenuCopyPaste');

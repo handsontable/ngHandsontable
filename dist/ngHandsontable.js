@@ -1,11 +1,11 @@
 /**
- * ng-handsontable 0.13.1
+ * ng-handsontable 0.13.2
  * 
  * Copyright 2012-2015 Marcin Warpechowski
  * Copyright 2015 Handsoncode sp. z o.o. <hello@handsontable.com>
  * Licensed under the MIT license.
  * https://github.com/handsontable/ngHandsontable
- * Date: Thu Aug 20 2020 11:07:09 GMT+0200 (CEST)
+ * Date: Tue Sep 01 2020 09:23:44 GMT+0200 (czas środkowoeuropejski letni)
 */
 
 if (document.all && !document.addEventListener) { // IE 8 and lower
@@ -315,7 +315,14 @@ Handsontable.hooks.add('afterContextMenuShow', function() {
        * @returns {Array}
        */
       getAvailableSettings: function(hyphenateStyle) {
-        var settings = Object.keys(Handsontable.DefaultSettings.prototype);
+        var defaultSettings = Handsontable.DefaultSettings.prototype;
+
+        // For Handsontable v8 the prototype is `undefined`.
+        if (defaultSettings === void 0) {
+          defaultSettings = Handsontable.DefaultSettings;
+        }
+
+        var settings = Object.keys(defaultSettings);
 
         if (settings.indexOf('contextMenuCopyPaste') === -1) {
           settings.push('contextMenuCopyPaste');

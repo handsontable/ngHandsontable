@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/ngHandsontable/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "dependencies": {
     "angular": "^1.5.0",
     "handsontable": "^0.28.0"

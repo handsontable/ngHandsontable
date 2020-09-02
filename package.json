@@ -2,6 +2,7 @@
   "name": "ng-handsontable",
   "description": "AngularJS directive for Handsontable",
   "homepage": "https://github.com/handsontable/ngHandsontable",
+  "main": "dist/ngHandsontable.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/handsontable/ngHandsontable.git"

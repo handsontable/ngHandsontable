@@ -1,0 +1,179 @@
+<!doctype html>
+<html data-ng-app="ngHandsontablePage">
+<head>
+  <meta charset='utf-8'>
+  <title>ngHandsontable.Angular version of Handsontable library</title>
+
+  <!-- Code highlighter -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="demo/css/main.css"/>
+
+  <!--
+  Loading Handsontable (full distribution that includes all dependencies)
+  -->
+  <link data-jsfiddle="common" rel="stylesheet" media="screen" href="node_modules/handsontable/dist/handsontable.full.css">
+  <script data-jsfiddle="common" src="node_modules/angular/angular.js"></script>
+  <script data-jsfiddle="common" src="node_modules/handsontable/dist/handsontable.full.js"></script>
+  <script data-jsfiddle="common" src="dist/ngHandsontable.js"></script>
+
+  <script data-jsfiddle="common" src="demo/js/services/dataFactory.js"></script>
+
+  <!--
+  Facebook open graph. Don't copy this to your project :)
+  -->
+  <meta property="og:title" content="ngHandsontable - Angular wrapper for Handsontable">
+  <meta property="og:description" content="Excel-like data grid with HTML &amp; JavaScript">
+  <meta property="og:url" content="http://handsontable.com/">
+  <meta property="og:image" content="http://handsontable.com/demo/image/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="409">
+  <meta property="og:image:height" content="164">
+  <link rel="canonical" href="http://handsontable.com/">
+</head>
+
+<body class="home" data-ng-controller="MainCtrl as ctrl">
+<div id="wrapper">
+  <header>
+    <h1>ngHandsontable</h1>
+    <h2 class="logo-desc">Angular wrapper for <a href="http://handsontable.com">Handsontable</a> data grid editor</h2>
+    <img class="angular" src="demo/images/angular@2x.png" alt="AngularJS">
+  </header>
+
+  <h2>Install</h2>
+  <br>
+  Install the component using Bower:
+  <pre><code class="bash">
+    $ bower install ngHandsontable --save
+  </code></pre>
+  using NPM:
+  <pre><code class="bash">
+    $ npm install ng-handsontable --save
+  </code></pre>
+  Or <a href="https://github.com/handsontable/ngHandsontable/archive/master.zip">download as ZIP</a>.
+
+  <h2>Usage</h2>
+  <br>
+  1. Include the library files:
+  <pre><code class="html">
+    &#x3C;link rel="stylesheet" media="screen" href="bower_components/handsontable/dist/handsontable.full.css"&#x3E;
+
+    &#x3C;script src="bower_components/angular/angular.js"&#x3E;&#x3C;/script&#x3E;
+    &#x3C;script src="bower_components/handsontable/dist/handsontable.full.js"&#x3E;&#x3C;/script&#x3E;
+    &#x3C;script src="bower_components/dist/ngHandsontable.js"&#x3E;&#x3C;/script&#x3E;
+  </code></pre>
+  2. Start using it!
+  <pre><code class="html">
+    &#x3C;hot-table datarows=&#x22;db.items&#x22;&#x3E;&#x3C;/hot-table&#x3E;
+  </code></pre>
+
+  <p>
+    <em>Note: ngHandsontable supports angular in version 1.3 and greater.</em>
+  </p>
+
+  <a href="https://github.com/handsontable/ngHandsontable" class="fork-me">
+    <img src="http://aral.github.com/fork-me-on-github-retina-ribbons/right-dusk-blue@2x.png" alt="Fork me on GitHub">
+  </a>
+
+  <h2>Simple Example</h2>
+
+  <div class="example">
+    <hot-table
+      settings="ctrl.settings"
+      row-headers="ctrl.rowHeaders"
+      min-spare-rows="ctrl.minSpareRows"
+      datarows="ctrl.db.items"
+      height="300"
+      width="700">
+        <hot-column data="id" title="'ID'"></hot-column>
+        <hot-column data="name.first" title="'First Name'" type="'text'" read-only></hot-column>
+        <hot-column data="name.last" title="'Last Name'" read-only></hot-column>
+        <hot-column data="address" title="'Address'" width="150"></hot-column>
+        <hot-column data="product.description" title="'Favorite food'" type="'autocomplete'">
+          <hot-autocomplete datarows="description in product.options"></hot-autocomplete>
+        </hot-column>
+        <hot-column data="price" title="'Price'" type="'numeric'" width="80" format="'$ 0,0.00'"></hot-column>
+        <hot-column data="isActive" title="'Is active'" type="'checkbox'" checked-template="'Yes'"
+                    unchecked-template="'No'"></hot-column>
+    </hot-table>
+  </div>
+
+  <h2>Code</h2>
+
+  <pre><code class="html">
+  &#x3C;hot-table
+    settings=&#x22;ctrl.settings&#x22;
+    row-headers=&#x22;ctrl.rowHeaders&#x22;
+    min-spare-rows=&#x22;ctrl.minSpareRows&#x22;
+    datarows=&#x22;ctrl.db.items&#x22;
+    height=&#x22;300&#x22;
+    width=&#x22;700&#x22;&#x3E;
+      &#x3C;hot-column data=&#x22;id&#x22; title=&#x22;&#x27;ID&#x27;&#x22;&#x3E;&#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;name.first&#x22; title=&#x22;&#x27;First Name&#x27;&#x22; type=&#x22;&#x27;text&#x27;&#x22; read-only&#x3E;&#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;name.last&#x22; title=&#x22;&#x27;Last Name&#x27;&#x22; read-only&#x3E;&#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;address&#x22; title=&#x22;&#x27;Address&#x27;&#x22; width=&#x22;150&#x22;&#x3E;&#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;product.description&#x22; title=&#x22;&#x27;Favorite food&#x27;&#x22; type=&#x22;&#x27;autocomplete&#x27;&#x22;&#x3E;
+        &#x3C;hot-autocomplete datarows=&#x22;description in product.options&#x22;&#x3E;&#x3C;/hot-autocomplete&#x3E;
+      &#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;price&#x22; title=&#x22;&#x27;Price&#x27;&#x22; type=&#x22;&#x27;numeric&#x27;&#x22; width=&#x22;80&#x22; format=&#x22;&#x27;$ 0,0.00&#x27;&#x22;&#x3E;&#x3C;/hot-column&#x3E;
+      &#x3C;hot-column data=&#x22;isActive&#x22; title=&#x22;&#x27;Is active&#x27;&#x22; type=&#x22;&#x27;checkbox&#x27;&#x22; checked-template=&#x22;&#x27;Yes&#x27;&#x22;
+                  unchecked-template=&#x22;&#x27;No&#x27;&#x22;&#x3E;&#x3C;/hot-column&#x3E;
+  &#x3C;/hot-table&#x3E;
+  </code></pre>
+
+  <p>
+    The main directive for ngHandsontable is <b>&#x3C;hot-table&#x3E;</b>. To define columns you can use
+    <b>&#x3C;hot-column&#x3E;</b> directive inside <b>&#x3C;hot-table&#x3E;</b> directive.
+    All Handsontable <a href="http://docs.handsontable.com/Options.html">options</a> described in documentation should be supported.
+  </p>
+  <p>
+    You can put all your settings in settings object e.g. settings="{colHeaders: true, contextMenu: true}" attribute or in
+    separated attributes, e.g. min-spare-rows="minSpareRows", row-headers="false".
+  </p>
+  <p>
+    It's recommended to put all your settings in one big object (<code>settings="ctrl.settings"</code>).
+    Settings attribute unlike any other attributes is not watched so using this can be helpful to achieve higher performance.
+  </p>
+
+  <h2>More demos</h2>
+  <ul>
+    <li><a href="demo/index.html#/intro-simple-example">Simple example</a></li>
+    <li><a href="demo/index.html#/columns-add-remove-column-ng-repeat">Add/Remove dynamically column</a></li>
+    <li><a href="demo/index.html#/binding-data-binding">Data binding</a></li>
+    <li><a href="demo/index.html#/callbacks-callbacks-by-object">Callbacks</a></li>
+    <li><a href="demo/index.html#/pagination-rows-pagination">Pagination</a></li>
+    <li><a href="demo/index.html#/PRO-filtering-external-inputs">Data filtering</a></li>
+    <li><a href="demo/index.html#/PRO-collapsing-columns-with-nested-headers">Collapsing columns with nested headers</a></li>
+    <li><a href="demo/index.html">More...</a></li>
+  </ul>
+
+  <h2>PRO features</h2>
+  <br>
+  To install Handsontable PRO overwrite regular handsontable version with new one:
+  <pre><code class="bash">
+    $ bower install handsontable=git@git.handsontable.com:handsontable/handsontable-pro.git --save
+  </code></pre>
+  <i>If you don't have license for Pro yet, please click <a href="https://handsontable.com/pricing.html">here</a> for more info.</i>
+
+
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script>
+    (function() {
+      function MainCtrl($scope, dataFactory) {
+        this.minSpareRows = 1;
+        this.rowHeaders = false;
+
+        this.db = {items: dataFactory.generateArrayOfObjects(10)};
+        this.settings = {colHeaders: true, contextMenu: ['row_above', 'row_below', 'remove_row']};
+      }
+      MainCtrl.$inject = ['$scope', 'dataFactory'];
+
+      angular.module('ngHandsontablePage', ['ngHandsontable']).controller('MainCtrl', MainCtrl);
+    }());
+  </script>
+</div>
+
+</body>
+</html>

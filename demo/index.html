@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Static configuration with dynamic data</title>
+
+  <!-- Code highlighter -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/main.css"/>
+
+  <!--
+  Loading Handsontable (full distribution that includes all dependencies)
+  -->
+  <link rel="stylesheet" media="screen" href="../node_modules/handsontable/dist/handsontable.full.css">
+  <script src="../node_modules/angular/angular.js"></script>
+  <script src="../node_modules/angular-ui-router/release/angular-ui-router.js"></script>
+  <script src="../node_modules/handsontable/dist/handsontable.full.js"></script>
+  <script src="../dist/ngHandsontable.js"></script>
+
+  <script src="build/app.js"></script>
+
+  <!--
+  Facebook open graph. Don't copy this to your project :)
+  -->
+  <meta property="og:title" content="ngHandsontable - Angular wrapper for Handsontable">
+  <meta property="og:description" content="Excel-like data grid with HTML &amp; JavaScript">
+  <meta property="og:url" content="http://handsontable.com/">
+  <meta property="og:image" content="http://handsontable.com/demo/image/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="409">
+  <meta property="og:image:height" content="164">
+  <link rel="canonical" href="http://handsontable.com/">
+</head>
+
+<body class="demo">
+  <div id="wrapper">
+    <div ui-view="menu"></div>
+    <div ui-view="preview"></div>
+  </div>
+  <script>
+    App.bootstrap();
+  </script>
+</body>
+</html>

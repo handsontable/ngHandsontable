@@ -1,0 +1,45 @@
+{
+  "name": "ng-handsontable",
+  "description": "AngularJS directive for Handsontable",
+  "homepage": "https://github.com/handsontable/ngHandsontable",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/handsontable/ngHandsontable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/handsontable/ngHandsontable/issues"
+  },
+  "author": "Handsoncode <hello@handsontable.com>",
+  "version": "0.13.0",
+  "dependencies": {
+    "angular": "^1.5.0",
+    "handsontable": "6.1.1"
+  },
+  "devDependencies": {
+    "angular": "^1.5.0",
+    "angular-mocks": "^1.5.0",
+    "angular-ui-router": "^0.2.15",
+    "browserify-replace": "^0.9.0",
+    "generate-release": "^0.10.2",
+    "grunt": "~0.4.5",
+    "grunt-browserify": "^4.0.0",
+    "grunt-contrib-concat": "^1.0.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^0.11.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jscs": "^2.8.0",
+    "jasmine-core": "^2.4.0",
+    "karma": "^0.13.0",
+    "karma-angular": "^0.0.6",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-jasmine": "^0.3.7",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.4"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/grunt build-release",
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
+    "release": "./node_modules/.bin/generate-release"
+  },
+  "license": "MIT"
+}

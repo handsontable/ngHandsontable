@@ -1,0 +1,11 @@
+<div class="demo-nav">
+  <h2><a href="/ngHandsontable">ngHandsontable {{ appCtrl.version }}</a></h2>
+  <ul>
+    <li ng-repeat="(name, child) in appCtrl.allDemos">
+      <a href="#">{{ name | uppercaseFirst }}</a>
+      <ul>
+        <li ui-sref-active="active" ng-repeat="(stateId, demo) in child"><a ui-sref="{{ name + '-' + stateId }}">{{ demo.title }}</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
